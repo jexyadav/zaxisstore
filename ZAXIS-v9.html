@@ -1,0 +1,3791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZAXIS — The Digital Tools Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   ZAXIS DESIGN SYSTEM — DARK INDUSTRIAL SaaS
+═══════════════════════════════════════════════ */
+:root {
+  --z0: #050507;
+  --z1: #0b0b0f;
+  --z2: #111118;
+  --z3: #18181f;
+  --z4: #22222c;
+  --z5: #2e2e3d;
+  --z6: #3d3d52;
+  --zm: #5a5a7a;
+  --zt: #8888aa;
+  --zs: #bbbbcc;
+  --zw: #e8e8f0;
+  --zx: #ffffff;
+
+  --neon: #7b5cff;
+  --neon2: #9b7cff;
+  --neon3: #5a3ddd;
+  --neon-glow: rgba(123,92,255,0.35);
+  --neon-soft: rgba(123,92,255,0.12);
+  --acid: #00f5a0;
+  --acid2: #00c07c;
+  --acid-glow: rgba(0,245,160,0.2);
+  --warn: #ff6b35;
+  --warn2: #ff4500;
+  --gold: #f5c842;
+  --red: #ff4466;
+
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --glass: rgba(255,255,255,0.04);
+  --glass2: rgba(255,255,255,0.08);
+
+  --r: 14px;
+  --r-sm: 8px;
+  --r-lg: 20px;
+
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-neon: 0 0 40px rgba(123,92,255,0.3);
+  --shadow-acid: 0 0 30px rgba(0,245,160,0.2);
+  --transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--z0);
+  color: var(--zw);
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+h1,h2,h3,h4,h5 { font-family: var(--font-head); line-height: 1.15; }
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font-body); cursor: pointer; border: none; outline: none; }
+input, textarea, select { font-family: var(--font-body); outline: none; }
+::selection { background: var(--neon); color: #fff; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--z1); }
+::-webkit-scrollbar-thumb { background: var(--z5); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neon); }
+
+/* ─── GRID NOISE TEXTURE ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ═══ PAGE ROUTER ═══ */
+.page { display: none; }
+.page.active { display: block; }
+.auth-page { display: none; min-height: 100vh; }
+.auth-page.active { display: flex; }
+
+/* ═══════════════════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════════════════ */
+/* ─── TOPBAR ─── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 64px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px;
+  background: rgba(5,5,7,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-logo {
+  font-family: var(--font-head);
+  font-size: 22px; font-weight: 800;
+  letter-spacing: -0.5px;
+  display: flex; align-items: center; gap: 2px;
+}
+.topbar-logo .z { color: var(--neon); }
+.topbar-logo .axis { color: var(--zx); }
+.logo-dot { width: 7px; height: 7px; background: var(--acid); border-radius: 50%; margin-left: 4px; animation: blink 2.5s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.topbar-nav { display: flex; align-items: center; gap: 6px; }
+.topbar-nav a {
+  padding: 7px 16px; border-radius: var(--r-sm);
+  font-size: 14px; font-weight: 500; color: var(--zt);
+  transition: var(--transition); cursor: pointer;
+}
+.topbar-nav a:hover { color: var(--zx); background: var(--glass2); }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 22px; border-radius: var(--r-sm);
+  font-size: 14px; font-weight: 600;
+  transition: var(--transition); cursor: pointer;
+  letter-spacing: 0.02em; border: 1.5px solid transparent;
+  white-space: nowrap;
+}
+.btn-neon {
+  background: var(--neon); color: #fff;
+  box-shadow: 0 0 20px var(--neon-glow);
+}
+.btn-neon:hover { background: var(--neon2); box-shadow: 0 0 35px var(--neon-glow); transform: translateY(-1px); }
+.btn-outline {
+  background: transparent; color: var(--zw);
+  border-color: var(--border2);
+}
+.btn-outline:hover { border-color: var(--neon); color: var(--neon); background: var(--neon-soft); }
+.btn-ghost {
+  background: var(--glass); color: var(--zs); border-color: var(--border);
+}
+.btn-ghost:hover { background: var(--glass2); color: var(--zx); }
+.btn-acid {
+  background: var(--acid); color: var(--z0);
+  box-shadow: 0 0 20px var(--acid-glow);
+}
+.btn-acid:hover { background: #00ffaa; transform: translateY(-1px); box-shadow: 0 0 35px var(--acid-glow); }
+.btn-danger { background: rgba(255,68,102,0.15); color: var(--red); border-color: rgba(255,68,102,0.3); }
+.btn-danger:hover { background: var(--red); color: #fff; }
+.btn-sm { padding: 7px 16px; font-size: 13px; }
+.btn-lg { padding: 14px 32px; font-size: 16px; }
+.btn-full { width: 100%; }
+.btn-icon { padding: 9px; border-radius: var(--r-sm); }
+
+/* ─── HERO ─── */
+.hero {
+  padding: 160px 40px 120px;
+  max-width: 1200px; margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+.hero-orb {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -60%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse at center, rgba(123,92,255,0.15) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--neon-soft); border: 1px solid rgba(123,92,255,0.3);
+  color: var(--neon2); padding: 6px 16px; border-radius: 40px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; margin-bottom: 32px;
+  position: relative; z-index: 1;
+}
+.hero h1 {
+  font-size: clamp(52px, 8vw, 96px);
+  font-weight: 800; letter-spacing: -3px; line-height: 1.0;
+  margin-bottom: 28px; position: relative; z-index: 1;
+  color: var(--zx);
+}
+.hero h1 .gradient-text {
+  background: linear-gradient(135deg, var(--neon) 0%, var(--acid) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 18px; color: var(--zt); max-width: 560px;
+  margin: 0 auto 44px; font-weight: 400; line-height: 1.7;
+  position: relative; z-index: 1;
+}
+.hero-actions {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  flex-wrap: wrap; position: relative; z-index: 1;
+}
+.hero-stats {
+  display: flex; align-items: center; justify-content: center; gap: 48px;
+  margin-top: 80px; padding-top: 48px;
+  border-top: 1px solid var(--border);
+  position: relative; z-index: 1;
+}
+.hero-stat-num {
+  font-family: var(--font-head); font-size: 36px; font-weight: 800;
+  color: var(--zx); letter-spacing: -1px;
+}
+.hero-stat-num span { color: var(--neon); }
+.hero-stat-label { font-size: 13px; color: var(--zm); margin-top: 2px; }
+
+/* ─── FEATURES STRIP ─── */
+.features-strip {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--z1);
+  padding: 0 40px;
+  overflow: hidden;
+}
+.features-scroll {
+  display: flex; gap: 0;
+  animation: scroll-x 20s linear infinite;
+  width: max-content;
+}
+@keyframes scroll-x { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.feature-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 18px 40px; white-space: nowrap;
+  font-size: 13px; color: var(--zm); font-weight: 500;
+  border-right: 1px solid var(--border);
+}
+.feature-item .fi { color: var(--neon); font-size: 15px; }
+
+/* ─── PRODUCT GRID (HOMEPAGE) ─── */
+.homepage-products {
+  max-width: 1200px; margin: 0 auto;
+  padding: 80px 40px;
+}
+.section-eyebrow {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  color: var(--acid); text-transform: uppercase; letter-spacing: 0.15em;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 800; letter-spacing: -1.5px; color: var(--zx);
+  margin-bottom: 14px;
+}
+.section-sub { font-size: 16px; color: var(--zt); max-width: 500px; font-weight: 400; }
+
+/* ─── CATEGORY CHIPS ─── */
+.cat-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 28px 0; }
+.cat-chip {
+  padding: 7px 18px; border-radius: 40px;
+  font-size: 13px; font-weight: 500;
+  border: 1px solid var(--border2); color: var(--zt);
+  background: var(--glass); cursor: pointer;
+  transition: var(--transition);
+}
+.cat-chip:hover, .cat-chip.active {
+  border-color: var(--neon); color: var(--neon);
+  background: var(--neon-soft);
+}
+
+/* ─── PRODUCT CARD ─── */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.product-card {
+  background: var(--z2); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+  transition: var(--transition); cursor: pointer;
+  position: relative;
+}
+.product-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--neon-soft) 0%, transparent 60%);
+  opacity: 0; transition: var(--transition); border-radius: var(--r);
+}
+.product-card:hover { border-color: rgba(123,92,255,0.4); transform: translateY(-4px); box-shadow: var(--shadow-neon); }
+.product-card:hover::before { opacity: 1; }
+.product-card-img {
+  height: 160px; display: flex; align-items: center; justify-content: center;
+  font-size: 56px; background: var(--z3);
+  border-bottom: 1px solid var(--border); position: relative;
+}
+.product-card-badge {
+  position: absolute; top: 12px; right: 12px;
+  font-size: 10px; font-weight: 700; padding: 3px 10px;
+  border-radius: 40px; text-transform: uppercase; letter-spacing: 0.06em;
+}
+.badge-featured { background: rgba(123,92,255,0.2); color: var(--neon2); border: 1px solid rgba(123,92,255,0.4); }
+.badge-new { background: rgba(0,245,160,0.15); color: var(--acid); border: 1px solid rgba(0,245,160,0.3); }
+.badge-hot { background: rgba(255,107,53,0.15); color: var(--warn); border: 1px solid rgba(255,107,53,0.3); }
+.product-card-body { padding: 22px; position: relative; z-index: 1; }
+.product-card-cat { font-family: var(--font-mono); font-size: 10px; color: var(--acid); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.product-card-name { font-family: var(--font-head); font-size: 19px; font-weight: 700; color: var(--zx); margin-bottom: 8px; }
+.product-card-desc { font-size: 13px; color: var(--zt); line-height: 1.6; margin-bottom: 18px; }
+.product-card-footer { display: flex; align-items: center; justify-content: space-between; }
+.product-card-price { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--zx); }
+.product-card-price span { font-size: 11px; color: var(--zm); font-family: var(--font-body); font-weight: 400; }
+.product-rating { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--gold); }
+
+/* ─── CATEGORIES SECTION ─── */
+.categories-section { max-width: 1200px; margin: 0 auto; padding: 0 40px 80px; }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-top: 32px; }
+.cat-card {
+  background: var(--z2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 28px 22px;
+  cursor: pointer; transition: var(--transition);
+  position: relative; overflow: hidden;
+}
+.cat-card::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--neon); transform: scaleX(0);
+  transition: var(--transition); transform-origin: left;
+}
+.cat-card:hover { border-color: rgba(123,92,255,0.35); transform: translateY(-3px); }
+.cat-card:hover::after { transform: scaleX(1); }
+.cat-card-icon { font-size: 34px; margin-bottom: 14px; }
+.cat-card-name { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--zx); margin-bottom: 4px; }
+.cat-card-count { font-family: var(--font-mono); font-size: 11px; color: var(--zm); }
+
+/* ─── CTA SECTION ─── */
+.cta-section {
+  margin: 40px; border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--z3) 0%, var(--z2) 100%);
+  border: 1px solid rgba(123,92,255,0.25);
+  padding: 80px 60px; text-align: center;
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow-neon);
+}
+.cta-section::before {
+  content: ''; position: absolute;
+  top: -50%; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(123,92,255,0.15) 0%, transparent 70%);
+}
+.cta-section h2 { font-size: clamp(32px,5vw,56px); font-weight: 800; letter-spacing: -1.5px; color: var(--zx); margin-bottom: 16px; position: relative; }
+.cta-section p { font-size: 17px; color: var(--zt); margin-bottom: 36px; position: relative; }
+
+/* ═══════════════════════════════════════════════
+   AUTH PAGES
+═══════════════════════════════════════════════ */
+.auth-wrap {
+  min-height: 100vh; display: none;
+  align-items: center; justify-content: center;
+  background: var(--z0); padding: 40px 20px;
+}
+.auth-wrap.active { display: flex; }
+.auth-split { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; width: 100%; }
+.auth-left {
+  background: linear-gradient(135deg, var(--z2) 0%, var(--z3) 100%);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 60px; position: relative; overflow: hidden;
+}
+.auth-left-orb {
+  position: absolute; width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(123,92,255,0.2) 0%, transparent 70%);
+  bottom: -100px; left: -100px; pointer-events: none;
+}
+.auth-brand { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--zx); margin-bottom: 12px; }
+.auth-brand .z { color: var(--neon); }
+.auth-tagline { font-size: 16px; color: var(--zt); line-height: 1.7; max-width: 360px; text-align: center; }
+.auth-features { margin-top: 48px; display: flex; flex-direction: column; gap: 18px; width: 100%; max-width: 360px; }
+.auth-feature { display: flex; align-items: center; gap: 14px; }
+.auth-feature-icon {
+  width: 38px; height: 38px; border-radius: var(--r-sm);
+  background: var(--neon-soft); border: 1px solid rgba(123,92,255,0.3);
+  display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.auth-feature-text strong { display: block; font-size: 14px; font-weight: 600; color: var(--zx); }
+.auth-feature-text span { font-size: 12px; color: var(--zm); }
+
+.auth-right {
+  display: flex; align-items: center; justify-content: center; padding: 60px;
+  background: var(--z0);
+}
+.auth-card { width: 100%; max-width: 420px; }
+.auth-card h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; color: var(--zx); margin-bottom: 6px; }
+.auth-card p { font-size: 14px; color: var(--zt); margin-bottom: 36px; }
+.auth-card p a { color: var(--neon); cursor: pointer; }
+.auth-card p a:hover { color: var(--neon2); text-decoration: underline; }
+
+/* ─── FORM ELEMENTS ─── */
+.form-group { margin-bottom: 18px; }
+.form-label { display: block; font-size: 12px; font-weight: 600; color: var(--zs); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.form-input {
+  width: 100%; background: var(--z2); border: 1.5px solid var(--border2);
+  border-radius: var(--r-sm); padding: 12px 16px;
+  font-size: 14px; color: var(--zx); transition: var(--transition);
+}
+.form-input:focus { border-color: var(--neon); box-shadow: 0 0 0 3px var(--neon-soft); }
+.form-input::placeholder { color: var(--zm); }
+.form-input option { background: var(--z3); }
+.form-select { appearance: none; cursor: pointer; }
+.form-textarea { resize: vertical; min-height: 100px; }
+.form-error { font-size: 12px; color: var(--red); margin-top: 6px; display: none; }
+.form-error.visible { display: block; }
+.form-divider { display: flex; align-items: center; gap: 14px; margin: 22px 0; }
+.form-divider::before, .form-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.form-divider span { font-size: 12px; color: var(--zm); }
+
+/* ─── ALERT / TOAST ─── */
+.alert {
+  padding: 12px 16px; border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 500; margin-bottom: 16px;
+  display: none; align-items: center; gap: 8px;
+}
+.alert.visible { display: flex; }
+.alert-success { background: rgba(0,245,160,0.1); border: 1px solid rgba(0,245,160,0.3); color: var(--acid); }
+.alert-error { background: rgba(255,68,102,0.1); border: 1px solid rgba(255,68,102,0.3); color: var(--red); }
+
+/* ─── TOAST NOTIFICATION ─── */
+#toast {
+  position: fixed; bottom: 28px; right: 28px; z-index: 9998;
+  background: var(--z3); border: 1px solid var(--border2);
+  border-radius: var(--r-sm); padding: 14px 20px;
+  font-size: 14px; font-weight: 500; color: var(--zx);
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: var(--shadow);
+  transform: translateY(100px); opacity: 0;
+  transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  max-width: 340px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast .toast-icon { font-size: 18px; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════════
+   APP SHELL (after login)
+═══════════════════════════════════════════════ */
+.app-shell { display: none; min-height: 100vh; }
+.app-shell.active { display: flex; }
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: 260px; background: var(--z1); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: 200; overflow-y: auto; flex-shrink: 0;
+}
+.sidebar-logo {
+  padding: 24px 24px 20px;
+  font-family: var(--font-head); font-size: 20px; font-weight: 800;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .z { color: var(--neon); }
+.sidebar-logo-sub { font-family: var(--font-mono); font-size: 9px; color: var(--zm); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+.sidebar-user {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.sidebar-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--neon), var(--acid));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+  font-family: var(--font-head);
+}
+.sidebar-user-name { font-size: 14px; font-weight: 600; color: var(--zx); }
+.sidebar-user-role {
+  font-family: var(--font-mono); font-size: 10px; padding: 2px 8px;
+  border-radius: 20px; margin-top: 2px; display: inline-block;
+}
+.role-admin { background: rgba(123,92,255,0.15); color: var(--neon2); border: 1px solid rgba(123,92,255,0.3); }
+.role-user { background: rgba(0,245,160,0.1); color: var(--acid); border: 1px solid rgba(0,245,160,0.25); }
+
+.sidebar-nav { padding: 16px 12px; flex: 1; }
+.sidebar-section-label {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+  color: var(--z6); text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 0 12px; margin: 14px 0 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: var(--r-sm);
+  font-size: 14px; font-weight: 500; color: var(--zt);
+  cursor: pointer; transition: var(--transition);
+  margin-bottom: 2px; position: relative;
+}
+.nav-item:hover { background: var(--glass2); color: var(--zx); }
+.nav-item.active { background: var(--neon-soft); color: var(--neon2); }
+.nav-item.active::before {
+  content: ''; position: absolute; left: -12px; top: 50%;
+  transform: translateY(-50%); width: 3px; height: 20px;
+  background: var(--neon); border-radius: 0 3px 3px 0;
+}
+.nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto; font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 20px;
+  background: var(--neon-soft); color: var(--neon);
+}
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ─── MAIN CONTENT ─── */
+.main-content { margin-left: 260px; flex: 1; min-height: 100vh; padding: 0; }
+.main-topbar {
+  height: 64px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; border-bottom: 1px solid var(--border);
+  background: rgba(5,5,7,0.9); backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 100;
+}
+.main-topbar h1 { font-size: 18px; font-weight: 700; color: var(--zx); letter-spacing: -0.3px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.topbar-search {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--z2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 8px 14px;
+  font-size: 13px; color: var(--zt); cursor: text;
+  transition: var(--transition);
+}
+.topbar-search:focus-within { border-color: var(--neon); }
+.topbar-search input { background: none; border: none; color: var(--zx); font-size: 13px; width: 200px; }
+.topbar-search input::placeholder { color: var(--zm); }
+
+/* ─── INNER VIEWS ─── */
+.view { display: none; padding: 32px; }
+.view.active { display: block; }
+.view-header { margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.view-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: var(--zx); }
+.view-sub { font-size: 14px; color: var(--zt); margin-top: 4px; }
+
+/* ─── STAT CARDS ─── */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--z2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 22px; position: relative; overflow: hidden;
+  transition: var(--transition);
+}
+.stat-card:hover { border-color: rgba(123,92,255,0.3); }
+.stat-card-icon {
+  width: 42px; height: 42px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 16px;
+}
+.stat-card-label { font-family: var(--font-mono); font-size: 10px; color: var(--zm); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.stat-card-value { font-family: var(--font-head); font-size: 34px; font-weight: 800; color: var(--zx); letter-spacing: -1px; }
+.stat-card-change { font-size: 12px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.change-up { color: var(--acid); }
+.change-down { color: var(--red); }
+
+/* ─── DATA TABLE ─── */
+.data-table-wrap {
+  background: var(--z2); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+}
+.data-table-header {
+  padding: 18px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+}
+.data-table-title { font-size: 15px; font-weight: 700; color: var(--zx); }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  padding: 10px 20px; text-align: left;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--zm);
+  background: var(--z3); border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 14px 20px; font-size: 13px; color: var(--zs);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  vertical-align: middle;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--glass); }
+.data-table td strong { color: var(--zx); font-weight: 600; }
+.table-actions { display: flex; gap: 6px; }
+.status-pill {
+  font-size: 10px; font-weight: 700; padding: 3px 10px;
+  border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em;
+  white-space: nowrap; display: inline-block;
+}
+.pill-published { background: rgba(0,245,160,0.1); color: var(--acid); border: 1px solid rgba(0,245,160,0.25); }
+.pill-draft { background: var(--glass); color: var(--zm); border: 1px solid var(--border); }
+.pill-featured { background: var(--neon-soft); color: var(--neon2); border: 1px solid rgba(123,92,255,0.3); }
+
+/* ─── PRODUCT DETAIL VIEW ─── */
+.detail-wrap { max-width: 900px; }
+.detail-hero {
+  background: var(--z2); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden; margin-bottom: 24px;
+}
+.detail-img {
+  height: 220px; display: flex; align-items: center; justify-content: center;
+  font-size: 80px; background: var(--z3); border-bottom: 1px solid var(--border);
+}
+.detail-body { padding: 32px; }
+.detail-cat { font-family: var(--font-mono); font-size: 11px; color: var(--acid); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.detail-name { font-size: 36px; font-weight: 800; color: var(--zx); letter-spacing: -1px; margin-bottom: 14px; }
+.detail-desc { font-size: 16px; color: var(--zt); line-height: 1.75; margin-bottom: 24px; }
+.detail-meta { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.detail-meta-item {
+  background: var(--z3); border: 1px solid var(--border); border-radius: var(--r-sm);
+  padding: 14px; display: flex; flex-direction: column; gap: 4px;
+}
+.detail-meta-label { font-family: var(--font-mono); font-size: 9px; color: var(--zm); text-transform: uppercase; letter-spacing: 0.1em; }
+.detail-meta-value { font-size: 15px; font-weight: 600; color: var(--zx); }
+.affiliate-box {
+  background: linear-gradient(135deg, rgba(123,92,255,0.12) 0%, rgba(0,245,160,0.06) 100%);
+  border: 1px solid rgba(123,92,255,0.3);
+  border-radius: var(--r); padding: 24px;
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.affiliate-box p { font-size: 14px; color: var(--zt); flex: 1; min-width: 200px; }
+
+/* ─── CHART BAR ─── */
+.bar-chart { display: flex; flex-direction: column; gap: 14px; padding: 24px; }
+.bar-row { display: flex; align-items: center; gap: 14px; }
+.bar-label { width: 140px; font-size: 12px; color: var(--zs); flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { flex: 1; height: 26px; background: var(--z3); border-radius: 4px; overflow: hidden; }
+.bar-fill {
+  height: 100%; background: linear-gradient(90deg, var(--neon) 0%, var(--acid) 100%);
+  border-radius: 4px; display: flex; align-items: center; padding-right: 10px;
+  justify-content: flex-end; font-size: 11px; font-weight: 700; color: #fff;
+  min-width: 36px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+.bar-val { width: 50px; text-align: right; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--zx); }
+
+/* ─── ADMIN PRODUCT FORM ─── */
+.form-card {
+  background: var(--z2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 32px; max-width: 760px;
+}
+.form-card h2 { font-size: 20px; font-weight: 700; color: var(--zx); margin-bottom: 28px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-full { grid-column: 1 / -1; }
+
+/* ─── SEARCH VIEW ─── */
+.search-bar-wrap {
+  display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap;
+}
+.search-input-wrap {
+  flex: 1; min-width: 240px; position: relative;
+}
+.search-input-wrap .search-icon {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%); font-size: 15px; color: var(--zm);
+}
+.search-input-wrap input {
+  width: 100%; padding: 11px 16px 11px 40px;
+  background: var(--z2); border: 1.5px solid var(--border2);
+  border-radius: var(--r-sm); font-size: 14px; color: var(--zx);
+  transition: var(--transition);
+}
+.search-input-wrap input:focus { border-color: var(--neon); box-shadow: 0 0 0 3px var(--neon-soft); }
+
+/* ─── MINI PRODUCT CARDS (dashboard) ─── */
+.mini-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 20px; }
+.mini-card {
+  background: var(--z3); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 16px; display: flex; align-items: center;
+  gap: 14px; cursor: pointer; transition: var(--transition);
+}
+.mini-card:hover { border-color: rgba(123,92,255,0.4); background: var(--z4); }
+.mini-card-icon { font-size: 28px; flex-shrink: 0; }
+.mini-card-name { font-size: 13px; font-weight: 600; color: var(--zx); margin-bottom: 2px; }
+.mini-card-cat { font-family: var(--font-mono); font-size: 10px; color: var(--zm); }
+.mini-card-price { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--neon2); white-space: nowrap; }
+
+/* ─── CLICK LOG ─── */
+.click-log { display: flex; flex-direction: column; gap: 10px; }
+.click-item {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--z3); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 12px 16px; font-size: 13px;
+}
+.click-product { font-weight: 600; color: var(--zx); flex: 1; }
+.click-page { color: var(--zm); font-family: var(--font-mono); font-size: 11px; }
+.click-time { color: var(--zm); font-size: 12px; white-space: nowrap; }
+.click-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--acid); animation: blink 2s infinite; }
+
+/* ─── PROFILE SECTION ─── */
+.profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 24px; }
+.profile-card {
+  background: var(--z2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 28px; text-align: center;
+}
+.profile-avatar-lg {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--neon), var(--acid));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700; color: #fff; margin: 0 auto 16px;
+  font-family: var(--font-head); box-shadow: 0 0 30px var(--neon-glow);
+}
+.profile-name { font-family: var(--font-head); font-size: 20px; font-weight: 700; color: var(--zx); margin-bottom: 6px; }
+.profile-email { font-size: 13px; color: var(--zt); margin-bottom: 14px; }
+.profile-joined { font-family: var(--font-mono); font-size: 11px; color: var(--zm); }
+.profile-info { background: var(--z2); border: 1px solid var(--border); border-radius: var(--r); padding: 28px; }
+
+/* ─── FOOTER (landing) ─── */
+.landing-footer {
+  border-top: 1px solid var(--border);
+  padding: 60px 40px 40px;
+  max-width: 1200px; margin: 0 auto;
+}
+.landing-footer-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px; margin-bottom: 48px;
+}
+.footer-brand p { font-size: 14px; color: var(--zm); line-height: 1.7; margin: 12px 0 20px; }
+.footer-col h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--zs); margin-bottom: 14px; }
+.footer-col a { display: block; font-size: 13px; color: var(--zm); margin-bottom: 10px; transition: color .2s; cursor: pointer; }
+.footer-col a:hover { color: var(--neon2); }
+.footer-bottom {
+  border-top: 1px solid var(--border); padding-top: 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 11px; color: var(--z6); flex-wrap: wrap; gap: 12px;
+}
+.footer-bottom a { color: var(--zm); transition: color .2s; }
+.footer-bottom a:hover { color: var(--neon2); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .auth-split { grid-template-columns: 1fr; }
+  .auth-left { display: none; }
+  .profile-grid { grid-template-columns: 1fr; }
+  .landing-footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .topbar { padding: 0 20px; }
+  .topbar-nav { display: none; }
+  .hero { padding: 100px 20px 60px; }
+  .hero-stats { flex-wrap: wrap; gap: 28px; }
+  .homepage-products { padding: 40px 20px; }
+  .categories-section { padding: 0 20px 40px; }
+  .sidebar { transform: translateX(-100%); }
+  .main-content { margin-left: 0; }
+  .view { padding: 20px; }
+  .form-row { grid-template-columns: 1fr; }
+  .cta-section { margin: 20px; padding: 40px 24px; }
+  .landing-footer { padding: 40px 20px; }
+  .landing-footer-grid { grid-template-columns: 1fr; gap: 28px; }
+}
+
+/* ─── MISC UTILS ─── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+.tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.tag-neon { background: var(--neon-soft); color: var(--neon2); border: 1px solid rgba(123,92,255,0.3); }
+.tag-acid { background: rgba(0,245,160,0.1); color: var(--acid); border: 1px solid rgba(0,245,160,0.25); }
+.tag-warn { background: rgba(255,107,53,0.1); color: var(--warn); border: 1px solid rgba(255,107,53,0.3); }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--zm); }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 14px; }
+.empty-state p { font-size: 15px; }
+.mono { font-family: var(--font-mono); font-size: 12px; color: var(--zm); }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-gap { display: flex; align-items: center; gap: 10px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.mt-4 { margin-top: 4px; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mb-20 { margin-bottom: 20px; }
+.text-neon { color: var(--neon); }
+.text-acid { color: var(--acid); }
+.text-muted { color: var(--zt); }
+.text-sm { font-size: 13px; }
+.text-xs { font-family: var(--font-mono); font-size: 11px; color: var(--zm); }
+.fw-7 { font-weight: 700; }
+.fw-8 { font-weight: 800; }
+.hidden { display: none !important; }
+
+/* ═══════════════════════════════════════════════
+   REMAINING FEATURES — CSS
+═══════════════════════════════════════════════ */
+
+/* ─── SKELETON LOADER ─── */
+.skeleton {
+  background: linear-gradient(90deg, var(--z3) 25%, var(--z4) 50%, var(--z3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--r-sm);
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.skeleton-card { height: 280px; border-radius: var(--r); }
+.skeleton-text { height: 14px; margin-bottom: 8px; }
+.skeleton-text.w60 { width: 60%; }
+.skeleton-text.w80 { width: 80%; }
+.skeleton-title { height: 22px; width: 70%; margin-bottom: 12px; }
+
+/* ─── NOTIFICATION PANEL ─── */
+.notif-btn { position: relative; }
+.notif-dot {
+  position: absolute; top: 4px; right: 4px;
+  width: 8px; height: 8px; background: var(--neon);
+  border-radius: 50%; border: 2px solid var(--z0);
+  animation: blink 2s infinite;
+}
+.notif-panel {
+  position: fixed; top: 68px; right: 16px; z-index: 500;
+  width: 340px; background: var(--z2);
+  border: 1px solid var(--border2); border-radius: var(--r);
+  box-shadow: var(--shadow); display: none;
+  overflow: hidden;
+}
+.notif-panel.open { display: block; animation: fadeDown 0.2s ease; }
+@keyframes fadeDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+.notif-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.notif-header h3 { font-size: 14px; font-weight: 700; color: var(--zx); }
+.notif-clear { font-size: 12px; color: var(--neon2); cursor: pointer; }
+.notif-item { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 12px; cursor: pointer; transition: background .15s; }
+.notif-item:hover { background: var(--glass2); }
+.notif-item.unread { background: var(--neon-soft); }
+.notif-icon { width: 36px; height: 36px; border-radius: var(--r-sm); background: var(--z4); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.notif-text strong { display: block; font-size: 13px; font-weight: 600; color: var(--zx); margin-bottom: 2px; }
+.notif-text span { font-size: 12px; color: var(--zm); }
+.notif-empty { padding: 32px; text-align: center; font-size: 13px; color: var(--zm); }
+
+/* ─── MOBILE SIDEBAR ─── */
+.sidebar-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  z-index: 199; display: none; backdrop-filter: blur(4px);
+}
+.sidebar-overlay.open { display: block; }
+.mobile-topbar-btn {
+  display: none; padding: 8px; border-radius: var(--r-sm);
+  background: var(--glass); border: 1px solid var(--border);
+  color: var(--zx); font-size: 18px; cursor: pointer;
+  transition: var(--transition);
+}
+.mobile-topbar-btn:hover { background: var(--glass2); }
+@media (max-width: 768px) {
+  .mobile-topbar-btn { display: flex; align-items: center; justify-content: center; }
+  .sidebar { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .sidebar.mobile-open { transform: translateX(0) !important; }
+}
+
+/* ─── COMPARISON PAGE ─── */
+.compare-wrap { max-width: 1000px; }
+.compare-header-box {
+  display: grid; grid-template-columns: 200px 1fr 1fr;
+  background: var(--z2); border: 1px solid var(--border);
+  border-radius: var(--r) var(--r) 0 0; overflow: hidden;
+}
+.compare-header-box .ch-label { padding: 24px; border-right: 1px solid var(--border); display: flex; align-items: center; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--zm); }
+.compare-product-header {
+  padding: 24px; border-right: 1px solid var(--border); text-align: center;
+}
+.compare-product-header:last-child { border-right: none; }
+.compare-product-icon { font-size: 40px; margin-bottom: 10px; }
+.compare-product-name { font-family: var(--font-head); font-size: 20px; font-weight: 800; color: var(--zx); margin-bottom: 4px; }
+.compare-product-price { font-size: 13px; color: var(--zt); margin-bottom: 14px; }
+.compare-product-header.winner { background: linear-gradient(135deg, rgba(123,92,255,0.12) 0%, transparent 100%); }
+.winner-crown { font-size: 11px; font-weight: 700; color: var(--neon2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.compare-row {
+  display: grid; grid-template-columns: 200px 1fr 1fr;
+  border-left: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  background: var(--z2);
+}
+.compare-row:last-child { border-radius: 0 0 var(--r) var(--r); overflow: hidden; }
+.compare-row:hover { background: var(--z3); }
+.compare-row .cr-label { padding: 14px 20px; font-size: 13px; font-weight: 600; color: var(--zs); border-right: 1px solid var(--border); display: flex; align-items: center; }
+.compare-row .cr-val { padding: 14px 20px; font-size: 13px; color: var(--zt); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; text-align: center; }
+.compare-row .cr-val:last-child { border-right: none; }
+.cr-yes { color: var(--acid); font-weight: 700; font-size: 16px; }
+.cr-no { color: var(--red); font-size: 16px; }
+.cr-better { background: rgba(123,92,255,0.08); }
+.compare-verdict {
+  background: var(--z2); border: 1px solid rgba(123,92,255,0.3);
+  border-radius: var(--r); padding: 24px; margin-bottom: 28px;
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.compare-verdict-icon { font-size: 32px; flex-shrink: 0; }
+.compare-verdict h3 { font-size: 16px; font-weight: 700; color: var(--zx); margin-bottom: 6px; }
+.compare-verdict p { font-size: 14px; color: var(--zt); line-height: 1.7; }
+.compare-dual-cta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 28px; }
+.compare-cta-card { background: var(--z2); border: 1px solid var(--border); border-radius: var(--r); padding: 22px; text-align: center; }
+.compare-cta-card.featured { border-color: rgba(123,92,255,0.4); background: linear-gradient(135deg, rgba(123,92,255,0.08) 0%, transparent 100%); }
+.compare-cta-card h3 { font-size: 16px; font-weight: 700; color: var(--zx); margin-bottom: 6px; }
+.compare-cta-card p { font-size: 13px; color: var(--zt); margin-bottom: 16px; }
+
+/* ─── REVIEW / BLOG PAGE ─── */
+.review-layout { display: grid; grid-template-columns: 1fr 300px; gap: 28px; max-width: 1000px; }
+@media(max-width:900px){ .review-layout { grid-template-columns: 1fr; } }
+.review-hero {
+  background: var(--z2); border: 1px solid var(--border); border-radius: var(--r);
+  overflow: hidden; margin-bottom: 24px;
+}
+.review-hero-img { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 72px; background: var(--z3); border-bottom: 1px solid var(--border); }
+.review-hero-body { padding: 28px; }
+.review-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--zm); margin-bottom: 14px; font-family: var(--font-mono); }
+.review-breadcrumb a { color: var(--neon2); cursor: pointer; }
+.review-breadcrumb a:hover { text-decoration: underline; }
+.review-h1 { font-size: clamp(22px,3vw,34px); font-weight: 800; color: var(--zx); letter-spacing: -.5px; margin-bottom: 12px; }
+.review-meta-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.rating-display { display: flex; align-items: center; gap: 8px; }
+.rating-num { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--zx); }
+.rating-stars-row { display: flex; gap: 2px; }
+.rating-stars-row span { color: var(--gold); font-size: 15px; }
+.verdict-highlight {
+  background: linear-gradient(135deg, rgba(123,92,255,0.12) 0%, rgba(0,245,160,0.06) 100%);
+  border: 1px solid rgba(123,92,255,0.3); border-radius: var(--r);
+  padding: 22px; margin-bottom: 24px;
+}
+.verdict-highlight h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--neon2); margin-bottom: 8px; }
+.verdict-highlight p { font-size: 15px; color: var(--zs); line-height: 1.75; margin-bottom: 16px; }
+.review-section-h2 { font-family: var(--font-head); font-size: 20px; font-weight: 700; color: var(--zx); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.review-body-text { font-size: 15px; color: var(--zt); line-height: 1.8; margin-bottom: 16px; }
+.pros-cons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+@media(max-width:600px){ .pros-cons-grid { grid-template-columns: 1fr; } }
+.pros-box { background: rgba(0,245,160,0.06); border: 1px solid rgba(0,245,160,0.2); border-radius: var(--r-sm); padding: 18px; }
+.cons-box { background: rgba(255,68,102,0.06); border: 1px solid rgba(255,68,102,0.2); border-radius: var(--r-sm); padding: 18px; }
+.pc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
+.pros-box .pc-label { color: var(--acid); }
+.cons-box .pc-label { color: var(--red); }
+.pc-item { display: flex; gap: 8px; font-size: 13px; color: var(--zs); margin-bottom: 8px; line-height: 1.5; }
+.pc-icon { flex-shrink: 0; font-size: 12px; margin-top: 2px; font-weight: 700; }
+.pros-box .pc-icon { color: var(--acid); }
+.cons-box .pc-icon { color: var(--red); }
+.review-sidebar-card { background: var(--z2); border: 1px solid var(--border); border-radius: var(--r); padding: 22px; margin-bottom: 16px; position: sticky; top: 80px; }
+.review-sidebar-card h3 { font-size: 14px; font-weight: 700; color: var(--zx); margin-bottom: 16px; }
+.score-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px; }
+.score-row:last-of-type { border-bottom: none; }
+.score-bar { height: 5px; border-radius: 3px; background: var(--z5); flex: 1; margin: 0 10px; overflow: hidden; }
+.score-fill { height: 100%; background: linear-gradient(90deg, var(--neon), var(--acid)); border-radius: 3px; }
+.inline-aff {
+  background: var(--z3); border: 1px solid rgba(123,92,255,.25);
+  border-radius: var(--r-sm); padding: 16px 18px;
+  display: flex; align-items: center; gap: 14px; margin: 20px 0; flex-wrap: wrap;
+}
+.inline-aff-icon { font-size: 24px; flex-shrink: 0; }
+.inline-aff-text { flex: 1; min-width: 160px; }
+.inline-aff-text strong { display: block; font-size: 14px; color: var(--zx); margin-bottom: 2px; }
+.inline-aff-text span { font-size: 12px; color: var(--zm); }
+.affiliate-note { font-size: 11px; color: var(--zm); padding: 10px 14px; background: var(--z3); border-radius: var(--r-sm); border-left: 3px solid var(--neon); margin: 16px 0; line-height: 1.6; }
+
+/* ─── PRICING PAGE ─── */
+.pricing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-top: 32px; }
+.pricing-card {
+  background: var(--z2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 32px; position: relative; overflow: hidden;
+  transition: var(--transition);
+}
+.pricing-card:hover { transform: translateY(-4px); }
+.pricing-card.popular {
+  border-color: rgba(123,92,255,0.5);
+  box-shadow: var(--shadow-neon);
+}
+.pricing-card.popular::before {
+  content: 'MOST POPULAR';
+  position: absolute; top: 16px; right: -28px;
+  background: var(--neon); color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  padding: 4px 36px; transform: rotate(45deg);
+}
+.plan-name { font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--zm); margin-bottom: 10px; }
+.plan-price { font-family: var(--font-head); font-size: 48px; font-weight: 800; color: var(--zx); letter-spacing: -2px; margin-bottom: 4px; }
+.plan-price sup { font-size: 22px; vertical-align: super; color: var(--zt); }
+.plan-price span { font-size: 15px; color: var(--zt); font-family: var(--font-body); font-weight: 400; }
+.plan-desc { font-size: 14px; color: var(--zt); margin-bottom: 24px; line-height: 1.6; }
+.plan-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+.plan-feature { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--zs); margin-bottom: 10px; line-height: 1.5; }
+.plan-feature .pf-icon { flex-shrink: 0; font-size: 14px; }
+.plan-feature.disabled { color: var(--zm); opacity: 0.6; }
+
+/* ─── CONTACT VIEW ─── */
+.contact-grid { display: grid; grid-template-columns: 300px 1fr; gap: 28px; max-width: 860px; }
+@media(max-width:768px){ .contact-grid { grid-template-columns: 1fr; } }
+.contact-info-card { background: var(--z2); border: 1px solid var(--border); border-radius: var(--r); padding: 28px; }
+.contact-info-card h2 { font-size: 20px; font-weight: 700; color: var(--zx); margin-bottom: 14px; }
+.contact-info-card p { font-size: 14px; color: var(--zt); line-height: 1.7; margin-bottom: 24px; }
+.contact-detail { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+.contact-detail-icon { width: 36px; height: 36px; border-radius: var(--r-sm); background: var(--neon-soft); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.contact-detail-text strong { display: block; font-size: 13px; color: var(--zx); margin-bottom: 2px; }
+.contact-detail-text a, .contact-detail-text span { font-size: 13px; color: var(--neon2); }
+
+/* ─── LEGAL PAGES ─── */
+.legal-content { max-width: 780px; background: var(--z2); border: 1px solid var(--border); border-radius: var(--r); padding: 36px; }
+.legal-tabs-row { display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
+.legal-tab { padding: 8px 18px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--zt); cursor: pointer; transition: var(--transition); background: var(--glass); border: 1px solid var(--border); }
+.legal-tab.active, .legal-tab:hover { background: var(--neon-soft); color: var(--neon2); border-color: rgba(123,92,255,.3); }
+.legal-h1 { font-size: 26px; font-weight: 800; color: var(--zx); letter-spacing: -.5px; margin-bottom: 6px; }
+.legal-date { font-family: var(--font-mono); font-size: 11px; color: var(--zm); margin-bottom: 28px; }
+.legal-h2 { font-size: 17px; font-weight: 700; color: var(--zx); margin: 28px 0 10px; }
+.legal-p { font-size: 14px; color: var(--zt); line-height: 1.8; margin-bottom: 12px; }
+.legal-li { font-size: 14px; color: var(--zt); line-height: 1.8; margin-bottom: 8px; margin-left: 20px; list-style: disc; }
+.disclosure-callout { background: rgba(123,92,255,.08); border: 1px solid rgba(123,92,255,.25); border-radius: var(--r-sm); padding: 16px 18px; margin: 20px 0; }
+.disclosure-callout p { font-size: 13px; color: var(--zt); line-height: 1.7; margin: 0; }
+
+/* ─── SAVED PRODUCTS ─── */
+.saved-empty { text-align: center; padding: 60px 20px; }
+.saved-empty .se-icon { font-size: 48px; margin-bottom: 16px; }
+.saved-empty p { font-size: 15px; color: var(--zm); }
+.save-btn {
+  position: absolute; top: 10px; left: 10px;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(5,5,7,0.7); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; cursor: pointer; transition: var(--transition); z-index: 2;
+}
+.save-btn:hover { background: var(--neon-soft); border-color: var(--neon); }
+.save-btn.saved { background: var(--neon-soft); border-color: var(--neon); }
+
+/* ─── NEWSLETTER STRIP ─── */
+.newsletter-strip {
+  background: var(--z2); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 28px 32px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  margin-top: 28px;
+}
+.newsletter-strip h3 { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--zx); margin-bottom: 4px; }
+.newsletter-strip p { font-size: 13px; color: var(--zt); }
+.newsletter-form { display: flex; gap: 10px; flex: 1; min-width: 260px; }
+.newsletter-form input { flex: 1; padding: 10px 14px; background: var(--z3); border: 1.5px solid var(--border2); border-radius: var(--r-sm); font-size: 13px; color: var(--zx); transition: var(--transition); }
+.newsletter-form input:focus { border-color: var(--neon); }
+
+/* ─── PAGINATION ─── */
+.pagination { display: flex; align-items: center; gap: 6px; margin-top: 28px; justify-content: center; flex-wrap: wrap; }
+.page-btn { padding: 8px 14px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; background: var(--z2); border: 1px solid var(--border); color: var(--zt); cursor: pointer; transition: var(--transition); }
+.page-btn:hover { border-color: var(--neon); color: var(--neon); }
+.page-btn.active { background: var(--neon); color: #fff; border-color: var(--neon); }
+.page-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── PASSWORD CHANGE MODAL ─── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 800; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+.modal-overlay.open { display: flex; }
+.modal-card { background: var(--z2); border: 1px solid var(--border2); border-radius: var(--r); padding: 36px; max-width: 440px; width: 100%; box-shadow: var(--shadow); animation: fadeDown .22s ease; position: relative; }
+.modal-close { position: absolute; top: 16px; right: 16px; background: var(--glass); border: 1px solid var(--border); color: var(--zs); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: var(--transition); }
+.modal-close:hover { background: var(--glass2); color: var(--zx); }
+.modal-card h2 { font-size: 20px; font-weight: 700; color: var(--zx); margin-bottom: 20px; }
+
+/* ─── THEME TOGGLE ─── */
+.theme-toggle {
+  width: 36px; height: 36px; border-radius: var(--r-sm);
+  background: var(--glass); border: 1px solid var(--border);
+  color: var(--zx); font-size: 16px; cursor: pointer;
+  transition: var(--transition); display: flex; align-items: center; justify-content: center;
+}
+.theme-toggle:hover { background: var(--glass2); }
+
+/* ─── SEARCH SUGGESTIONS ─── */
+.search-suggestions {
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: var(--z2); border: 1px solid var(--border2);
+  border-top: none; border-radius: 0 0 var(--r-sm) var(--r-sm);
+  box-shadow: var(--shadow); z-index: 300; display: none; max-height: 280px; overflow-y: auto;
+}
+.search-suggestions.open { display: block; }
+.suggestion-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; cursor: pointer; transition: background .15s; font-size: 13px; color: var(--zs); }
+.suggestion-item:hover { background: var(--glass2); color: var(--zx); }
+.suggestion-icon { font-size: 18px; flex-shrink: 0; }
+.suggestion-cat { font-family: var(--font-mono); font-size: 10px; color: var(--zm); margin-left: auto; }
+
+/* ─── EXPORT BUTTON ─── */
+.export-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--r-sm); font-size: 12px; font-weight: 600; background: rgba(0,245,160,.08); border: 1px solid rgba(0,245,160,.25); color: var(--acid); cursor: pointer; transition: var(--transition); }
+.export-btn:hover { background: rgba(0,245,160,.15); }
+
+/* ─── BREADCRUMB NAV ─── */
+.app-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--zm); margin-bottom: 20px; font-family: var(--font-mono); }
+.app-breadcrumb a { color: var(--neon2); cursor: pointer; }
+.app-breadcrumb a:hover { text-decoration: underline; }
+.app-breadcrumb span { color: var(--z6); }
+
+</style>
+</head>
+<body>
+
+<!-- ╔═══════════════════════════════════════════╗
+     ║           LANDING PAGE                    ║
+     ╚═══════════════════════════════════════════╝ -->
+<div class="page active" id="page-landing">
+
+  <!-- Topbar -->
+  <nav class="topbar">
+    <div class="topbar-logo" onclick="scrollTop()">
+      <span class="z">Z</span><span class="axis">AXIS</span>
+      <div class="logo-dot"></div>
+    </div>
+    <div class="topbar-nav">
+      <a onclick="smoothSection('features')">Features</a>
+      <a onclick="smoothSection('products-section')">Products</a>
+      <a onclick="smoothSection('categories-section')">Categories</a>
+      <a href="http://www.zaxis.kesug.com" target="_blank">CEO Portfolio ↗</a>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-outline" onclick="showAuth('login')">Sign In</button>
+      <button class="btn btn-neon" onclick="showAuth('signup')">Get Started →</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-orb"></div>
+    <div class="hero-tag">✦ ZAXIS INTELLIGENCE PLATFORM v2.0</div>
+    <h1>Discover tools that<br><span class="gradient-text">actually work.</span></h1>
+    <p class="hero-sub">ZAXIS is the decision-intelligence platform trusted by 120,000+ professionals to find, compare, and deploy the best digital tools — before spending a dollar.</p>
+    <div class="hero-actions">
+      <button class="btn btn-neon btn-lg" onclick="showAuth('signup')">Start for Free →</button>
+      <button class="btn btn-outline btn-lg" onclick="showAuth('login')">Sign In to Dashboard</button>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">500<span>+</span></div>
+        <div class="hero-stat-label">Tools reviewed</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">120<span>k</span></div>
+        <div class="hero-stat-label">Monthly users</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">$2<span>.3M</span></div>
+        <div class="hero-stat-label">Commissions tracked</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">98<span>%</span></div>
+        <div class="hero-stat-label">Satisfaction rate</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features strip -->
+  <div class="features-strip">
+    <div class="features-scroll">
+      <div class="feature-item"><span class="fi">⚡</span> Real-time click analytics</div>
+      <div class="feature-item"><span class="fi">🔐</span> Secure auth system</div>
+      <div class="feature-item"><span class="fi">📦</span> 500+ reviewed products</div>
+      <div class="feature-item"><span class="fi">🤖</span> AI-powered comparisons</div>
+      <div class="feature-item"><span class="fi">💸</span> Affiliate revenue tracking</div>
+      <div class="feature-item"><span class="fi">🎛</span> Full admin panel</div>
+      <div class="feature-item"><span class="fi">📊</span> Analytics dashboard</div>
+      <div class="feature-item"><span class="fi">🔄</span> Monthly updates</div>
+      <!-- duplicate for seamless loop -->
+      <div class="feature-item"><span class="fi">⚡</span> Real-time click analytics</div>
+      <div class="feature-item"><span class="fi">🔐</span> Secure auth system</div>
+      <div class="feature-item"><span class="fi">📦</span> 500+ reviewed products</div>
+      <div class="feature-item"><span class="fi">🤖</span> AI-powered comparisons</div>
+      <div class="feature-item"><span class="fi">💸</span> Affiliate revenue tracking</div>
+      <div class="feature-item"><span class="fi">🎛</span> Full admin panel</div>
+      <div class="feature-item"><span class="fi">📊</span> Analytics dashboard</div>
+      <div class="feature-item"><span class="fi">🔄</span> Monthly updates</div>
+    </div>
+  </div>
+
+  <!-- Featured Products -->
+  <section class="homepage-products" id="products-section">
+    <div class="section-eyebrow">// featured products</div>
+    <div class="section-title">Trending tools this month</div>
+    <p class="section-sub">Expert-reviewed, independently tested, honestly ranked.</p>
+    <div class="cat-chips" id="home-filter">
+      <div class="cat-chip active" onclick="filterHome(this,'all')">All</div>
+      <div class="cat-chip" onclick="filterHome(this,'ai')">AI Tools</div>
+      <div class="cat-chip" onclick="filterHome(this,'hosting')">Hosting</div>
+      <div class="cat-chip" onclick="filterHome(this,'marketing')">Marketing</div>
+      <div class="cat-chip" onclick="filterHome(this,'student')">Student</div>
+    </div>
+    <div class="product-grid" id="home-product-grid"></div>
+  </section>
+
+  <!-- Categories -->
+  <section class="categories-section" id="categories-section">
+    <div class="section-eyebrow">// browse by category</div>
+    <div class="section-title">Every category covered</div>
+    <div class="cat-grid" id="home-cat-grid"></div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section" id="features">
+    <h2>Built by Jex for builders</h2>
+    <p>ZAXIS is led by CEO Jex — a full-stack developer & affiliate strategist.<br>
+    <a href="http://www.zaxis.kesug.com" target="_blank" style="color:var(--neon2)">→ View Jex's portfolio at zaxis.kesug.com</a></p>
+    <button class="btn btn-acid btn-lg" onclick="showAuth('signup')">Join ZAXIS Free →</button>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="landing-footer">
+      <div class="landing-footer-grid">
+        <div class="footer-brand">
+          <div class="topbar-logo" style="font-size:20px;margin-bottom:8px">
+            <span class="z">Z</span><span class="axis">AXIS</span>
+          </div>
+          <p>The digital tools intelligence platform. Find, compare, and deploy the best software — powered by honest expert reviews.</p>
+          <div class="flex-gap">
+            <a href="http://www.zaxis.kesug.com" target="_blank" class="btn btn-ghost btn-sm">CEO Portfolio ↗</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <a onclick="showAuth('signup')">Sign Up</a>
+          <a onclick="showAuth('login')">Sign In</a>
+          <a>Pricing</a>
+          <a>Affiliate Program</a>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <a>AI Tools</a>
+          <a>Web Hosting</a>
+          <a>Make Money Online</a>
+          <a>Student Tools</a>
+          <a>SEO & Marketing</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="http://www.zaxis.kesug.com" target="_blank">CEO: Jex ↗</a>
+          <a>About ZAXIS</a>
+          <a>Contact</a>
+          <a>Privacy Policy</a>
+          <a>Affiliate Disclosure</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 ZAXIS. All rights reserved. CEO: Jex · <a href="http://www.zaxis.kesug.com" target="_blank">zaxis.kesug.com</a></span>
+        <span>hello@zaxis.kesug.com · partners@zaxis.kesug.com</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ╔═══════════════════════════════════════════╗
+     ║           AUTH — SIGN IN                  ║
+     ╚═══════════════════════════════════════════╝ -->
+<div class="auth-wrap" id="auth-login">
+  <div class="auth-split">
+    <div class="auth-left">
+      <div class="auth-left-orb"></div>
+      <div style="text-align:center;position:relative;z-index:1">
+        <div class="auth-brand"><span class="z">Z</span>AXIS</div>
+        <div class="auth-tagline">The intelligence platform for discovering tools that matter.</div>
+      </div>
+      <div class="auth-features" style="position:relative;z-index:1">
+        <div class="auth-feature">
+          <div class="auth-feature-icon">📦</div>
+          <div class="auth-feature-text">
+            <strong>500+ reviewed products</strong>
+            <span>Independently tested by our team</span>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">📊</div>
+          <div class="auth-feature-text">
+            <strong>Click analytics dashboard</strong>
+            <span>Track affiliate conversions in real-time</span>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🛡</div>
+          <div class="auth-feature-text">
+            <strong>Role-based access control</strong>
+            <span>Admin and user dashboards</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card">
+        <h1>Welcome back</h1>
+        <p>New to ZAXIS? <a onclick="showAuth('signup')">Create an account →</a></p>
+        <div class="alert alert-error" id="login-error">⚠ Invalid email or password.</div>
+        <div class="alert alert-success" id="login-success">✓ Signed in! Redirecting...</div>
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input class="form-input" id="login-email" type="email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" id="login-password" type="password" placeholder="••••••••">
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--zt)">
+            <input type="checkbox" style="accent-color:var(--neon)"> Remember me
+          </label>
+          <a style="font-size:13px;color:var(--neon);cursor:pointer">Forgot password?</a>
+        </div>
+        <button class="btn btn-neon btn-full" onclick="doLogin()">Sign In →</button>
+        <div class="form-divider"><span>or continue with</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button class="btn btn-ghost" onclick="quickLogin('user')">👤 Demo User</button>
+          <button class="btn btn-ghost" onclick="quickLogin('admin')">🔑 Demo Admin</button>
+        </div>
+        <div style="margin-top:20px;text-align:center">
+          <button class="btn btn-ghost btn-sm" onclick="showPage('landing')">← Back to ZAXIS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ╔═══════════════════════════════════════════╗
+     ║           AUTH — SIGN UP                  ║
+     ╚═══════════════════════════════════════════╝ -->
+<div class="auth-wrap" id="auth-signup">
+  <div class="auth-split">
+    <div class="auth-left">
+      <div class="auth-left-orb"></div>
+      <div style="text-align:center;position:relative;z-index:1">
+        <div class="auth-brand"><span class="z">Z</span>AXIS</div>
+        <div class="auth-tagline">Join 120,000+ professionals making smarter tool decisions.</div>
+      </div>
+      <div class="auth-features" style="position:relative;z-index:1;margin-top:40px">
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🚀</div>
+          <div class="auth-feature-text">
+            <strong>Free to start</strong>
+            <span>No credit card required</span>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">⚡</div>
+          <div class="auth-feature-text">
+            <strong>Instant access</strong>
+            <span>Dashboard live in 30 seconds</span>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">💸</div>
+          <div class="auth-feature-text">
+            <strong>Affiliate tracking built-in</strong>
+            <span>Track every click and commission</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card">
+        <h1>Create account</h1>
+        <p>Already have an account? <a onclick="showAuth('login')">Sign in →</a></p>
+        <div class="alert alert-error" id="signup-error">⚠ Please fill in all fields.</div>
+        <div class="alert alert-success" id="signup-success">✓ Account created! Welcome to ZAXIS!</div>
+        <div class="form-group">
+          <label class="form-label">Full name</label>
+          <input class="form-input" id="signup-name" type="text" placeholder="Jane Smith">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input class="form-input" id="signup-email" type="email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" id="signup-password" type="password" placeholder="At least 8 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Account type</label>
+          <select class="form-input form-select" id="signup-role">
+            <option value="user">User (browse & save products)</option>
+            <option value="admin">Admin (full management access)</option>
+          </select>
+        </div>
+        <div style="margin-bottom:22px">
+          <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12px;color:var(--zm);line-height:1.6">
+            <input type="checkbox" id="signup-terms" style="accent-color:var(--neon);margin-top:2px;flex-shrink:0">
+            I agree to ZAXIS <a style="color:var(--neon)">Terms of Service</a> and understand affiliate disclosure requirements.
+          </label>
+        </div>
+        <button class="btn btn-neon btn-full" onclick="doSignup()">Create Free Account →</button>
+        <div style="margin-top:20px;text-align:center">
+          <button class="btn btn-ghost btn-sm" onclick="showPage('landing')">← Back to ZAXIS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ╔═══════════════════════════════════════════╗
+     ║           APP SHELL (dashboard)           ║
+     ╚═══════════════════════════════════════════╝ -->
+<div class="app-shell" id="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div>
+        <div><span class="z">Z</span><span style="color:var(--zx)">AXIS</span></div>
+        <div class="sidebar-logo-sub">Intelligence Platform</div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-avatar">JX</div>
+      <div>
+        <div class="sidebar-user-name" id="sb-name">Loading...</div>
+        <div class="sidebar-user-role role-user" id="sb-role">user</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Main</div>
+      <div class="nav-item active" onclick="showView('dashboard',this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="showView('browse',this)">
+        <span class="nav-icon">📦</span> Browse Products
+        <span class="nav-badge" id="nav-products-count">6</span>
+      </div>
+      <div class="nav-item" onclick="showView('categories',this)">
+        <span class="nav-icon">📂</span> Categories
+      </div>
+      <div class="nav-item" onclick="showView('search',this)">
+        <span class="nav-icon">🔍</span> Search
+      </div>
+      <div class="sidebar-section-label admin-only" id="admin-label">Admin</div>
+      <div class="nav-item admin-only" id="nav-admin-products" onclick="showView('admin-products',this)">
+        <span class="nav-icon">🗂</span> Manage Products
+      </div>
+      <div class="nav-item admin-only" id="nav-add-product" onclick="showView('add-product',this)">
+        <span class="nav-icon">➕</span> Add Product
+      </div>
+      <div class="nav-item admin-only" id="nav-analytics" onclick="showView('analytics',this)">
+        <span class="nav-icon">📈</span> Analytics
+      </div>
+      <div class="nav-item admin-only" id="nav-manage-cats" onclick="showView('manage-cats',this)">
+        <span class="nav-icon">🏷</span> Manage Categories
+      </div>
+      <div class="sidebar-section-label">Account</div>
+      <div class="nav-item" onclick="showView('profile',this)">
+        <span class="nav-icon">👤</span> Profile
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="doLogout()" style="color:var(--red)">
+        <span class="nav-icon">🚪</span> Sign Out
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="main-topbar">
+      <h1 id="main-title">Dashboard</h1>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span class="search-icon">🔍</span>
+          <input placeholder="Search products..." oninput="globalSearch(this.value)">
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('landing')">↗ Public Site</button>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: DASHBOARD ═══ -->
+    <div class="view active" id="view-dashboard">
+      <div class="view-header">
+        <div>
+          <div class="view-title" id="dash-welcome">Welcome back 👋</div>
+          <div class="view-sub">Here's what's happening on ZAXIS today</div>
+        </div>
+        <button class="btn btn-neon btn-sm admin-only" onclick="showView('add-product',document.getElementById('nav-add-product'))">+ Add Product</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:var(--neon-soft)">📦</div>
+          <div class="stat-card-label">Total Products</div>
+          <div class="stat-card-value" id="stat-total">6</div>
+          <div class="stat-card-change change-up">↑ +3 this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:rgba(0,245,160,0.1)">⚡</div>
+          <div class="stat-card-label">Affiliate Clicks</div>
+          <div class="stat-card-value" id="stat-clicks">1,847</div>
+          <div class="stat-card-change change-up">↑ +12% vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:rgba(245,200,66,0.1)">💰</div>
+          <div class="stat-card-label">Est. Revenue</div>
+          <div class="stat-card-value">$2.3k</div>
+          <div class="stat-card-change change-up">↑ +18% vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:rgba(255,107,53,0.1)">📂</div>
+          <div class="stat-card-label">Categories</div>
+          <div class="stat-card-value" id="stat-cats">6</div>
+          <div class="stat-card-change change-up">↑ Active</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+        <!-- Recent Clicks -->
+        <div class="data-table-wrap">
+          <div class="data-table-header">
+            <div class="data-table-title">Live Affiliate Clicks</div>
+            <span class="mono">Last 24h</span>
+          </div>
+          <div class="click-log" id="dash-click-log" style="padding:12px"></div>
+        </div>
+        <!-- Quick actions -->
+        <div class="data-table-wrap">
+          <div class="data-table-header">
+            <div class="data-table-title">Quick Actions</div>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-neon btn-sm" onclick="showView('browse',document.querySelector('.nav-item:nth-child(2)'))">📦 Browse Products</button>
+            <button class="btn btn-ghost btn-sm" onclick="showView('search',document.querySelector('.nav-item:nth-child(4)'))">🔍 Search Tools</button>
+            <button class="btn btn-ghost btn-sm admin-only" onclick="showView('add-product',document.getElementById('nav-add-product'))">➕ Add New Product</button>
+            <button class="btn btn-ghost btn-sm admin-only" onclick="showView('analytics',document.getElementById('nav-analytics'))">📈 View Analytics</button>
+            <hr class="divider">
+            <div style="font-size:12px;color:var(--zm)">CEO: <a href="http://www.zaxis.kesug.com" target="_blank" style="color:var(--neon2)">Jex ↗ zaxis.kesug.com</a></div>
+            <div style="font-size:12px;color:var(--zm)">Contact: <span style="color:var(--zs)">hello@zaxis.kesug.com</span></div>
+            <div style="font-size:12px;color:var(--zm)">Partners: <span style="color:var(--zs)">partners@zaxis.kesug.com</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent products mini -->
+      <div class="data-table-wrap">
+        <div class="data-table-header">
+          <div class="data-table-title">Recent Products</div>
+          <button class="btn btn-ghost btn-sm" onclick="showView('browse',document.querySelector('.nav-item:nth-child(2)'))">View all →</button>
+        </div>
+        <div class="mini-grid" id="dash-mini-products" style="padding:16px"></div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: BROWSE PRODUCTS ═══ -->
+    <div class="view" id="view-browse">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Browse Products</div>
+          <div class="view-sub">Explore all <span id="browse-count">6</span> reviewed tools</div>
+        </div>
+      </div>
+      <div class="cat-chips" id="browse-filter">
+        <div class="cat-chip active" onclick="filterBrowse(this,'all')">All</div>
+      </div>
+      <div class="product-grid" id="browse-grid"></div>
+    </div>
+
+    <!-- ═══ VIEW: PRODUCT DETAIL ═══ -->
+    <div class="view" id="view-product-detail">
+      <div class="view-header">
+        <button class="btn btn-ghost btn-sm" onclick="goBack()">← Back</button>
+      </div>
+      <div class="detail-wrap" id="product-detail-content"></div>
+    </div>
+
+    <!-- ═══ VIEW: CATEGORIES ═══ -->
+    <div class="view" id="view-categories">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Categories</div>
+          <div class="view-sub">Browse products by category</div>
+        </div>
+      </div>
+      <div class="cat-grid" id="app-cat-grid"></div>
+    </div>
+
+    <!-- ═══ VIEW: SEARCH ═══ -->
+    <div class="view" id="view-search">
+      <div class="view-header">
+        <div class="view-title">Search</div>
+      </div>
+      <div class="search-bar-wrap">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input id="search-input" placeholder="Search products by name, description, category..." oninput="doSearch(this.value)">
+        </div>
+        <select class="form-input form-select" style="width:200px" id="search-cat-filter" onchange="doSearch(document.getElementById('search-input').value)">
+          <option value="all">All Categories</option>
+        </select>
+        <select class="form-input form-select" style="width:160px" onchange="sortSearch(this.value)">
+          <option value="default">Sort: Default</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+          <option value="rating">Highest Rated</option>
+        </select>
+      </div>
+      <div id="search-results" class="product-grid"></div>
+      <div id="search-empty" class="empty-state" style="display:none">
+        <div class="empty-icon">🔍</div>
+        <p>No products found. Try a different search term.</p>
+      </div>
+      <div id="search-placeholder" style="text-align:center;padding:60px;color:var(--zm)">
+        <div style="font-size:48px;margin-bottom:14px">⚡</div>
+        <p>Start typing to search 500+ tools...</p>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: ADMIN — MANAGE PRODUCTS ═══ -->
+    <div class="view" id="view-admin-products">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Manage Products</div>
+          <div class="view-sub">Add, edit, or delete product listings</div>
+        </div>
+        <button class="btn btn-neon btn-sm" onclick="showView('add-product',document.getElementById('nav-add-product'))">+ Add Product</button>
+      </div>
+      <div class="data-table-wrap">
+        <div class="data-table-header">
+          <div class="data-table-title">All Products</div>
+          <input class="form-input" style="width:240px;padding:8px 12px;font-size:13px" placeholder="Filter table...">
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Icon</th><th>Product</th><th>Category</th><th>Price</th><th>Rating</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-products-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: ADD PRODUCT ═══ -->
+    <div class="view" id="view-add-product">
+      <div class="view-header">
+        <div>
+          <div class="view-title" id="add-product-title">Add New Product</div>
+          <div class="view-sub">This product will be immediately visible in the platform</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="showView('admin-products',document.getElementById('nav-admin-products'))">Cancel</button>
+      </div>
+      <div class="form-card">
+        <div class="alert alert-success" id="add-success">✓ Product saved successfully!</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Product Title *</label>
+            <input class="form-input" id="ap-title" placeholder="e.g. Jasper AI">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select class="form-input form-select" id="ap-category">
+              <option value="">Select category...</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Affiliate / Product URL *</label>
+            <input class="form-input" id="ap-link" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Starting Price</label>
+            <input class="form-input" id="ap-price" placeholder="e.g. $39/mo">
+          </div>
+        </div>
+        <div class="form-group form-full">
+          <label class="form-label">Description *</label>
+          <textarea class="form-input form-textarea" id="ap-desc" placeholder="Write an honest, detailed description..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Rating (1–5)</label>
+            <input class="form-input" id="ap-rating" type="number" min="1" max="5" step="0.1" placeholder="4.8">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Emoji Icon</label>
+            <input class="form-input" id="ap-icon" placeholder="🤖">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Commission Rate</label>
+            <input class="form-input" id="ap-commission" placeholder="e.g. 30%">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-input form-select" id="ap-status">
+              <option value="published">Published</option>
+              <option value="featured">Featured</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Pros (comma separated)</label>
+            <input class="form-input" id="ap-pros" placeholder="Great output quality, Easy to use, Affordable">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cons (comma separated)</label>
+            <input class="form-input" id="ap-cons" placeholder="No free plan, Steep learning curve">
+          </div>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:12px;align-items:center">
+          <button class="btn btn-neon" onclick="saveProduct()">Save Product →</button>
+          <button class="btn btn-ghost" onclick="resetProductForm()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: ANALYTICS ═══ -->
+    <div class="view" id="view-analytics">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Click Analytics</div>
+          <div class="view-sub">Real-time affiliate click tracking & revenue data</div>
+        </div>
+        <div class="mono">All time</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-label">Total Clicks</div>
+          <div class="stat-card-value">7,087</div>
+          <div class="stat-card-change change-up">↑ +23% this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Conversions</div>
+          <div class="stat-card-value">312</div>
+          <div class="stat-card-change change-up">↑ 4.4% CVR</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Est. Revenue</div>
+          <div class="stat-card-value">$2.3k</div>
+          <div class="stat-card-change change-up">↑ +18%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Avg. Commission</div>
+          <div class="stat-card-value">$7.38</div>
+          <div class="stat-card-change change-up">↑ per click</div>
+        </div>
+      </div>
+
+      <div class="data-table-wrap" style="margin-bottom:20px">
+        <div class="data-table-header">
+          <div class="data-table-title">Clicks by Product</div>
+        </div>
+        <div class="bar-chart" id="analytics-chart"></div>
+      </div>
+
+      <div class="data-table-wrap">
+        <div class="data-table-header">
+          <div class="data-table-title">Click Log</div>
+          <span class="mono">Live</span>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Product</th><th>Source Page</th><th>Country</th><th>Commission</th><th>Time</th></tr></thead>
+          <tbody id="analytics-log"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: MANAGE CATEGORIES ═══ -->
+    <div class="view" id="view-manage-cats">
+      <div class="view-header">
+        <div class="view-title">Manage Categories</div>
+        <button class="btn btn-neon btn-sm" onclick="addCategory()">+ Add Category</button>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Icon</th><th>Name</th><th>Slug</th><th>Products</th><th>Actions</th></tr></thead>
+          <tbody id="cats-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: PROFILE ═══ -->
+    <div class="view" id="view-profile">
+      <div class="view-header">
+        <div class="view-title">My Profile</div>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-card">
+          <div class="profile-avatar-lg" id="profile-avatar">JX</div>
+          <div class="profile-name" id="profile-name">Loading...</div>
+          <div class="profile-email" id="profile-email">...</div>
+          <div class="profile-joined mono">Member since Jan 2025</div>
+          <hr class="divider">
+          <div class="sidebar-user-role" id="profile-role" style="display:inline-block">user</div>
+        </div>
+        <div class="profile-info">
+          <div style="font-size:16px;font-weight:700;color:var(--zx);margin-bottom:20px">Account Details</div>
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-input" id="profile-name-input" placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" id="profile-email-input" type="email" placeholder="you@example.com" disabled style="opacity:0.6">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Company / Portfolio URL</label>
+            <input class="form-input" id="profile-url" placeholder="https://your-portfolio.com" value="http://www.zaxis.kesug.com">
+          </div>
+          <hr class="divider">
+          <div style="font-size:13px;color:var(--zm);margin-bottom:14px">
+            <strong style="color:var(--zs)">ZAXIS Contact Directory</strong><br>
+            General: zaxisgod02@gmail.com<br>
+            Partnerships: jexyadav00@gmail.com<br>
+            Legal: zaxisgod02@gmail.com<br>
+            CEO Portfolio: <a href="http://www.zaxis.kesug.com" target="_blank" style="color:var(--neon2)">zaxis.kesug.com</a>
+          </div>
+          <button class="btn btn-neon" onclick="saveProfile()">Save Changes →</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══ VIEW: COMPARE ═══ -->
+    <div class="view" id="view-compare">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Compare Products</div>
+          <div class="view-sub">Side-by-side feature comparison to help you decide</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+        <select class="form-input form-select" id="cmp-a" style="flex:1;min-width:180px" onchange="renderComparison()">
+          <option value="">Select Product A...</option>
+        </select>
+        <div style="display:flex;align-items:center;color:var(--zm);font-weight:700;font-size:18px">VS</div>
+        <select class="form-input form-select" id="cmp-b" style="flex:1;min-width:180px" onchange="renderComparison()">
+          <option value="">Select Product B...</option>
+        </select>
+      </div>
+      <div id="compare-output"></div>
+      <div id="compare-placeholder" style="text-align:center;padding:60px;color:var(--zm)">
+        <div style="font-size:48px;margin-bottom:14px">⚖️</div>
+        <p>Select two products above to see a full side-by-side comparison</p>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: REVIEW / BLOG ═══ -->
+    <div class="view" id="view-review">
+      <div class="view-header">
+        <button class="btn btn-ghost btn-sm" onclick="goBack()">← Back</button>
+        <button class="btn btn-ghost btn-sm" onclick="showView('compare',document.querySelector('.nav-item'))">⚖️ Compare products</button>
+      </div>
+      <div class="review-layout" id="review-content"></div>
+    </div>
+
+    <!-- ═══ VIEW: PRICING ═══ -->
+    <div class="view" id="view-pricing">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Pricing Plans</div>
+          <div class="view-sub">Choose the plan that fits your needs</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-bottom:8px">
+        <div style="display:inline-flex;align-items:center;gap:10px;background:var(--z3);border:1px solid var(--border);border-radius:40px;padding:4px">
+          <button class="btn btn-neon btn-sm" id="billing-monthly" onclick="setBilling('monthly')" style="border-radius:40px">Monthly</button>
+          <button class="btn btn-ghost btn-sm" id="billing-annual" onclick="setBilling('annual')" style="border-radius:40px">Annual <span style="color:var(--acid);font-size:11px">-20%</span></button>
+        </div>
+      </div>
+      <div class="pricing-grid" id="pricing-grid"></div>
+      <div style="text-align:center;margin-top:36px">
+        <div class="newsletter-strip" style="max-width:600px;margin:0 auto;text-align:left">
+          <div>
+            <h3>Stay updated</h3>
+            <p>Get new tool reviews and deals delivered to your inbox</p>
+          </div>
+          <div class="newsletter-form">
+            <input type="email" id="nl-email" placeholder="you@email.com">
+            <button class="btn btn-neon btn-sm" onclick="subscribeNewsletter()">Subscribe</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: CONTACT ═══ -->
+    <div class="view" id="view-contact">
+      <div class="view-header">
+        <div class="view-title">Contact ZAXIS</div>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info-card">
+          <h2>Get in touch</h2>
+          <p>The ZAXIS team reads every message and responds within 1–3 business days.</p>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">✉️</div>
+            <div class="contact-detail-text">
+              <strong>General</strong>
+              <a href="mailto:hello@zaxis.kesug.com">zaxisgod02@gmail.com</a>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">🤝</div>
+            <div class="contact-detail-text">
+              <strong>Partnerships</strong>
+              <a href="mailto:partners@zaxis.kesug.com">jexyadav00@gmail.com</a>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">⚖️</div>
+            <div class="contact-detail-text">
+              <strong>Legal</strong>
+              <a href="mailto:legal@zaxis.kesug.com">zaxisgod02@gmail.com</a>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">🌐</div>
+            <div class="contact-detail-text">
+              <strong>Founder/CEO Portfolio</strong>
+              <a href="http://www.zaxis.kesug.com" target="_blank">zaxis.kesug.com ↗</a>
+            </div>
+          </div>
+          <hr class="divider">
+          <div style="font-size:12px;color:var(--zm);line-height:1.7">
+            <strong style="color:var(--zs)">Response time:</strong> 1–3 business days<br>
+            <strong style="color:var(--zs)">Affiliate inquiries:</strong> jexyadav00@gmail.com<br>
+            <strong style="color:var(--zs)">CEO:</strong> Jex Yadav· <a href="http://www.zaxis.kesug.com" target="_blank" style="color:var(--neon2)">Portfolio ↗</a>
+          </div>
+        </div>
+        <div class="form-card" style="max-width:100%">
+          <h2>Send a message</h2>
+          <div class="alert alert-success" id="contact-success">✓ Message sent! We'll reply within 1–3 business days.</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="contact-name" placeholder="Jane Smith"></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="contact-email" type="email" placeholder="you@example.com"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <select class="form-input form-select" id="contact-subject">
+              <option>General question</option>
+              <option>Partnership / Affiliate</option>
+              <option>Press inquiry</option>
+              <option>Submit a correction</option>
+              <option>Technical support</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-input form-textarea" id="contact-msg" placeholder="Tell us what's on your mind..."></textarea>
+          </div>
+          <button class="btn btn-neon" onclick="submitContact()">Send Message →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: LEGAL ═══ -->
+    <div class="view" id="view-legal">
+      <div class="view-header">
+        <div class="view-title">Legal</div>
+      </div>
+      <div class="legal-content">
+        <div class="legal-tabs-row">
+          <div class="legal-tab active" onclick="switchLegal(this,'privacy')">Privacy Policy</div>
+          <div class="legal-tab" onclick="switchLegal(this,'disclosure')">Affiliate Disclosure</div>
+          <div class="legal-tab" onclick="switchLegal(this,'terms')">Terms &amp; Conditions</div>
+        </div>
+        <!-- Privacy -->
+        <div id="legal-privacy">
+          <h1 class="legal-h1">Privacy Policy</h1>
+          <div class="legal-date">Last updated: January 1, 2025</div>
+          <h2 class="legal-h2">Information We Collect</h2>
+          <p class="legal-p">ZAXIS collects information you provide directly (name, email via signup/contact form), information collected automatically (IP address, browser type, pages visited, referring URL), and data from third-party services including Supabase and analytics providers.</p>
+          <h2 class="legal-h2">How We Use Your Information</h2>
+          <ul><li class="legal-li">To authenticate your account and maintain your session</li><li class="legal-li">To display personalized product recommendations</li><li class="legal-li">To track affiliate clicks and attribute commissions</li><li class="legal-li">To send newsletters if you've opted in</li><li class="legal-li">To improve our platform based on usage patterns</li></ul>
+          <h2 class="legal-h2">Cookies &amp; Tracking</h2>
+          <p class="legal-p">We use cookies for authentication (Supabase session), affiliate link tracking (to attribute commissions), and analytics. Affiliate cookies persist for 30–90 days depending on the partner program.</p>
+          <h2 class="legal-h2">Data Security</h2>
+          <p class="legal-p">User data is stored in Supabase (PostgreSQL) with row-level security enabled. Passwords are never stored in plaintext — Supabase Auth handles all credential management using bcrypt.</p>
+          <h2 class="legal-h2">Your Rights</h2>
+          <p class="legal-p">You may request access to, correction of, or deletion of your personal data at any time. Contact: <a href="mailto:legal@zaxis.kesug.com" style="color:var(--neon2)">legal@zaxis.kesug.com</a></p>
+        </div>
+        <!-- Disclosure -->
+        <div id="legal-disclosure" style="display:none">
+          <h1 class="legal-h1">Affiliate Disclosure</h1>
+          <div class="legal-date">Last updated: January 1, 2025</div>
+          <div class="disclosure-callout"><p>⚡ ZAXIS participates in affiliate marketing programs. When you click a product link and make a purchase, we earn a commission — at no extra cost to you. This is how we fund independent research and keep the platform free.</p></div>
+          <h2 class="legal-h2">How Affiliate Links Work</h2>
+          <p class="legal-p">Affiliate links contain a tracking parameter that identifies ZAXIS as the referral source. If you purchase within the cookie window (typically 30–90 days), we receive a commission from the merchant. All affiliate links are tracked through our /api/click system.</p>
+          <h2 class="legal-h2">Our Editorial Standards</h2>
+          <p class="legal-p">Commission rates <strong style="color:var(--zx)">never</strong> influence our ratings or rankings. Products are evaluated solely on their merits. We frequently recommend products that pay lower commissions when they are genuinely the best option for our users.</p>
+          <h2 class="legal-h2">Which Products Earn Commission?</h2>
+          <p class="legal-p">Any product link on ZAXIS marked "Visit [Product]", "Try Free →", or similar is typically an affiliate link. We disclose this on every review and comparison page.</p>
+          <h2 class="legal-h2">Contact</h2>
+          <p class="legal-p">Affiliate partnerships: <a href="mailto:partners@zaxis.kesug.com" style="color:var(--neon2)">partners@zaxis.kesug.com</a></p>
+        </div>
+        <!-- Terms -->
+        <div id="legal-terms" style="display:none">
+          <h1 class="legal-h1">Terms &amp; Conditions</h1>
+          <div class="legal-date">Last updated: January 1, 2025</div>
+          <h2 class="legal-h2">Use of Platform</h2>
+          <p class="legal-p">By using ZAXIS you agree to use the platform for lawful purposes only. You may not reproduce, resell, or commercially exploit our content or data without written permission from ZAXIS.</p>
+          <h2 class="legal-h2">Accuracy of Information</h2>
+          <p class="legal-p">We strive to keep all reviews, prices, and product information accurate. Tool prices and features change frequently — always verify details directly with the product vendor before purchasing. ZAXIS is not liable for pricing discrepancies.</p>
+          <h2 class="legal-h2">User Accounts</h2>
+          <p class="legal-p">You are responsible for maintaining the security of your account credentials. ZAXIS is not liable for any losses arising from unauthorized account access due to credential compromise.</p>
+          <h2 class="legal-h2">Limitation of Liability</h2>
+          <p class="legal-p">ZAXIS is not liable for any losses or damages arising from your use of our platform or reliance on our recommendations. All purchasing decisions are made at your sole discretion and risk.</p>
+          <h2 class="legal-h2">Changes to Terms</h2>
+          <p class="legal-p">We may update these terms at any time. Continued use of the platform constitutes acceptance of any changes. Contact: <a href="mailto:legal@zaxis.kesug.com" style="color:var(--neon2)">legal@zaxis.kesug.com</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: SAVED PRODUCTS ═══ -->
+    <div class="view" id="view-saved">
+      <div class="view-header">
+        <div class="view-title">Saved Products</div>
+        <button class="btn btn-ghost btn-sm" onclick="clearSaved()">Clear all</button>
+      </div>
+      <div id="saved-grid" class="product-grid"></div>
+      <div id="saved-empty" class="saved-empty" style="display:none">
+        <div class="se-icon">🔖</div>
+        <p>No saved products yet. Browse and bookmark products to find them here.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══ PASSWORD CHANGE MODAL ═══ -->
+<div class="modal-overlay" id="modal-password">
+  <div class="modal-card">
+    <div class="modal-close" onclick="closeModal('modal-password')">✕</div>
+    <h2>Change Password</h2>
+    <div class="alert alert-success" id="pw-success">✓ Password updated!</div>
+    <div class="alert alert-error" id="pw-error">⚠ Passwords do not match.</div>
+    <div class="form-group">
+      <label class="form-label">Current Password</label>
+      <input class="form-input" id="pw-current" type="password" placeholder="••••••••">
+    </div>
+    <div class="form-group">
+      <label class="form-label">New Password</label>
+      <input class="form-input" id="pw-new" type="password" placeholder="At least 8 characters">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirm New Password</label>
+      <input class="form-input" id="pw-confirm" type="password" placeholder="Repeat new password">
+    </div>
+    <button class="btn btn-neon btn-full" onclick="changePassword()">Update Password →</button>
+  </div>
+</div>
+
+<!-- ═══ FORGOT PASSWORD MODAL ═══ -->
+<div class="modal-overlay" id="modal-forgot">
+  <div class="modal-card">
+    <div class="modal-close" onclick="closeModal('modal-forgot')">✕</div>
+    <h2>Reset Password</h2>
+    <p style="font-size:14px;color:var(--zt);margin-bottom:20px">Enter your email and we'll send you a reset link.</p>
+    <div class="alert alert-success" id="forgot-success">✓ Reset link sent to your email!</div>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input class="form-input" id="forgot-email" type="email" placeholder="you@example.com">
+    </div>
+    <button class="btn btn-neon btn-full" onclick="sendReset()">Send Reset Link →</button>
+    <div style="margin-top:14px;text-align:center">
+      <a style="font-size:13px;color:var(--neon2);cursor:pointer" onclick="closeModal('modal-forgot');showAuth('login')">← Back to login</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SIDEBAR OVERLAY (mobile) ═══ -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ═══ NOTIFICATION PANEL ═══ -->
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-header">
+    <h3>Notifications</h3>
+    <span class="notif-clear" onclick="clearNotifications()">Mark all read</span>
+  </div>
+  <div id="notif-list">
+    <div class="notif-item unread">
+      <div class="notif-icon">⚡</div>
+      <div class="notif-text"><strong>New affiliate click</strong><span>Jasper AI · 2 min ago</span></div>
+    </div>
+    <div class="notif-item unread">
+      <div class="notif-icon">📦</div>
+      <div class="notif-text"><strong>Product updated</strong><span>Hostinger pricing changed · 1h ago</span></div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-icon">🎉</div>
+      <div class="notif-text"><strong>Welcome to ZAXIS!</strong><span>Your account is ready · Just now</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST ─── -->
+
+<!-- ═══ PAYMENT MODAL ═══ -->
+<div id="payment-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.75);backdrop-filter:blur(10px);align-items:center;justify-content:center">
+  <div style="background:var(--z2);border:1px solid var(--border2);border-radius:var(--r-lg);padding:0;max-width:440px;width:92%;position:relative;overflow:hidden">
+
+    <!-- Header bar -->
+    <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);padding:24px 28px 20px;border-bottom:1px solid var(--border2)">
+      <button onclick="closePaymentModal()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:var(--zt);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">✕</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <span style="font-size:26px">🟢</span>
+        <div>
+          <div style="font-family:var(--font-head);font-size:20px;font-weight:800;color:#fff">Pay with eSewa</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.55)">Nepal's most trusted digital wallet</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:24px 28px">
+
+      <!-- Plan selector -->
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--zm);margin-bottom:10px">Select Plan</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px">
+        <div class="pay-plan active" data-plan="pro" onclick="selectPayPlan(this,'pro','19')" style="border:2px solid #60bb46;border-radius:var(--r-sm);padding:14px 12px;cursor:pointer;text-align:center;background:rgba(96,187,70,0.08);transition:all .2s">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--zm);margin-bottom:4px">Pro</div>
+          <div style="font-size:24px;font-weight:800;color:#60bb46">$19<span style="font-size:12px;color:var(--zt);font-weight:400">/mo</span></div>
+          <div style="font-size:10px;color:var(--zm);margin-top:3px">≈ Rs. 2,527/mo</div>
+        </div>
+        <div class="pay-plan" data-plan="agency" onclick="selectPayPlan(this,'agency','49')" style="border:2px solid var(--border2);border-radius:var(--r-sm);padding:14px 12px;cursor:pointer;text-align:center;background:transparent;transition:all .2s">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--zm);margin-bottom:4px">Agency</div>
+          <div style="font-size:24px;font-weight:800;color:var(--zx)">$49<span style="font-size:12px;color:var(--zt);font-weight:400">/mo</span></div>
+          <div style="font-size:10px;color:var(--zm);margin-top:3px">≈ Rs. 6,517/mo</div>
+        </div>
+      </div>
+
+      <!-- Amount display -->
+      <div style="background:rgba(96,187,70,0.07);border:1px solid rgba(96,187,70,0.25);border-radius:var(--r-sm);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div>
+          <div style="font-size:11px;color:var(--zm);margin-bottom:2px">You will pay</div>
+          <div id="esewa-display-amount" style="font-size:22px;font-weight:800;color:#60bb46">Rs. 2,527</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--zm);margin-bottom:2px">eSewa number</div>
+          <div style="font-size:14px;font-weight:700;color:var(--zx)">9809278755</div>
+        </div>
+      </div>
+
+      <!-- Pay button -->
+      <button onclick="payWithEsewa()" style="width:100%;background:#60bb46;border:none;border-radius:var(--r-sm);padding:16px;cursor:pointer;font-size:16px;font-weight:800;color:#fff;letter-spacing:.03em;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:10px" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
+        <span style="font-size:20px">🟢</span> Continue to eSewa →
+      </button>
+
+      <!-- Other options -->
+      <div style="margin-top:16px;display:flex;gap:8px">
+        <button onclick="payWithKhalti()" style="flex:1;background:rgba(92,45,145,0.15);border:1px solid rgba(92,45,145,0.4);border-radius:var(--r-sm);padding:10px;cursor:pointer;font-size:13px;font-weight:600;color:#c084fc;transition:opacity .2s" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">
+          💜 Khalti
+        </button>
+        <button onclick="payWithPaypal()" style="flex:1;background:rgba(0,48,135,0.15);border:1px solid rgba(0,48,135,0.4);border-radius:var(--r-sm);padding:10px;cursor:pointer;font-size:13px;font-weight:600;color:#60a5fa;transition:opacity .2s" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">
+          🅿️ PayPal
+        </button>
+      </div>
+
+      <div style="font-size:11px;color:var(--zm);text-align:center;margin-top:14px">🔒 Secure · Cancel anytime · No hidden charges</div>
+    </div>
+  </div>
+</div>
+
+<!-- eSewa Form (hidden, auto-submits) -->
+<form id="esewa-form" action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" method="POST" target="_blank" style="display:none">
+  <input type="hidden" name="amount" id="esewa-amount">
+  <input type="hidden" name="tax_amount" value="0">
+  <input type="hidden" name="total_amount" id="esewa-total">
+  <input type="hidden" name="transaction_uuid" id="esewa-uuid">
+  <input type="hidden" name="product_code" id="esewa-product-code" value="EPAYTEST">
+  <input type="hidden" name="product_service_charge" value="0">
+  <input type="hidden" name="product_delivery_charge" value="0">
+  <input type="hidden" name="success_url" id="esewa-success-url">
+  <input type="hidden" name="failure_url" id="esewa-failure-url">
+  <input type="hidden" name="signed_field_names" value="total_amount,transaction_uuid,product_code">
+  <input type="hidden" name="signature" id="esewa-signature">
+</form>
+
+<!-- Payment Success Modal -->
+<div id="pay-success-modal" style="display:none;position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,0.8);align-items:center;justify-content:center">
+  <div style="background:var(--z2);border:1px solid rgba(0,245,160,0.3);border-radius:var(--r-lg);padding:48px 36px;max-width:420px;width:90%;text-align:center">
+    <div style="font-size:64px;margin-bottom:16px">🎉</div>
+    <div style="font-family:var(--font-head);font-size:26px;font-weight:800;color:var(--acid);margin-bottom:8px">Payment Initiated!</div>
+    <div id="pay-success-msg" style="font-size:14px;color:var(--zt);line-height:1.7;margin-bottom:28px"></div>
+    <button onclick="closePaySuccessModal()" class="btn btn-acid">Close</button>
+  </div>
+</div>
+<div id="toast"><span class="toast-icon">✓</span><span id="toast-text">Done!</span></div>
+
+<!-- ╔═══════════════════════════════════════════╗
+     ║           APP JAVASCRIPT                  ║
+     ╚═══════════════════════════════════════════╝ -->
+<!-- 1. CDN first -->
+<!-- Supabase loaded as module to guarantee it's ready before any code runs -->
+<script>
+// ══════════════════════════════════════════════════════════════════
+// ZAXIS — UNIFIED APP SCRIPT  (Supabase + full app logic)
+// ══════════════════════════════════════════════════════════════════
+
+// ── 1. Load Supabase from CDN then boot everything ────────────────
+(function loadSupabaseAndBoot() {
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
+  s.onload = bootApp;
+  s.onerror = () => {
+    // fallback CDN
+    const s2 = document.createElement('script');
+    s2.src = 'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js';
+    s2.onload = bootApp;
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s);
+})();
+
+function bootApp() {
+  // ── 2. Init Supabase ─────────────────────────────────────────────
+  const SUPABASE_URL = "https://vjzjwycqnmiahggyvowl.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqemp3eWNxbm1pYWhnZ3l2b3dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2ODk1MDMsImV4cCI6MjA5MzI2NTUwM30.a0n-Vi-TMXNM3BejE6qO_cjgN9Vh4nuIXoDedDIfajY";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  console.log('[ZAXIS] Supabase client ready');
+
+  // ── 3. Local DB (demo data) ──────────────────────────────────────
+  const DB = {
+    categories: [
+      { id:'c1', name:'AI Tools',          slug:'ai-tools',    icon:'🤖', description:'Artificial intelligence software for writing, design, coding, and productivity.' },
+      { id:'c2', name:'Web Hosting',        slug:'hosting',     icon:'🌐', description:'Shared hosting, VPS, WordPress hosts, and domain registrars.' },
+      { id:'c3', name:'Make Money Online',  slug:'make-money',  icon:'💰', description:'Freelancing platforms, passive income tools, and side hustle software.' },
+      { id:'c4', name:'Student Tools',      slug:'student',     icon:'🎓', description:'Note-taking, study aids, research tools, and productivity apps.' },
+      { id:'c5', name:'SEO & Marketing',    slug:'seo-marketing',icon:'📈',description:'Keyword tools, rank trackers, email marketing, and growth software.' },
+      { id:'c6', name:'Design Tools',       slug:'design',      icon:'🎨', description:'Graphic design, video editing, UI/UX tools, and creative software.' },
+    ],
+    products: [
+      { id:'p1', title:'Jasper AI',   slug:'jasper-ai',   description:'The most powerful AI writing assistant. Ideal for marketers, bloggers, and content teams who need high-volume output consistently.',  price:'$39/mo',   image_url:'🤖', category_id:'c1', rating:4.9, status:'featured',  affiliate_link:'https://www.jasper.ai/', commission:'30%', pros:['Exceptional output quality','Brand voice training','50+ templates','Surfer SEO integration'], cons:['No free plan','Expensive vs competitors'], created_at:'2025-01-01' },
+      { id:'p2', title:'Copy.ai',     slug:'copy-ai',     description:'Fast, affordable AI copywriting for small businesses. Great for social media, emails, and short-form content with 90+ templates.',       price:'$36/mo',   image_url:'✍️', category_id:'c1', rating:4.7, status:'published', affiliate_link:'https://www.copy.ai/', commission:'25%', pros:['Free plan available','90+ templates','Easy to use'], cons:['Weaker long-form','No SEO integration'], created_at:'2025-01-02' },
+      { id:'p3', title:'Hostinger',   slug:'hostinger',   description:'Best budget web hosting for beginners. Blazing-fast LiteSpeed servers, free domain, SSL, and 1-click WordPress install included.',        price:'$2.99/mo', image_url:'🌐', category_id:'c2', rating:4.8, status:'featured',  affiliate_link:'https://www.hostinger.com/', commission:'60%', pros:['Ultra cheap','Free domain & SSL','Fast servers'], cons:['Support can be slow','No daily backups on cheapest plan'], created_at:'2025-01-03' },
+      { id:'p4', title:'Notion AI',   slug:'notion-ai',   description:'AI integrated directly into your workspace. Summarize docs, generate content, and automate tasks without switching apps.',                  price:'$10/mo',   image_url:'📝', category_id:'c4', rating:4.6, status:'published', affiliate_link:'https://www.notion.so/', commission:'15%', pros:['Seamless workspace integration','Great for students','Free base plan'], cons:['AI add-on costs extra','Limited templates'], created_at:'2025-01-04' },
+      { id:'p5', title:'Surfer SEO',  slug:'surfer-seo',  description:'AI-powered SEO content optimization. Write content that ranks by analyzing top SERP competitors and keyword density in real-time.',       price:'$59/mo',   image_url:'🔍', category_id:'c5', rating:4.7, status:'published', affiliate_link:'https://surferseo.com/', commission:'25%', pros:['Real-time SERP analysis','Jasper integration','Content score system'], cons:['Expensive','Steep learning curve'], created_at:'2025-01-05' },
+      { id:'p6', title:'Midjourney',  slug:'midjourney',  description:'The leading AI image generator. Best-in-class quality for creative professionals, designers, and marketers needing stunning visuals.',      price:'$10/mo',   image_url:'🎨', category_id:'c6', rating:4.8, status:'featured',  affiliate_link:'https://www.midjourney.com/', commission:'20%', pros:['Best image quality','Active community','Fast generation'], cons:['Discord-only interface','No free plan'], created_at:'2025-01-06' },
+    ],
+    affiliate_clicks: [],
+    profiles: [
+      { id:'u1', email:'zaxisgod02@gmail.com', name:'Jex Yadav',       role:'Admin', created_at:'2025-01-01' },
+      { id:'u2', email:'user@zaxis.kesug.com',  name:'Demo User', role:'user',  created_at:'2025-01-15' },
+    ]
+  };
+
+  // ── 4. Auth Service ──────────────────────────────────────────────
+  const AuthService = {
+    currentUser: null,
+
+    async loadSession() {
+      // Emails that are always treated as admin regardless of DB state
+      const ADMIN_EMAILS = ['zaxisgod02@gmail.com', 'jexyadav00@gmail.com'];
+
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) { this.currentUser = null; return null; }
+
+        console.log('[ZAXIS] Auth user:', user.email);
+
+        // Try to get profile row
+        const { data: profile, error: profileErr } = await supabase
+          .from('profiles').select('*').eq('id', user.id).single();
+
+        console.log('[ZAXIS] Profile row:', profile, profileErr?.message);
+
+        let role = 'user';
+        let name = user.user_metadata?.name || user.email.split('@')[0];
+
+        if (profile) {
+          role = (profile.role || 'user').toLowerCase();
+          name = profile.name || name;
+        }
+
+        // Admin email override — ensures admin always gets admin role
+        // Also read role from Supabase profile if available
+        const profileRole = (profile?.role || '').toLowerCase();
+        if (profileRole === 'admin') {
+          role = 'admin';
+          console.log('[ZAXIS] Admin role from profiles table');
+        }
+        if (ADMIN_EMAILS.some(e => e.toLowerCase() === user.email.toLowerCase())) {
+          role = 'admin';
+          console.log('[ZAXIS] Admin email match — forcing role=admin');
+        }
+
+        this.currentUser = {
+          id: user.id,
+          email: user.email,
+          name,
+          role,
+          created_at: profile?.created_at || user.created_at
+        };
+
+        console.log('[ZAXIS] currentUser set:', this.currentUser.email, '| role:', this.currentUser.role);
+        return this.currentUser;
+      } catch(e) {
+        console.warn('[ZAXIS] loadSession error:', e);
+        return null;
+      }
+    },
+
+    async logout() {
+      await supabase.auth.signOut();
+      this.currentUser = null;
+    }
+  };
+
+  // ── 5. Product Service ───────────────────────────────────────────
+  const ProductService = {
+    getProducts(catId) {
+      // Only show published/featured products to end users
+      let products = DB.products.filter(p => p.status === 'published' || p.status === 'featured');
+      if (catId && catId !== 'all') {
+        // Match by id, or resolve category by slug/name if stored differently
+        const cat = DB.categories.find(c => c.id === catId || c.slug === catId);
+        const matchIds = cat ? [cat.id, cat.slug, cat.name] : [catId];
+        products = products.filter(p => matchIds.includes(p.category_id));
+      }
+      return products;
+    },
+    getAllProducts(catId) {
+      // Admin view: show all including drafts
+      if (catId && catId !== 'all') return DB.products.filter(p => p.category_id === catId);
+      return DB.products;
+    },
+    getProductBySlug(slug) { return DB.products.find(p => p.slug === slug) || null; },
+    async loadFromSupabase() {
+      console.log('[ZAXIS] loadFromSupabase START');
+      try {
+
+        // ── Step 1: Fetch categories — REPLACE DB.categories entirely ──
+        // The old merge-by-slug logic failed when slugs didn't match exactly
+        // (e.g. local slug 'student' vs Supabase slug 'student-tools').
+        // Fix: fetch real UUIDs, remap seed product fake IDs by slug, then
+        // fully replace DB.categories so the dropdown always has real UUIDs.
+        const { data: supabaseCats, error: catErr } = await supabase
+          .from('categories')
+          .select('id, name, slug, icon, description')
+          .order('name', { ascending: true });
+
+        if (catErr) {
+          console.warn('[ZAXIS] categories fetch error:', catErr.message);
+          console.warn('[ZAXIS] Check RLS — run in Supabase SQL editor:');
+          console.warn('  CREATE POLICY "public_read_cats" ON categories FOR SELECT USING (true);');
+          // Fall through — keep local seed categories so the page still loads
+        } else if (supabaseCats && supabaseCats.length > 0) {
+
+          // Build slug → real UUID map from Supabase rows
+          const slugToUUID = {};
+          supabaseCats.forEach(sc => { slugToUUID[sc.slug] = sc.id; });
+
+          // Build name→UUID map as well (slug matching can fail if slugs differ)
+          const nameToUUID = {};
+          supabaseCats.forEach(sc => { nameToUUID[sc.name.toLowerCase()] = sc.id; });
+
+          // Remap seed products with fake IDs (c1, c2…) → real Supabase UUIDs
+          // Try slug first, then name — one of them will always match
+          DB.products.forEach(p => {
+            const isRealUUID = supabaseCats.some(sc => sc.id === p.category_id);
+            if (!isRealUUID) {
+              const seedCat = DB.categories.find(c => c.id === p.category_id);
+              if (seedCat) {
+                const realId = slugToUUID[seedCat.slug]
+                            || nameToUUID[seedCat.name.toLowerCase()];
+                if (realId) p.category_id = realId;
+              }
+            }
+          });
+
+          // Fully replace DB.categories with real Supabase rows
+          DB.categories.length = 0;
+          supabaseCats.forEach(sc => DB.categories.push(sc));
+          console.log('[ZAXIS] ✓ DB.categories replaced with', DB.categories.length, 'real Supabase rows');
+          console.log('[ZAXIS] UUIDs:', DB.categories.map(c => c.slug + '=' + c.id.slice(0,8)).join(' | '));
+
+          // Immediately repopulate every category dropdown/chip right now.
+          // Do NOT wait for initApp — the dropdown must have real UUIDs
+          // before the user can click Add Product.
+          if (typeof populateCategoryFilters === 'function') populateCategoryFilters();
+        } else {
+          console.warn('[ZAXIS] Supabase returned 0 categories — check table content and RLS policy.');
+        }
+
+        // ── Step 2: Fetch products ────────────────────────────────────
+        const { data: products, error: prodErr } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (prodErr) {
+          console.error('[ZAXIS] Products fetch failed:', prodErr.message);
+          console.error('[ZAXIS] Fix: CREATE POLICY "public_read" ON products FOR SELECT USING (true);');
+          return;
+        }
+
+        if (!products || products.length === 0) {
+          console.warn('[ZAXIS] No products from Supabase — table empty or RLS blocking reads.');
+          return;
+        }
+
+        // ── Step 3: Replace/merge products ───────────────────────────
+        const supabaseIds = new Set(products.map(p => p.id));
+        // Remove local seed products that have a real counterpart in Supabase
+        DB.products = DB.products.filter(p => !supabaseIds.has(p.id));
+        products.forEach(p => {
+          DB.products.push({
+            ...p,
+            image_url: p.image_url || '📦',
+            pros: Array.isArray(p.pros) ? p.pros : (p.pros ? String(p.pros).split(',').map(s=>s.trim()).filter(Boolean) : []),
+            cons: Array.isArray(p.cons) ? p.cons : (p.cons ? String(p.cons).split(',').map(s=>s.trim()).filter(Boolean) : []),
+          });
+        });
+
+        console.log('[ZAXIS] ✓ loadFromSupabase DONE — products:', DB.products.length, '| categories:', DB.categories.length);
+
+      } catch(e) {
+        console.error('[ZAXIS] loadFromSupabase EXCEPTION:', e);
+      }
+    },
+    async createProductInSupabase(data) {
+      const slug = data.title.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+      // Build the local product immediately so UI updates even if Supabase fails
+      const localProduct = {
+        id: 'p' + Date.now(),
+        ...data,
+        slug,
+        pros: Array.isArray(data.pros) ? data.pros : [],
+        cons: Array.isArray(data.cons) ? data.cons : [],
+        image_url: data.image_url || '📦',
+        created_at: new Date().toISOString()
+      };
+
+      // Push to local DB immediately — UI will show it right away
+      DB.products.unshift(localProduct);
+
+      // Try to persist to Supabase
+      try {
+        console.log('[ZAXIS] Inserting product to Supabase:', localProduct.title, '| category_id:', localProduct.category_id);
+        // ── CRITICAL FIX: never send the local temp id ('p123456…') to Supabase ──
+        // Supabase's `id` column is type UUID — sending 'p1746283498' causes
+        // error 22P02 "invalid input syntax for type uuid". Omit `id` entirely
+        // so Supabase auto-generates a proper UUID via gen_random_uuid().
+        // Also validate category_id is a real UUID before sending.
+        if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(localProduct.category_id)) {
+          const errMsg = `category_id "${localProduct.category_id}" is not a valid UUID. Categories may not have loaded from Supabase yet.`;
+          console.error('[ZAXIS] INSERT ABORTED:', errMsg);
+          showToast('⚠ Category ID is not a valid UUID. Please re-select the category.', 'error');
+          // Remove the optimistic local entry since we can't persist it
+          const badIdx = DB.products.findIndex(p => p.id === localProduct.id);
+          if (badIdx !== -1) DB.products.splice(badIdx, 1);
+          return localProduct;
+        }
+        const insertPayload = {
+          // id intentionally omitted — Supabase auto-generates a UUID
+          title: localProduct.title,
+          slug: localProduct.slug,
+          description: localProduct.description,
+          category_id: localProduct.category_id,
+          affiliate_link: localProduct.affiliate_link || '',
+          price: localProduct.price || '',
+          rating: localProduct.rating || 4.5,
+          image_url: localProduct.image_url || '📦',
+          status: localProduct.status || 'published',
+          commission: localProduct.commission || '',
+          pros: localProduct.pros || [],
+          cons: localProduct.cons || [],
+        };
+        console.log('[ZAXIS] Insert payload:', JSON.stringify(insertPayload));
+
+        const { data: saved, error } = await supabase
+          .from('products')
+          .insert([insertPayload])
+          .select()
+          .single();
+
+        if (error) {
+          console.error('[ZAXIS] INSERT FAILED:', error.message);
+          console.error('[ZAXIS] error.details:', error.details);
+          console.error('[ZAXIS] error.hint:', error.hint);
+          console.error('[ZAXIS] error.code:', error.code);
+          if (error.code === '42501' || error.message.includes('policy') || error.message.includes('RLS')) {
+            showToast('⚠ Supabase RLS blocking insert. Run the SQL policy fix — see console.', 'error');
+          } else {
+            showToast('⚠ Supabase error: ' + error.message, 'error');
+          }
+          // Product is already in local DB — still shows in UI this session
+          return localProduct;
+        }
+
+        // Replace local temp entry with real Supabase row
+        const idx = DB.products.findIndex(p => p.id === localProduct.id);
+        const normalized = {
+          ...saved,
+          pros: Array.isArray(saved.pros) ? saved.pros : [],
+          cons: Array.isArray(saved.cons) ? saved.cons : [],
+          image_url: saved.image_url || '📦'
+        };
+        if (idx !== -1) DB.products[idx] = normalized;
+        console.log('[ZAXIS] ✓ Product saved to Supabase with id:', saved.id);
+        return normalized;
+      } catch(e) {
+        console.error('[ZAXIS] createProductInSupabase exception:', e);
+        return localProduct;
+      }
+    },
+    createProduct(data) {
+      const p = { id:'p'+Date.now(), ...data,
+        slug: data.title.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''),
+        created_at: new Date().toISOString() };
+      DB.products.push(p); return p;
+    },
+    updateProduct(id, data) {
+      const i = DB.products.findIndex(p=>p.id===id);
+      if (i!==-1){ DB.products[i]={...DB.products[i],...data}; return DB.products[i]; }
+      return null;
+    },
+    deleteProduct(id) {
+      const i = DB.products.findIndex(p=>p.id===id);
+      if (i!==-1){ DB.products.splice(i,1); return true; } return false;
+    },
+    trackClick(productId, source) {
+      const c = { id:'clk'+Date.now(), product_id:productId, source_page:source,
+        country:['US','IN','UK','CA','DE','AU','NP'][Math.floor(Math.random()*7)],
+        commission:['$12','$8','$22','$15','$6','$18'][Math.floor(Math.random()*6)],
+        clicked_at: new Date() };
+      DB.affiliate_clicks.push(c); return c;
+    }
+  };
+
+  // ── 6. UI Router ─────────────────────────────────────────────────
+  let currentView = 'dashboard', previousView = 'dashboard';
+
+  function showPage(page) {
+    document.querySelectorAll('.page,.auth-wrap,.app-shell').forEach(el=>el.classList.remove('active'));
+    if (page==='landing') {
+      document.getElementById('page-landing').classList.add('active');
+    } else if (page==='app') {
+      document.getElementById('app-shell').classList.add('active');
+      initApp();
+    }
+  }
+  window.showPage = showPage;
+
+  function showAuth(type) {
+    document.querySelectorAll('.page,.auth-wrap,.app-shell').forEach(el=>el.classList.remove('active'));
+    document.getElementById('auth-'+type).classList.add('active');
+  }
+  window.showAuth = showAuth;
+
+  function showView(name, navEl) {
+    previousView = currentView; currentView = name;
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    const view = document.getElementById('view-'+name);
+    if (view) { view.classList.add('active'); window.scrollTo(0,0); }
+    if (navEl) navEl.classList.add('active');
+    const titles = { dashboard:'Dashboard', browse:'Browse Products', categories:'Categories',
+      search:'Search Tools','admin-products':'Manage Products','add-product':'Add Product',
+      analytics:'Analytics','manage-cats':'Categories',profile:'My Profile',
+      'product-detail':'Product Detail', compare:'Compare', saved:'Saved', pricing:'Pricing',
+      contact:'Contact', legal:'Legal', review:'Review' };
+    const el = document.getElementById('main-title');
+    if(el) el.textContent = titles[name]||name;
+    if(name==='compare') populateCompareSelects();
+    if(name==='pricing') renderPricing();
+    if(name==='saved') renderSaved();
+    if(name==='search') setTimeout(initSearchSuggestions,100);
+    if(name==='admin-products') setTimeout(initTableFilter,100);
+    // Always refresh category dropdown with real UUIDs when opening Add Product
+    if(name==='add-product') populateCategoryFilters();
+  }
+  window.showView = showView;
+
+  function goBack() { showView(previousView); }
+  window.goBack = goBack;
+
+  // ── 7. AUTH ACTIONS ──────────────────────────────────────────────
+
+  window.doSignup = async function() {
+    hideAlert('signup-error');
+    hideAlert('signup-success');
+
+    const name  = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const pw    = document.getElementById('signup-password').value;
+    const role  = (document.getElementById('signup-role').value || 'user');
+    const terms = document.getElementById('signup-terms').checked;
+
+    if (!name)  return showAlert('signup-error', true, '⚠ Enter your full name');
+    if (!email) return showAlert('signup-error', true, '⚠ Enter your email');
+    if (!pw)    return showAlert('signup-error', true, '⚠ Enter a password');
+    if (pw.length < 6) return showAlert('signup-error', true, '⚠ Password must be at least 6 characters');
+    if (!terms) return showAlert('signup-error', true, '⚠ Please accept the terms');
+
+    const btn = document.querySelector('#auth-signup .btn-neon');
+    if (btn) { btn.disabled=true; btn.textContent='Creating account…'; }
+
+    console.log('[ZAXIS] Signing up:', email);
+
+    const { data, error } = await supabase.auth.signUp({ email, password: pw });
+
+    if (btn) { btn.disabled=false; btn.textContent='Create Free Account →'; }
+
+    if (error) {
+      console.error('[ZAXIS] Signup error:', error);
+      return showAlert('signup-error', true, '⚠ '+error.message);
+    }
+
+    const user = data?.user;
+    if (!user) return showAlert('signup-error', true, '⚠ Signup failed — no user returned. Try again.');
+
+    // Duplicate email: Supabase returns identities=[]
+    if (user.identities && user.identities.length === 0) {
+      return showAlert('signup-error', true, '⚠ That email is already registered. Sign in instead.');
+    }
+
+    console.log('[ZAXIS] User created:', user.id);
+
+    // Insert profile (non-fatal if it fails)
+    const { error: dbErr } = await supabase.from('profiles').insert([{ id:user.id, email, name, role }]);
+    if (dbErr) console.warn('[ZAXIS] Profile insert warning:', dbErr.message);
+
+    AuthService.currentUser = { id:user.id, email, name, role, created_at:new Date().toISOString() };
+
+    // If Supabase requires email confirmation, no session is returned
+    if (!data.session) {
+      showAlert('signup-success', true, '✓ Account created! Check your email to confirm, then sign in.');
+      return;
+    }
+
+    showAlert('signup-success', true, '✓ Account created! Entering dashboard…');
+    setTimeout(() => showPage('app'), 1000);
+  };
+
+  window.doLogin = async function() {
+    hideAlert('login-error');
+    hideAlert('login-success');
+
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if (!email || !password) return showAlert('login-error', true, '⚠ Enter email and password');
+
+    const btn = document.querySelector('#auth-login .btn-neon');
+    if (btn) { btn.disabled=true; btn.textContent='Signing in…'; }
+
+    console.log('[ZAXIS] Logging in:', email);
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (btn) { btn.disabled=false; btn.textContent='Sign In →'; }
+
+    if (error) {
+      console.error('[ZAXIS] Login error:', error);
+      return showAlert('login-error', true, '⚠ '+error.message);
+    }
+
+    console.log('[ZAXIS] Login success');
+    await AuthService.loadSession();
+    const r = AuthService.currentUser?.role || 'user';
+    showAlert('login-success', true, '✓ Signed in! Role: ' + r + '. Loading…');
+    setTimeout(() => showPage('app'), 800);
+  };
+
+  window.doLogout = async function() {
+    await AuthService.logout();
+    showPage('landing');
+    showToast('👋 Signed out of ZAXIS');
+  };
+
+  window.quickLogin = async function(type) {
+    // Fill the fields visually
+    const creds = {
+      user:  { email:'user@zaxis.kesug.com',  pw:'demo1234',  name:'Demo User', role:'user'  },
+      admin: { email:'zaxisgod02@gmail.com', pw:'demo1234',  name:'Demo Admin', role:'admin' }
+    };
+    const c = creds[type];
+    document.getElementById('login-email').value    = c.email;
+    document.getElementById('login-password').value = c.pw;
+    hideAlert('login-error'); hideAlert('login-success');
+
+    const btn = document.querySelector('#auth-login .btn-neon');
+    if (btn) { btn.disabled=true; btn.textContent='Signing in…'; }
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email:c.email, password:c.pw });
+
+    if (btn) { btn.disabled=false; btn.textContent='Sign In →'; }
+
+    if (error) {
+      // Supabase demo accounts don't exist yet → use local demo session
+      console.warn('[ZAXIS] Demo Supabase login failed, using local session:', error.message);
+      AuthService.currentUser = { id:'demo-'+type, email:c.email, name:c.name, role:c.role, created_at:'2025-01-01' };
+      showAlert('login-success', true, '✓ Demo login (offline mode) — role: ' + c.role);
+      setTimeout(() => showPage('app'), 800);
+      return;
+    }
+
+    await AuthService.loadSession();
+    showAlert('login-success', true, '✓ Signed in! Role: ' + (AuthService.currentUser?.role || 'user'));
+    setTimeout(() => showPage('app'), 800);
+  };
+
+  // ── 8. App Init ──────────────────────────────────────────────────
+  async function initApp() {
+    // Always reload session to get fresh role from Supabase
+    await AuthService.loadSession();
+    const user = AuthService.currentUser;
+    if (!user) { showPage('landing'); return; }
+
+    // Load products from Supabase before rendering anything
+    await ProductService.loadFromSupabase();
+
+    const initials = (user.name||'?').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('sb-avatar').textContent  = initials;
+    document.getElementById('sb-name').textContent    = user.name;
+    const roleEl = document.getElementById('sb-role');
+    roleEl.textContent  = user.role;
+    roleEl.className    = 'sidebar-user-role '+(user.role==='admin'?'role-admin':'role-user');
+
+    const isAdmin = user.role === 'admin';
+    console.log('[ZAXIS] initApp — user role:', user.role, '| isAdmin:', isAdmin);
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? '' : 'none');
+
+    document.getElementById('dash-welcome').textContent = `Welcome back, ${user.name} 👋`;
+    document.getElementById('profile-avatar').textContent   = initials;
+    document.getElementById('profile-name').textContent     = user.name;
+    document.getElementById('profile-email').textContent    = user.email;
+    document.getElementById('profile-name-input').value     = user.name;
+    document.getElementById('profile-email-input').value    = user.email;
+    const profileRole = document.getElementById('profile-role');
+    profileRole.textContent = user.role;
+    profileRole.className   = 'sidebar-user-role '+(user.role==='admin'?'role-admin':'role-user');
+
+    renderDashboard(); renderBrowse(); renderCategories();
+    renderAdminProducts(); renderAnalytics(); renderCatsTable();
+    populateCategoryFilters(); renderPricing(); renderSaved();
+    populateCompareSelects();
+
+    // Use all products for admin counts, published-only for user-facing counts
+    const publishedCount = ProductService.getProducts(null).length;
+    document.getElementById('stat-total').textContent       = DB.products.length;
+    document.getElementById('stat-cats').textContent        = DB.categories.length;
+    document.getElementById('nav-products-count').textContent = DB.products.length;
+    document.getElementById('browse-count').textContent     = publishedCount;
+
+    updateSidebarNav(); updateMainTopbar(); upgradeProfilePage();
+    upgradeAnalytics(); upgradeAuthForms();
+
+    // ── Real-time: listen for product INSERT/UPDATE/DELETE from Supabase ──
+    if (!window._zaxisRealtimeChannel) {
+      window._zaxisRealtimeChannel = supabase
+        .channel("zaxis-realtime")
+        .on("postgres_changes", { event: "*", schema: "public", table: "products" }, async (payload) => {
+          console.log("[ZAXIS] Realtime product event:", payload.eventType, payload.new?.title || payload.old?.id);
+          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+            const p = payload.new;
+            // Resolve category_id — Supabase sends the real UUID
+            let catId = p.category_id;
+            if (catId) { const byId = DB.categories.find(c => c.id === catId); if (!byId) { const bySlug = DB.categories.find(c => c.slug === catId); if (bySlug) catId = bySlug.id; } }
+            const normalized = {
+              ...p, category_id: catId || p.category_id, image_url: p.image_url || "📦",
+              pros: Array.isArray(p.pros) ? p.pros : (p.pros ? String(p.pros).split(",").map(s=>s.trim()).filter(Boolean) : []),
+              cons: Array.isArray(p.cons) ? p.cons : (p.cons ? String(p.cons).split(",").map(s=>s.trim()).filter(Boolean) : []),
+            };
+            const idx = DB.products.findIndex(e => e.id === p.id);
+            if (idx !== -1) { DB.products[idx] = normalized; } else { DB.products.unshift(normalized); }
+          } else if (payload.eventType === "DELETE") {
+            const idx = DB.products.findIndex(e => e.id === payload.old.id);
+            if (idx !== -1) DB.products.splice(idx, 1);
+          }
+          renderBrowse(); renderDashboard(); renderAdminProducts(); renderCategories();
+          const publishedCount = ProductService.getProducts(null).length;
+          const totalEl = document.getElementById("stat-total");
+          const browseEl = document.getElementById("browse-count");
+          const navEl = document.getElementById("nav-products-count");
+          if (totalEl) totalEl.textContent = DB.products.length;
+          if (browseEl) browseEl.textContent = publishedCount;
+          if (navEl) navEl.textContent = DB.products.length;
+          showToast("🔄 Store updated live!");
+        })
+        .on("postgres_changes", { event: "*", schema: "public", table: "categories" }, async (payload) => {
+          console.log("[ZAXIS] Realtime category event:", payload.eventType);
+          if (payload.eventType === "INSERT") {
+            if (!DB.categories.find(c => c.id === payload.new.id)) DB.categories.push(payload.new);
+          } else if (payload.eventType === "UPDATE") {
+            const idx = DB.categories.findIndex(c => c.id === payload.new.id);
+            if (idx !== -1) DB.categories[idx] = payload.new;
+          } else if (payload.eventType === "DELETE") {
+            const idx = DB.categories.findIndex(c => c.id === payload.old.id);
+            if (idx !== -1) DB.categories.splice(idx, 1);
+          }
+          renderCatsTable(); renderCategories(); populateCategoryFilters();
+          const catsEl = document.getElementById("stat-cats");
+          if (catsEl) catsEl.textContent = DB.categories.length;
+        })
+        .subscribe((status) => { console.log("[ZAXIS] Realtime status:", status); });
+    }
+  }
+
+  // ── 9. Render Functions ──────────────────────────────────────────
+  function renderProductCard(p, onclick_fn) {
+    // Find category by id, or by slug/name if id doesn't match (Supabase UUID vs local)
+    const cat = DB.categories.find(c=>c.id===p.category_id)
+             || DB.categories.find(c=>c.slug===p.category_id)
+             || DB.categories.find(c=>c.name===p.category_id);
+    const badge = p.status==='featured'?'<div class="product-card-badge badge-featured">Featured</div>':
+                  p.status==='new'?'<div class="product-card-badge badge-new">New</div>':'';
+    return `<div class="product-card" onclick="${onclick_fn}">
+      <div class="product-card-img" style="font-size:56px">${p.image_url}${badge}</div>
+      <div class="product-card-body">
+        <div class="product-card-cat">${cat?cat.name:(p.category_id||'Uncategorized')}</div>
+        <div class="product-card-name">${p.title}</div>
+        <div class="product-card-desc">${p.description.slice(0,100)}…</div>
+        <div class="product-card-footer">
+          <div class="product-card-price">${p.price} <span>starting</span></div>
+          <div class="product-rating">★ ${p.rating}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+  window.renderProductCard = renderProductCard;
+
+  function renderDashboard() {
+    const mini = DB.products.slice(0,6).map(p=>{
+      const cat=DB.categories.find(c=>c.id===p.category_id);
+      return `<div class="mini-card" onclick="openProduct('${p.id}')">
+        <div class="mini-card-icon">${p.image_url}</div>
+        <div><div class="mini-card-name">${p.title}</div><div class="mini-card-cat">${cat?.name||''}</div></div>
+        <div class="mini-card-price">${p.price}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('dash-mini-products').innerHTML=mini;
+    renderDashClickLog();
+  }
+
+  function renderDashClickLog() {
+    const log = DB.affiliate_clicks.slice(-5).reverse();
+    const el = document.getElementById('dash-click-log');
+    if(!el) return;
+    el.innerHTML = log.length>0 ? log.map(c=>{
+      const p=DB.products.find(pr=>pr.id===c.product_id);
+      return `<div class="click-item">
+        <div class="click-dot"></div>
+        <div class="click-product">${p?.title||'Unknown'}</div>
+        <div class="click-page">${c.source_page}</div>
+        <div class="click-time">${c.clicked_at.toLocaleTimeString()}</div>
+      </div>`;
+    }).join('') : '<div style="text-align:center;padding:20px;color:var(--zm);font-size:13px">No clicks yet.</div>';
+  }
+  window.renderDashClickLog = renderDashClickLog;
+
+  function renderBrowse(filter='all') {
+    // ProductService.getProducts already filters to published/featured only
+    const products = ProductService.getProducts(filter==='all'?null:filter);
+    const grid = document.getElementById('browse-grid');
+    if(!grid) return;
+    grid.innerHTML = products.length===0
+      ? '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📦</div><p>No products in this category yet.</p></div>'
+      : products.map(p=>renderProductCard(p,`openProduct('${p.id}')`)).join('');
+    const bc = document.getElementById('browse-count');
+    if(bc) bc.textContent = products.length;
+  }
+  window.renderBrowse = renderBrowse;
+
+  function renderCategories() {
+    const grid = document.getElementById('app-cat-grid');
+    if(grid) grid.innerHTML = DB.categories.map(c=>{
+      const count = DB.products.filter(p=>(p.category_id===c.id||p.category_id===c.slug||p.category_id===c.name) && (p.status==='published'||p.status==='featured')).length;
+      return `<div class="cat-card" onclick="filterByCategory('${c.id}')">
+        <div class="cat-card-icon">${c.icon}</div>
+        <div class="cat-card-name">${c.name}</div>
+        <div class="cat-card-count mono">${count} products</div>
+      </div>`;
+    }).join('');
+    const homeGrid = document.getElementById('home-cat-grid');
+    if(homeGrid) homeGrid.innerHTML = DB.categories.map(c=>{
+      const count = DB.products.filter(p=>p.category_id===c.id && (p.status==='published'||p.status==='featured')).length;
+      return `<div class="cat-card" onclick="showAuth('signup')">
+        <div class="cat-card-icon">${c.icon}</div>
+        <div class="cat-card-name">${c.name}</div>
+        <div class="cat-card-count mono">${count} products</div>
+      </div>`;
+    }).join('');
+  }
+  window.renderCategories = renderCategories;
+
+  function filterByCategory(catId) {
+    showView('browse', document.querySelector('.nav-item:nth-child(2)'));
+    renderBrowse(catId);
+  }
+  window.filterByCategory = filterByCategory;
+
+  function renderAdminProducts() {
+    const tbody = document.getElementById('admin-products-table');
+    if(!tbody) return;
+    // Admin sees ALL products (published, featured, draft)
+    tbody.innerHTML = DB.products.map(p=>{
+      const cat=DB.categories.find(c=>c.id===p.category_id)
+               ||DB.categories.find(c=>c.slug===p.category_id)
+               ||DB.categories.find(c=>c.name===p.category_id);
+      const pill = p.status==='featured'?'pill-featured':p.status==='draft'?'pill-draft':'pill-published';
+      return `<tr>
+        <td style="font-size:24px">${p.image_url}</td>
+        <td><strong>${p.title}</strong><br><span class="mono">${p.slug||''}</span></td>
+        <td>${cat?.name||p.category_id}</td>
+        <td>${p.price}</td>
+        <td style="color:var(--gold)">★ ${p.rating}</td>
+        <td><span class="status-pill ${pill}">${p.status}</span></td>
+        <td><div class="table-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editProduct('${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Delete</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+  window.renderAdminProducts = renderAdminProducts;
+
+  function renderAnalytics() {
+    const chart=document.getElementById('analytics-chart');
+    if(chart){
+      const maxC=1847;
+      chart.innerHTML=DB.products.map((p,i)=>{
+        const clicks=[1847,1520,1160,880,720,560][i]||Math.floor(Math.random()*500);
+        const pct=Math.round((clicks/maxC)*100);
+        return `<div class="bar-row">
+          <div class="bar-label">${p.image_url} ${p.title}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:0%" data-target="${pct}%">${clicks}</div></div>
+          <div class="bar-val">${clicks.toLocaleString()}</div>
+        </div>`;
+      }).join('');
+      setTimeout(()=>chart.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.target),100);
+    }
+    const logTbl=document.getElementById('analytics-log');
+    if(logTbl){
+      const logs=[
+        {p:'Jasper AI',src:'/review/jasper-ai',country:'🇺🇸 US',comm:'$12.40',time:'2 min ago'},
+        {p:'Hostinger', src:'/category/hosting',country:'🇮🇳 IN',comm:'$22.00',time:'5 min ago'},
+        {p:'Copy.ai',   src:'/compare',          country:'🇬🇧 UK',comm:'$8.10', time:'11 min ago'},
+        {p:'Notion AI', src:'/blog',              country:'🇨🇦 CA',comm:'$6.20', time:'18 min ago'},
+        {p:'Surfer SEO',src:'/dashboard',         country:'🇩🇪 DE',comm:'$15.50',time:'24 min ago'},
+      ];
+      logTbl.innerHTML=logs.map(l=>`<tr>
+        <td><strong>${l.p}</strong></td><td class="mono">${l.src}</td>
+        <td>${l.country}</td><td style="color:var(--acid)">${l.comm}</td>
+        <td class="mono">${l.time}</td>
+      </tr>`).join('');
+    }
+  }
+  window.renderAnalytics = renderAnalytics;
+
+  function renderCatsTable() {
+    const tbody=document.getElementById('cats-table');
+    if(!tbody) return;
+    tbody.innerHTML=DB.categories.map(c=>{
+      const count=DB.products.filter(p=>p.category_id===c.id).length;
+      return `<tr>
+        <td style="font-size:22px">${c.icon}</td>
+        <td><strong>${c.name}</strong></td>
+        <td class="mono">${c.slug}</td>
+        <td>${count}</td>
+        <td><div class="table-actions">
+          <button class="btn btn-ghost btn-sm">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCat('${c.id}')">Delete</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+  window.renderCatsTable = renderCatsTable;
+
+  function populateCategoryFilters() {
+    const bf=document.getElementById('browse-filter');
+    if(bf) bf.innerHTML='<div class="cat-chip active" onclick="filterBrowse(this,\'all\')">All</div>'+
+      DB.categories.map(c=>`<div class="cat-chip" onclick="filterBrowse(this,'${c.id}')">${c.icon} ${c.name}</div>`).join('');
+    const apCat=document.getElementById('ap-category');
+    if(apCat) apCat.innerHTML='<option value="">Select category…</option>'+
+      DB.categories.map(c=>`<option value="${c.id}">${c.icon} ${c.name}</option>`).join('');
+    const sc=document.getElementById('search-cat-filter');
+    if(sc) sc.innerHTML='<option value="all">All Categories</option>'+
+      DB.categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    renderHomeProducts();
+  }
+  window.populateCategoryFilters = populateCategoryFilters;
+
+  function renderHomeProducts(filter='all') {
+    const grid=document.getElementById('home-product-grid');
+    if(!grid) return;
+    const products = filter==='all' ? DB.products : DB.products.filter(p=>{
+      const cat=DB.categories.find(c=>c.id===p.category_id);
+      if(filter==='ai') return cat?.slug==='ai-tools';
+      if(filter==='hosting') return cat?.slug==='hosting';
+      if(filter==='marketing') return cat?.slug==='seo-marketing';
+      if(filter==='student') return cat?.slug==='student';
+      return true;
+    });
+    grid.innerHTML=products.map(p=>{
+      const cat=DB.categories.find(c=>c.id===p.category_id);
+      const badge=p.status==='featured'?'<div class="product-card-badge badge-featured">Featured</div>':'';
+      return `<div class="product-card" onclick="showAuth('signup')">
+        <div class="product-card-img">${p.image_url}${badge}</div>
+        <div class="product-card-body">
+          <div class="product-card-cat">${cat?.name||''}</div>
+          <div class="product-card-name">${p.title}</div>
+          <div class="product-card-desc">${p.description.slice(0,90)}…</div>
+          <div class="product-card-footer">
+            <div class="product-card-price">${p.price}</div>
+            <div class="product-rating">★ ${p.rating}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  window.renderHomeProducts = renderHomeProducts;
+
+  // ── 10. Product Actions ──────────────────────────────────────────
+  window.openProduct = function(id) {
+    const p=DB.products.find(pr=>pr.id===id);
+    if(!p) return;
+    const cat=DB.categories.find(c=>c.id===p.category_id)
+           ||DB.categories.find(c=>c.slug===p.category_id)
+           ||DB.categories.find(c=>c.name===p.category_id);
+    const prosH=(p.pros||[]).map(pr=>`<li style="display:flex;gap:8px;margin-bottom:8px;font-size:14px;color:var(--zs)"><span style="color:var(--acid);font-weight:700">✓</span>${pr}</li>`).join('');
+    const consH=(p.cons||[]).map(con=>`<li style="display:flex;gap:8px;margin-bottom:8px;font-size:14px;color:var(--zs)"><span style="color:var(--red);font-weight:700">✗</span>${con}</li>`).join('');
+    document.getElementById('product-detail-content').innerHTML=`
+      <div class="detail-hero">
+        <div class="detail-img">${p.image_url}</div>
+        <div class="detail-body">
+          <div class="detail-cat">${cat?.icon||''} ${cat?.name||''}</div>
+          <div class="detail-name">${p.title}</div>
+          <div class="detail-desc">${p.description}</div>
+          <div class="detail-meta">
+            <div class="detail-meta-item"><div class="detail-meta-label">Price</div><div class="detail-meta-value">${p.price}</div></div>
+            <div class="detail-meta-item"><div class="detail-meta-label">Rating</div><div class="detail-meta-value" style="color:var(--gold)">★ ${p.rating}/5</div></div>
+            <div class="detail-meta-item"><div class="detail-meta-label">Commission</div><div class="detail-meta-value" style="color:var(--acid)">${p.commission||'N/A'}</div></div>
+            <div class="detail-meta-item"><div class="detail-meta-label">Status</div><div class="detail-meta-value">${p.status}</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+            ${prosH?`<div style="background:rgba(0,245,160,0.06);border:1px solid rgba(0,245,160,0.2);border-radius:var(--r-sm);padding:16px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--acid);margin-bottom:10px">Pros</div><ul style="list-style:none">${prosH}</ul></div>`:''}
+            ${consH?`<div style="background:rgba(255,68,102,0.06);border:1px solid rgba(255,68,102,0.2);border-radius:var(--r-sm);padding:16px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--red);margin-bottom:10px">Cons</div><ul style="list-style:none">${consH}</ul></div>`:''}
+          </div>
+          <div class="affiliate-box">
+            <div style="flex:1">
+              <div style="font-size:16px;font-weight:700;color:var(--zx);margin-bottom:4px">Ready to try ${p.title}?</div>
+              <p>ZAXIS earns a commission if you subscribe — at no extra cost to you.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-neon" onclick="visitProduct('${p.id}')">Visit Product ↗</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    showView('product-detail');
+    const mt=document.getElementById('main-title');
+    if(mt) mt.textContent=p.title;
+  };
+
+  window.visitProduct = function(productId) {
+    const p = DB.products.find(pr => pr.id === productId);
+    if (!p) { showToast('⚠ Product not found', 'error'); return; }
+
+    const link = p.affiliate_link;
+
+    // Guard: no link at all
+    if (!link || link.trim() === '') {
+      showToast('⚠ No affiliate link set for this product', 'error');
+      return;
+    }
+    // Guard: placeholder # was never replaced
+    if (link === '#') {
+      showToast('⚠ Affiliate link not configured yet', 'error');
+      return;
+    }
+    // Guard: must be a real URL
+    if (!link.startsWith('http://') && !link.startsWith('https://')) {
+      showToast('⚠ Invalid affiliate link — must start with https://', 'error');
+      return;
+    }
+
+    // Track the click
+    ProductService.trackClick(productId, 'product-detail');
+    renderDashClickLog();
+    showToast(`⚡ Opening ${p.title}…`);
+
+    // Open in new tab using window.open (avoids about:blank from <a> tag issues)
+    const newTab = window.open(link, '_blank', 'noopener,noreferrer');
+    if (!newTab) {
+      // Popup was blocked — fall back to direct navigation
+      showToast('⚠ Popup blocked. Opening here instead…', 'error');
+      window.location.href = link;
+    }
+  };
+
+  window.trackAndOpen = function(productId, source) {
+    ProductService.trackClick(productId, source);
+    const p=DB.products.find(pr=>pr.id===productId);
+    showToast(`⚡ Click tracked: ${p?.title}`);
+    renderDashClickLog();
+  };
+
+  // UUID validation helper — returns true only for real UUID v4 strings
+  function isRealUUID(val) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+  }
+
+  window.saveProduct = async function() {
+    const title=document.getElementById('ap-title').value.trim();
+    const cat=document.getElementById('ap-category').value;
+    const desc=document.getElementById('ap-desc').value.trim();
+    if(!title||!cat||!desc){ showToast('⚠ Fill Title, Category and Description','error'); return; }
+
+    // ── CRITICAL FIX: ensure DB.categories has real Supabase UUIDs ──────────
+    // If categories haven't been fetched yet (still have seed fake IDs like c1),
+    // fetch them now before attempting the insert — otherwise Supabase will reject
+    // with "invalid input syntax for type uuid: c1" (error code 22P02).
+    const hasRealUUIDs = DB.categories.length > 0 && isRealUUID(DB.categories[0].id);
+    if (!hasRealUUIDs) {
+      showToast('⏳ Loading categories from Supabase, please wait…', 'error');
+      console.warn('[ZAXIS] Categories not yet loaded from Supabase — fetching now…');
+      try {
+        const { data: freshCats, error: catErr } = await supabase
+          .from('categories')
+          .select('id, name, slug, icon, description')
+          .order('name');
+        if (catErr) throw catErr;
+        if (freshCats && freshCats.length > 0) {
+          DB.categories.length = 0;
+          freshCats.forEach(sc => DB.categories.push(sc));
+          populateCategoryFilters(); // re-render dropdowns with real UUIDs
+          console.log('[ZAXIS] ✓ Categories refreshed before save:', DB.categories.map(c=>c.slug+'='+c.id.slice(0,8)).join(' | '));
+        }
+      } catch(e) {
+        console.error('[ZAXIS] Failed to fetch categories before save:', e);
+        showToast('⚠ Could not load categories from Supabase. Check RLS policy.', 'error');
+        return;
+      }
+    }
+
+    // Re-read dropdown value after potential repopulation
+    const freshCat = document.getElementById('ap-category').value;
+    const catRow = DB.categories.find(c => c.id === (freshCat || cat));
+    if (!catRow || !isRealUUID(catRow.id)) {
+      showToast('⚠ Please select a valid category. Categories may still be loading.', 'error');
+      console.error('[ZAXIS] BLOCKED: no real UUID category_id found.', {
+        selectedValue: freshCat || cat,
+        categories: DB.categories.map(c => ({ id: c.id, name: c.name, isUUID: isRealUUID(c.id) }))
+      });
+      return;
+    }
+    const finalCatId = catRow.id; // guaranteed real UUID
+    console.log('[ZAXIS] saveProduct — category:', catRow.name, '| UUID:', finalCatId);
+    console.log('[ZAXIS] saveProduct — category:', catRow.name, '| UUID:', finalCatId);
+    const affiliateLink = document.getElementById('ap-link').value.trim();
+    if (affiliateLink && !affiliateLink.startsWith('http://') && !affiliateLink.startsWith('https://')) {
+      showToast('⚠ Affiliate link must start with https:// — e.g. https://jasper.ai', 'error');
+      return;
+    }
+    const btn = document.querySelector('#view-add-product .btn-neon');
+    if(btn){ btn.disabled=true; btn.textContent='Saving…'; }
+
+    // Check if we're editing an existing product
+    const editingId = document.getElementById('ap-title').dataset.editingId;
+
+    const productData = {
+      title, category_id: finalCatId,
+      affiliate_link: affiliateLink,
+      price: document.getElementById('ap-price').value.trim(),
+      description: desc,
+      rating: parseFloat(document.getElementById('ap-rating').value)||4.5,
+      image_url: document.getElementById('ap-icon').value.trim()||'📦',
+      status: document.getElementById('ap-status').value,
+      commission: document.getElementById('ap-commission').value.trim(),
+      pros: document.getElementById('ap-pros').value.split(',').map(s=>s.trim()).filter(Boolean),
+      cons: document.getElementById('ap-cons').value.split(',').map(s=>s.trim()).filter(Boolean),
+    };
+
+    if (editingId) {
+      // ── UPDATE existing product ───────────────────────────────
+      const { data: updated, error } = await supabase
+        .from('products')
+        .update(productData)
+        .eq('id', editingId)
+        .select()
+        .single();
+      if (error) {
+        console.error('[ZAXIS] UPDATE FAILED:', error.message, error.hint);
+        showToast('⚠ Update failed: ' + error.message, 'error');
+      } else {
+        // Patch local DB
+        const normalized = {
+          ...updated,
+          pros: Array.isArray(updated.pros) ? updated.pros : [],
+          cons: Array.isArray(updated.cons) ? updated.cons : [],
+          image_url: updated.image_url || '📦'
+        };
+        const idx = DB.products.findIndex(p => p.id === editingId);
+        if (idx !== -1) DB.products[idx] = normalized;
+        showToast(`✓ "${title}" updated!`);
+      }
+      // Clear editing state
+      document.getElementById('ap-title').dataset.editingId = '';
+      const h = document.getElementById('add-product-title');
+      if(h) h.textContent = 'Add New Product';
+    } else {
+      // ── INSERT new product ────────────────────────────────────
+      await ProductService.createProductInSupabase(productData);
+      showToast(`✓ "${title}" added to store!`);
+    }
+
+    if(btn){ btn.disabled=false; btn.textContent='Save Product'; }
+    showAlert('add-success',true); setTimeout(()=>hideAlert('add-success'),3000);
+    ['ap-title','ap-link','ap-price','ap-desc','ap-rating','ap-icon','ap-commission','ap-pros','ap-cons'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    renderAdminProducts();
+    renderBrowse();
+    renderDashboard();
+    renderCategories();
+    populateCategoryFilters();
+    const totalEl = document.getElementById('stat-total');
+    const navEl = document.getElementById('nav-products-count');
+    const browseEl = document.getElementById('browse-count');
+    if(totalEl) totalEl.textContent = DB.products.length;
+    if(navEl) navEl.textContent = DB.products.length;
+    if(browseEl) browseEl.textContent = ProductService.getProducts(null).length;
+  };
+
+  window.editProduct = function(id) {
+    const p=DB.products.find(pr=>pr.id===id); if(!p) return;
+    showView('add-product',document.getElementById('nav-add-product'));
+    const h=document.getElementById('add-product-title'); if(h) h.textContent='Edit Product: '+p.title;
+    populateCategoryFilters(); // ensure dropdown has real UUIDs before setting value
+    document.getElementById('ap-title').value=p.title;
+    document.getElementById('ap-category').value=p.category_id;
+    document.getElementById('ap-link').value=p.affiliate_link||'';
+    document.getElementById('ap-price').value=p.price;
+    document.getElementById('ap-desc').value=p.description;
+    document.getElementById('ap-rating').value=p.rating;
+    document.getElementById('ap-icon').value=p.image_url;
+    document.getElementById('ap-status').value=p.status;
+    document.getElementById('ap-commission').value=p.commission||'';
+    document.getElementById('ap-pros').value=(p.pros||[]).join(', ');
+    document.getElementById('ap-cons').value=(p.cons||[]).join(', ');
+    // Track the ID being edited so saveProduct knows to UPDATE, not INSERT
+    document.getElementById('ap-title').dataset.editingId = id;
+  };
+
+  window.deleteProduct = async function(id) {
+    const p=DB.products.find(pr=>pr.id===id);
+    if(!confirm(`Delete "${p?.title}"?`)) return;
+    // Delete from Supabase first (Realtime will re-render automatically)
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (error) {
+      console.error('[ZAXIS] deleteProduct Supabase error:', error.message);
+      showToast('⚠ Supabase delete failed: ' + error.message, 'error');
+      // Still remove locally so the UI stays consistent this session
+    }
+    ProductService.deleteProduct(id);
+    renderAdminProducts(); renderBrowse(); renderDashboard();
+    document.getElementById('stat-total').textContent=DB.products.length;
+    document.getElementById('nav-products-count').textContent=DB.products.length;
+    showToast(`🗑 "${p?.title}" deleted`);
+  };
+
+  window.addCategory = async function() {
+    const name=prompt('Category name:'); if(!name) return;
+    const icon=prompt('Emoji icon:','📌');
+    const slug = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    const newCat = { name, slug, icon: icon||'📌', description:'' };
+    // Save to Supabase
+    const { data: saved, error } = await supabase.from('categories').insert([newCat]).select().single();
+    if (error) {
+      console.error('[ZAXIS] addCategory error:', error.message);
+      showToast('⚠ Category save failed: ' + error.message, 'error');
+      // Still add locally so the session keeps working
+      DB.categories.push({ id:'c'+Date.now(), ...newCat });
+    } else {
+      DB.categories.push(saved);
+    }
+    renderCatsTable(); populateCategoryFilters(); renderCategories();
+    document.getElementById('stat-cats').textContent=DB.categories.length;
+    showToast(`✓ Category "${name}" created`);
+  };
+
+  window.deleteCat = async function(id) {
+    const cat=DB.categories.find(c=>c.id===id);
+    if(DB.products.some(p=>p.category_id===id)){ showToast('⚠ Remove products in this category first','error'); return; }
+    if(!confirm(`Delete "${cat?.name}"?`)) return;
+    const { error } = await supabase.from('categories').delete().eq('id', id);
+    if (error) {
+      console.error('[ZAXIS] deleteCat error:', error.message);
+      showToast('⚠ Delete failed: ' + error.message, 'error');
+      return;
+    }
+    DB.categories.splice(DB.categories.findIndex(c=>c.id===id),1);
+    renderCatsTable(); populateCategoryFilters(); renderCategories();
+    document.getElementById('stat-cats').textContent=DB.categories.length;
+    showToast(`🗑 "${cat?.name}" deleted`);
+  };
+
+  // ── 11. Search ───────────────────────────────────────────────────
+  let searchTimeout;
+  window.doSearch = function(query) {
+    const catF=document.getElementById('search-cat-filter')?.value||'all';
+    const ph=document.getElementById('search-placeholder');
+    if(ph) ph.style.display='none';
+    if(!query.trim()){
+      const sg=document.getElementById('search-grid');
+      if(sg) sg.innerHTML='';
+      if(ph) ph.style.display='block';
+      return;
+    }
+    const q=query.toLowerCase();
+    let results=DB.products.filter(p=>
+      p.title.toLowerCase().includes(q)||p.description.toLowerCase().includes(q)
+    );
+    if(catF!=='all') results=results.filter(p=>p.category_id===catF);
+    const sg=document.getElementById('search-grid');
+    if(sg){
+      sg.innerHTML=results.length?results.map(p=>renderProductCard(p,`openProduct('${p.id}')`)).join('')
+        :'<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>No results for "'+query+'"</p></div>';
+    }
+    const sc=document.getElementById('search-count');
+    if(sc) sc.textContent=results.length+' result'+(results.length!==1?'s':'');
+  };
+
+  window.globalSearch = function(val) {
+    if(val.length>1){ showView('search'); window.doSearch(val); }
+  };
+
+  window.filterBrowse = function(el, filter) {
+    document.querySelectorAll('#browse-filter .cat-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    renderBrowse(filter);
+  };
+
+  window.filterHome = function(el, filter) {
+    document.querySelectorAll('#home-filter .cat-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    renderHomeProducts(filter);
+  };
+
+  // ── 12. Profile ──────────────────────────────────────────────────
+  window.saveProfile = async function() {
+    const name=document.getElementById('profile-name-input').value.trim();
+    if(!name) return;
+    if(AuthService.currentUser){
+      const {error}=await supabase.from('profiles').update({name}).eq('id',AuthService.currentUser.id);
+      if(error) console.warn('[ZAXIS] Profile update:', error.message);
+      AuthService.currentUser.name=name;
+      const initials=name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+      ['sb-avatar','profile-avatar'].forEach(id=>document.getElementById(id).textContent=initials);
+      document.getElementById('sb-name').textContent=name;
+      document.getElementById('profile-name').textContent=name;
+      document.getElementById('dash-welcome').textContent=`Welcome back, ${name} 👋`;
+      showToast('✓ Profile updated!');
+    }
+  };
+
+  // ── 13. UI Helpers ───────────────────────────────────────────────
+  function showAlert(id, show, msg) {
+    const el=document.getElementById(id); if(!el) return;
+    if(msg) el.innerHTML=(el.className.includes('error')?'⚠ ':'✓ ')+msg.replace(/^[⚠✓] /,'');
+    el.classList.toggle('visible',show);
+  }
+  window.showAlert=showAlert;
+  function hideAlert(id){ showAlert(id,false); }
+  window.hideAlert=hideAlert;
+
+  let toastTimer;
+  function showToast(msg,type='success'){
+    const toast=document.getElementById('toast');
+    const icon=toast.querySelector('.toast-icon');
+    document.getElementById('toast-text').textContent=msg;
+    icon.textContent=type==='error'?'⚠':'✓';
+    toast.style.borderLeftColor=type==='error'?'var(--red)':'var(--acid)';
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>toast.classList.remove('show'),3500);
+  }
+  window.showToast=showToast;
+
+  window.scrollTop=function(){ window.scrollTo({top:0,behavior:'smooth'}); };
+  window.smoothSection=function(id){ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth'}); };
+
+  // ── 14. Saved Products ───────────────────────────────────────────
+  let savedProducts = JSON.parse(localStorage.getItem('zaxis_saved')||'[]');
+  window.toggleSave=function(productId,btn){
+    const idx=savedProducts.indexOf(productId);
+    if(idx===-1){ savedProducts.push(productId); btn.textContent='🔖'; btn.classList.add('saved'); showToast('🔖 Saved!'); }
+    else { savedProducts.splice(idx,1); btn.textContent='♡'; btn.classList.remove('saved'); showToast('Removed'); }
+    localStorage.setItem('zaxis_saved',JSON.stringify(savedProducts));
+    renderSaved();
+  };
+  function renderSaved(){
+    const grid=document.getElementById('saved-grid');
+    const empty=document.getElementById('saved-empty');
+    if(!grid) return;
+    const products=DB.products.filter(p=>savedProducts.includes(p.id));
+    empty.style.display=products.length?'none':'block';
+    grid.innerHTML=products.length?products.map(p=>renderProductCard(p,`openProduct('${p.id}')`)).join(''):'';
+  }
+  window.renderSaved=renderSaved;
+  window.clearSaved=function(){ if(!confirm('Clear all saved?')) return; savedProducts=[]; localStorage.setItem('zaxis_saved','[]'); renderSaved(); showToast('Cleared'); };
+
+  // ── 15. Compare ──────────────────────────────────────────────────
+  function populateCompareSelects(){
+    const opts=DB.products.map(p=>`<option value="${p.id}">${p.image_url} ${p.title}</option>`).join('');
+    const a=document.getElementById('cmp-a'), b=document.getElementById('cmp-b');
+    if(a){ a.innerHTML='<option value="">Select Product A…</option>'+opts; }
+    if(b){ b.innerHTML='<option value="">Select Product B…</option>'+opts; }
+    if(a&&DB.products.length>=2){ a.value=DB.products[0].id; b.value=DB.products[1].id; renderComparison(); }
+  }
+  window.populateCompareSelects=populateCompareSelects;
+  window.renderComparison=function(){
+    const aId=document.getElementById('cmp-a')?.value;
+    const bId=document.getElementById('cmp-b')?.value;
+    const ph=document.getElementById('compare-placeholder');
+    const out=document.getElementById('compare-output');
+    if(!aId||!bId){ if(ph) ph.style.display='block'; if(out) out.innerHTML=''; return; }
+    if(ph) ph.style.display='none';
+    const a=DB.products.find(p=>p.id===aId), b=DB.products.find(p=>p.id===bId);
+    if(!a||!b) return;
+    const row=(label,va,vb)=>`<tr><td style="color:var(--zm);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">${label}</td><td style="color:var(--zx)">${va}</td><td style="color:var(--zx)">${vb}</td></tr>`;
+    out.innerHTML=`<div class="data-table-wrap"><table class="data-table">
+      <thead><tr><th>Feature</th><th>${a.image_url} ${a.title}</th><th>${b.image_url} ${b.title}</th></tr></thead>
+      <tbody>
+        ${row('Price',a.price,b.price)}
+        ${row('Rating','★ '+a.rating,'★ '+b.rating)}
+        ${row('Commission',a.commission||'N/A',b.commission||'N/A')}
+        ${row('Status',a.status,b.status)}
+      </tbody>
+    </table></div>`;
+  };
+
+  // ── 16. Pricing ──────────────────────────────────────────────────
+  let billingCycle='monthly';
+  window.setBilling=function(cycle){
+    billingCycle=cycle;
+    document.getElementById('billing-monthly').className='btn btn-sm '+(cycle==='monthly'?'btn-neon':'btn-ghost');
+    document.getElementById('billing-annual').className='btn btn-sm '+(cycle==='annual'?'btn-neon':'btn-ghost');
+    renderPricing();
+  };
+  function renderPricing(){
+    const grid=document.getElementById('pricing-grid'); if(!grid) return;
+    const plans=[
+      {name:'Free',monthly:0,annual:0,desc:'Perfect for discovering tools',features:['Browse all products','Basic search','Save up to 5 products','Community access'],popular:false},
+      {name:'Pro',monthly:19,annual:15,desc:'For serious affiliate marketers',features:['Everything in Free','Unlimited saved products','Click analytics','Affiliate link tracking','Priority support'],popular:true},
+      {name:'Agency',monthly:49,annual:39,desc:'For teams and agencies',features:['Everything in Pro','5 team members','White-label reports','API access','Dedicated account manager'],popular:false},
+    ];
+    grid.innerHTML=plans.map(p=>{
+      const price=billingCycle==='annual'?p.annual:p.monthly;
+      return `<div class="pricing-card ${p.popular?'popular':''}">
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-price">${price===0?'Free':'<sup>$</sup>'+price+'<span>/mo</span>'}</div>
+        <div class="plan-desc">${p.desc}</div>
+        <hr class="plan-divider">
+        ${p.features.map(f=>`<div class="plan-feature"><span class="pf-icon" style="color:var(--acid)">✓</span>${f}</div>`).join('')}
+        <button class="btn ${p.popular?'btn-neon':'btn-outline'} btn-full" style="margin-top:24px;padding:14px 20px;font-size:15px;font-weight:700;letter-spacing:.03em" onclick="price===0?showAuth('signup'):openPaymentModal(null)">${price===0?'🚀 Start Free — No Card Needed':p.name==='Agency'?'🏢 Unlock Agency Power →':'⚡ Claim Pro Access →'}</button>
+      </div>`;
+    }).join('');
+  }
+  window.renderPricing=renderPricing;
+
+  // ── 17. Newsletter ───────────────────────────────────────────────
+  window.subscribeNewsletter=function(){
+    const el=document.getElementById('nl-email'); if(!el) return;
+    const email=el.value.trim();
+    if(!email.includes('@')) return showToast('⚠ Enter valid email','error');
+    el.value=''; showToast('✓ Subscribed! Welcome to ZAXIS updates.');
+  };
+
+  // ── 18. Misc UI ──────────────────────────────────────────────────
+  window.toggleNotifications=function(){
+    const p=document.getElementById('notif-panel');
+    if(p) p.classList.toggle('open');
+  };
+  window.openMobileSidebar=function(){
+    const s=document.querySelector('.sidebar');
+    if(s) s.classList.toggle('mobile-open');
+  };
+  window.openPasswordModal=function(){
+    const m=document.getElementById('password-modal');
+    if(m) m.classList.add('open');
+  };
+  window.closePasswordModal=function(){
+    const m=document.getElementById('password-modal');
+    if(m) m.classList.remove('open');
+  };
+  window.changePassword=async function(){
+    const pw=document.getElementById('new-password')?.value;
+    const confirm=document.getElementById('confirm-password')?.value;
+    if(!pw||pw.length<6) return showToast('⚠ Password too short','error');
+    if(pw!==confirm) return showToast('⚠ Passwords do not match','error');
+    const {error}=await supabase.auth.updateUser({password:pw});
+    if(error) return showToast('⚠ '+error.message,'error');
+    showToast('✓ Password updated!');
+    closePasswordModal();
+  };
+  window.openForgotModal=function(){
+    const email=document.getElementById('login-email')?.value.trim();
+    if(email){
+      supabase.auth.resetPasswordForEmail(email).then(({error})=>{
+        showAlert('login-error',false);
+        showAlert('login-success',true,error?'⚠ '+error.message:'✓ Reset email sent! Check your inbox.');
+      });
+    } else {
+      showToast('Enter your email first, then click Forgot password','error');
+    }
+  };
+  window.toggleTheme=function(){
+    const d=document.documentElement;
+    const isDark=!d.style.getPropertyValue('--z0')||d.style.getPropertyValue('--z0')==='';
+    if(isDark){
+      d.style.setProperty('--z0','#f0f0f5'); d.style.setProperty('--z1','#e8e8f0');
+      d.style.setProperty('--z2','#ffffff'); d.style.setProperty('--z3','#f4f4f8');
+      d.style.setProperty('--z4','#eaeaf0'); d.style.setProperty('--zx','#0f0e1a');
+      d.style.setProperty('--zw','#1a1a2e'); d.style.setProperty('--zt','#555566');
+      d.style.setProperty('--zm','#888899'); d.style.setProperty('--border','rgba(0,0,0,0.1)');
+      d.style.setProperty('--border2','rgba(0,0,0,0.15)'); d.style.setProperty('--glass','rgba(0,0,0,0.04)');
+      d.style.setProperty('--glass2','rgba(0,0,0,0.08)'); showToast('☀️ Light mode');
+    } else {
+      ['--z0','--z1','--z2','--z3','--z4','--zx','--zw','--zt','--zm','--border','--border2','--glass','--glass2'].forEach(v=>d.style.removeProperty(v));
+      showToast('🌙 Dark mode');
+    }
+  };
+  window.exportCSV=function(){
+    const rows=[['Product','Category','Price','Rating','Commission','Status'],...DB.products.map(p=>{
+      const cat=DB.categories.find(c=>c.id===p.category_id);
+      return [p.title,cat?.name||'',p.price,p.rating,p.commission||'',p.status];
+    })];
+    const csv=rows.map(r=>r.join(',')).join('\n');
+    const a=document.createElement('a');
+    a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+    a.download='zaxis-products.csv'; a.click();
+  };
+  window.setBillingCycle=window.setBilling;
+
+  function initTableFilter(){
+    const fi=document.querySelector('#view-admin-products .data-table-header input');
+    if(!fi) return;
+    fi.addEventListener('input',function(){
+      const q=this.value.toLowerCase();
+      document.querySelectorAll('#admin-products-table tr').forEach(r=>{
+        r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';
+      });
+    });
+  }
+  window.initTableFilter=initTableFilter;
+
+  function initSearchSuggestions(){
+    const inp=document.getElementById('search-input');
+    if(!inp) return;
+    inp.addEventListener('input',function(){ window.doSearch(this.value); });
+  }
+  window.initSearchSuggestions=initSearchSuggestions;
+
+  // ── 19. Sidebar/Topbar upgrades ──────────────────────────────────
+  function updateSidebarNav(){
+    const nav=document.querySelector('.sidebar-nav');
+    if(!nav||document.getElementById('nav-compare-link')) return;
+    const extra=`
+      <div class="sidebar-section-label">Discover</div>
+      <div class="nav-item" id="nav-compare-link" onclick="showView('compare',this)"><span class="nav-icon">⚖️</span> Compare</div>
+      <div class="nav-item" id="nav-saved-link" onclick="showView('saved',this)"><span class="nav-icon">🔖</span> Saved</div>
+      <div class="sidebar-section-label">Plans</div>
+      <div class="nav-item" onclick="showView('pricing',this)"><span class="nav-icon">💳</span> Pricing</div>
+      <div class="sidebar-section-label">Info</div>
+      <div class="nav-item" onclick="showView('contact',this)"><span class="nav-icon">✉️</span> Contact</div>
+      <div class="nav-item" onclick="showView('legal',this)"><span class="nav-icon">⚖️</span> Legal</div>`;
+    const accountLabel=[...nav.querySelectorAll('.sidebar-section-label')].find(el=>el.textContent.trim()==='Account');
+    if(accountLabel) accountLabel.insertAdjacentHTML('beforebegin',extra);
+  }
+  window.updateSidebarNav=updateSidebarNav;
+
+  function updateMainTopbar(){
+    const right=document.querySelector('.topbar-right');
+    if(!right||document.getElementById('notif-btn')) return;
+    right.insertAdjacentHTML('afterbegin',`
+      <button class="btn btn-icon btn-ghost" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="btn btn-icon btn-ghost" id="notif-btn" onclick="toggleNotifications()" style="position:relative">🔔<span class="notif-dot"></span></button>
+      <button class="mobile-topbar-btn" onclick="openMobileSidebar()">☰</button>`);
+  }
+  window.updateMainTopbar=updateMainTopbar;
+
+  function upgradeProfilePage(){
+    const pi=document.querySelector('.profile-info');
+    if(!pi||document.getElementById('pw-change-btn')) return;
+    const btn=pi.querySelector('.btn-neon');
+    if(btn) btn.insertAdjacentHTML('beforebegin',`
+      <hr class="divider">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div><div style="font-size:15px;font-weight:700;color:var(--zx)">Password</div>
+        <div style="font-size:12px;color:var(--zm)">Change your login password</div></div>
+        <button class="btn btn-ghost btn-sm" id="pw-change-btn" onclick="openPasswordModal()">Change Password</button>
+      </div><hr class="divider">`);
+  }
+  window.upgradeProfilePage=upgradeProfilePage;
+
+  function upgradeAnalytics(){
+    const h=document.querySelector('#view-analytics .data-table-wrap .data-table-header');
+    if(h&&!h.querySelector('.export-btn')){
+      const sp=h.querySelector('span');
+      if(sp) sp.insertAdjacentHTML('afterend','<button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>');
+    }
+  }
+  window.upgradeAnalytics=upgradeAnalytics;
+
+  function upgradeAuthForms(){
+    document.addEventListener('click',e=>{
+      if(e.target.textContent==='Forgot password?'&&e.target.tagName==='A'){
+        e.preventDefault(); openForgotModal();
+      }
+    });
+  }
+  window.upgradeAuthForms=upgradeAuthForms;
+
+  // ── 20. Browse pagination ────────────────────────────────────────
+  const PAGE_SIZE=12;
+  window.renderBrowseWithPagination=function(filter='all',page=1){
+    // ProductService.getProducts filters to published/featured only
+    let all=ProductService.getProducts(filter==='all'?null:filter);
+    const total=all.length, totalPages=Math.ceil(total/PAGE_SIZE);
+    const products=all.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+    const grid=document.getElementById('browse-grid');
+    grid.innerHTML=products.length===0
+      ?'<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📦</div><p>No products here yet.</p></div>'
+      :products.map(p=>renderProductCard(p,`openProduct('${p.id}')`)).join('');
+    document.getElementById('browse-count').textContent=total;
+    let pag=document.getElementById('browse-pagination');
+    if(!pag){ pag=document.createElement('div'); pag.id='browse-pagination'; grid.parentNode.appendChild(pag); }
+    if(totalPages<=1){ pag.innerHTML=''; return; }
+    const pages=Array.from({length:totalPages},(_,i)=>i+1);
+    pag.innerHTML=`<div class="pagination">
+      <div class="page-btn ${page===1?'disabled':''}" onclick="${page>1?`renderBrowseWithPagination('${filter}',${page-1})`:''}">← Prev</div>
+      ${pages.map(pg=>`<div class="page-btn ${pg===page?'active':''}" onclick="renderBrowseWithPagination('${filter}',${pg})">${pg}</div>`).join('')}
+      <div class="page-btn ${page===totalPages?'disabled':''}" onclick="${page<totalPages?`renderBrowseWithPagination('${filter}',${page+1})`:''}">Next →</div>
+    </div>`;
+  };
+  window.renderBrowse=function(filter='all'){ window.renderBrowseWithPagination(filter,1); };
+
+  // ── 21. Review/blog stubs ────────────────────────────────────────
+  window.openReview=function(productId){
+    const p=DB.products.find(pr=>pr.id===productId); if(!p) return;
+    const rc=document.getElementById('review-content');
+    if(rc) rc.innerHTML=`<div style="padding:20px"><h2 style="color:var(--zx)">${p.title} — Full Review</h2><p style="color:var(--zt);margin-top:12px">${p.description}</p></div>`;
+    showView('review');
+  };
+
+  // ── 22. Contact form ─────────────────────────────────────────────
+  window.submitContact=function(){
+    showToast('✓ Message sent! We\'ll reply within 24h.'); };
+
+  // ── 23. Legal tabs ───────────────────────────────────────────────
+  window.showLegalTab=function(tab,el){
+    document.querySelectorAll('.legal-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    const content=document.getElementById('legal-content');
+    if(content) content.innerHTML=`<p style="color:var(--zt);font-size:14px;line-height:1.8">Content for ${tab} — placeholder.</p>`;
+  };
+
+  // ── 24. DOMContentLoaded ─────────────────────────────────────────
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onReady);
+  } else {
+    onReady();
+  }
+
+  async function onReady() {
+    console.log('[ZAXIS] DOM ready, booting…');
+
+    // Render landing page
+    renderHomeProducts();
+    renderCategories();
+
+    // Check for existing Supabase session (page refresh / persistent login)
+    const user = await AuthService.loadSession();
+    if (user) {
+      console.log('[ZAXIS] Existing session found:', user.email);
+      showPage('app');
+      return;
+    }
+
+    // Wire Enter key on auth forms
+    const lp=document.getElementById('login-password');
+    const le=document.getElementById('login-email');
+    const sp=document.getElementById('signup-password');
+    if(lp) lp.addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
+    if(le) le.addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
+    if(sp) sp.addEventListener('keydown',e=>{if(e.key==='Enter')window.doSignup();});
+  }
+
+
+  // ── PAYMENT SYSTEM ────────────────────────────────────────────────
+  let _payState = { plan: 'pro', amount: 19 };
+
+  window.openPaymentModal = function(productId) {
+    const p = productId ? DB.products.find(pr => pr.id === productId) : null;
+    const info = document.getElementById('pay-product-info');
+    if (info) info.textContent = p ? 'Subscribing for access to ' + p.title : 'Upgrade your ZAXIS plan';
+    document.getElementById('payment-modal').style.display = 'flex';
+  };
+
+  window.closePaymentModal = function() {
+    document.getElementById('payment-modal').style.display = 'none';
+  };
+
+  window.selectPayPlan = function(el, plan, amount) {
+    document.querySelectorAll('.pay-plan').forEach(p => {
+      p.style.border = '2px solid var(--border2)';
+      p.style.background = 'transparent';
+    });
+    el.style.border = '2px solid #60bb46';
+    el.style.background = 'rgba(96,187,70,0.08)';
+    _payState = { plan, amount: parseInt(amount) };
+    // Update the amount display
+    const npr = (parseInt(amount) * 133).toLocaleString();
+    const disp = document.getElementById('esewa-display-amount');
+    if (disp) disp.textContent = 'Rs. ' + npr;
+  };
+
+  // ── eSewa ─────────────────────────────────────────────────────────
+  // ⚙️  SETUP REQUIRED — fill in these 3 values when you go live:
+  const ESEWA_CONFIG = {
+    merchantCode: 'EPAYTEST',          // 🔴 Replace with your eSewa Merchant Code (e.g. "NP-ES-XXXXXX")
+    secretKey:    'YOUR_SECRET_KEY',   // 🔴 Replace with your eSewa Secret Key (for HMAC-SHA256 signature)
+    successUrl:   'YOUR_SUCCESS_URL',  // 🔴 Replace with your live success URL (e.g. "https://zaxis.com.np/?pay=success")
+    failureUrl:   'YOUR_FAILURE_URL',  // 🔴 Replace with your live failure URL (e.g. "https://zaxis.com.np/?pay=failed")
+    // Live endpoint (switch from rc-epay to epay when going live):
+    // Test:  https://rc-epay.esewa.com.np/api/epay/main/v2/form
+    // Live:  https://epay.esewa.com.np/api/epay/main/v2/form
+  };
+
+  window.payWithEsewa = function() {
+    const amt = _payState.amount;
+    const amtNPR = (amt * 133).toFixed(0);
+    const uuid = 'ZAXIS-' + Date.now();
+
+    // Update eSewa form fields
+    document.getElementById('esewa-amount').value = amtNPR;
+    document.getElementById('esewa-total').value = amtNPR;
+    document.getElementById('esewa-uuid').value = uuid;
+    document.getElementById('esewa-product-code').value = ESEWA_CONFIG.merchantCode;
+    document.getElementById('esewa-success-url').value = ESEWA_CONFIG.successUrl !== 'YOUR_SUCCESS_URL'
+      ? ESEWA_CONFIG.successUrl
+      : window.location.href + '?pay=success&via=esewa';
+    document.getElementById('esewa-failure-url').value = ESEWA_CONFIG.failureUrl !== 'YOUR_FAILURE_URL'
+      ? ESEWA_CONFIG.failureUrl
+      : window.location.href + '?pay=failed&via=esewa';
+
+    // Signature: must be HMAC-SHA256 of "total_amount=X,transaction_uuid=Y,product_code=Z"
+    // using your secretKey. Since this runs client-side, set signature to empty for now.
+    // When you add a backend, generate it server-side and pass it here.
+    // 🔴 TODO: generate signature server-side and inject it here before form submit.
+    document.getElementById('esewa-signature').value = '';
+
+    closePaymentModal();
+
+    const msg = document.getElementById('pay-success-msg');
+    if (msg) msg.innerHTML =
+      '<strong>Redirecting to eSewa…</strong><br><br>' +
+      'Plan: <strong>' + _payState.plan.toUpperCase() + '</strong> &nbsp;·&nbsp; Rs. ' + parseInt(amtNPR).toLocaleString() + '/mo<br><br>' +
+      'eSewa number: <strong>9809278755</strong><br><br>' +
+      '<span style="opacity:.7;font-size:12px">You will be redirected to eSewa to complete payment securely.</span>';
+    document.getElementById('pay-success-modal').style.display = 'flex';
+
+    // Submit eSewa form
+    document.getElementById('esewa-form').submit();
+
+    // Log to Supabase (non-blocking)
+    supabase.from('payment_logs').insert([{
+      user_id: AuthService.currentUser?.id || null,
+      gateway: 'esewa', plan: _payState.plan,
+      amount_usd: amt, amount_npr: parseInt(amtNPR),
+      transaction_uuid: uuid, status: 'initiated',
+      created_at: new Date().toISOString()
+    }]).then(({ error }) => {
+      if (error) console.warn('[ZAXIS] payment log error:', error.message);
+    });
+  };
+
+  // ── Khalti (structured placeholder) ──────────────────────────────
+  window.payWithKhalti = function() {
+    closePaymentModal();
+    // Khalti Web Checkout SDK integration point
+    // 1. Server-side: POST to https://a.khalti.com/api/v2/epayment/initiate/ with your secret key
+    // 2. Get pidx from response
+    // 3. Redirect to: https://test-pay.khalti.com/?pidx=<pidx>
+    // 4. On return, verify at: https://a.khalti.com/api/v2/epayment/lookup/?pidx=<pidx>
+    const msg = document.getElementById('pay-success-msg');
+    if (msg) msg.innerHTML =
+      '<strong>Khalti integration is ready to activate.</strong><br><br>' +
+      'Add your Khalti Secret Key to your backend and call the initiate API.<br><br>' +
+      'Test credentials: <strong>9800000001</strong> · MPIN: <strong>1111</strong> · OTP: <strong>987654</strong><br><br>' +
+      'Plan: <strong>' + _payState.plan.toUpperCase() + '</strong> · $' + _payState.amount + '/mo';
+    document.getElementById('pay-success-modal').style.display = 'flex';
+  };
+
+  // ── PayPal (structured placeholder) ──────────────────────────────
+  window.payWithPaypal = function() {
+    closePaymentModal();
+    // PayPal integration point:
+    // 1. Load PayPal JS SDK: <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID">
+    // 2. Render PayPal button and call paypal.Buttons({ createOrder, onApprove }).render("#paypal-button-container")
+    // OR use simple PayPal.me link for immediate use:
+    const paypalMe = 'https://paypal.me/YourPayPalUsername/' + _payState.amount;
+    const msg = document.getElementById('pay-success-msg');
+    if (msg) msg.innerHTML =
+      '<strong>PayPal checkout.</strong><br><br>' +
+      'Replace the PayPal.me link with your PayPal client-id SDK for full integration.<br><br>' +
+      'Plan: <strong>' + _payState.plan.toUpperCase() + '</strong> · $' + _payState.amount + '/mo';
+    document.getElementById('pay-success-modal').style.display = 'flex';
+    // window.open(paypalMe, '_blank'); // Uncomment with real PayPal.me URL
+  };
+
+  window.closePaySuccessModal = function() {
+    document.getElementById('pay-success-modal').style.display = 'none';
+  };
+
+  // Auto-detect payment return from eSewa
+  (function checkPaymentReturn() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('pay') === 'success') {
+      const via = params.get('via') || 'payment';
+      setTimeout(() => showToast('✅ Payment via ' + via.toUpperCase() + ' confirmed! Welcome to ZAXIS Pro.'), 1500);
+    }
+    if (params.get('pay') === 'failed') {
+      setTimeout(() => showToast('⚠ Payment failed or cancelled. Try again.', 'error'), 1500);
+    }
+  })();
+
+} // end bootApp
+</script>
+</body>
+</html>
