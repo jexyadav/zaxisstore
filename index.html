@@ -824,16 +824,47 @@ body::before {
   z-index: 199; display: none; backdrop-filter: blur(4px);
 }
 .sidebar-overlay.open { display: block; }
-.mobile-topbar-btn {
-  display: none; padding: 8px; border-radius: var(--r-sm);
-  background: var(--glass); border: 1px solid var(--border);
-  color: var(--zx); font-size: 18px; cursor: pointer;
+/* ☰ hamburger completely hidden — replaced by pull-tab */
+.mobile-topbar-btn { display: none !important; }
+
+/* ✕ close button inside sidebar — mobile only */
+.sidebar-close-btn {
+  display: none; position: absolute;
+  top: 14px; right: 12px;
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--glass2); border: 1px solid var(--border);
+  color: var(--zt); font-size: 16px; cursor: pointer;
+  align-items: center; justify-content: center;
+  transition: var(--transition); z-index: 10;
+}
+.sidebar-close-btn:hover { background: var(--red); color:#fff; border-color: var(--red); }
+
+/* Slim pull-tab on left edge — never overlaps ZAXIS logo */
+#sidebar-pull-tab {
+  display: none;
+  position: fixed; top: 50%; left: 0;
+  transform: translateY(-50%);
+  z-index: 201;
+  width: 18px; height: 56px;
+  border-radius: 0 8px 8px 0;
+  background: var(--neon);
+  border: none; color: #fff;
+  font-size: 10px; cursor: pointer;
+  align-items: center; justify-content: center;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.08em; font-weight: 700;
+  box-shadow: 2px 0 16px rgba(123,92,255,0.4);
   transition: var(--transition);
 }
-.mobile-topbar-btn:hover { background: var(--glass2); }
+#sidebar-pull-tab:hover { width: 24px; }
+
 @media (max-width: 768px) {
-  .mobile-topbar-btn { display: flex; align-items: center; justify-content: center; }
-  .sidebar { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .sidebar-close-btn { display: flex; }
+  #sidebar-pull-tab { display: flex; }
+  .sidebar {
+    position: fixed; top: 0; left: 0; height: 100vh; z-index: 200;
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
   .sidebar.mobile-open { transform: translateX(0) !important; }
 }
 
@@ -1062,9 +1093,301 @@ body::before {
 .app-breadcrumb a:hover { text-decoration: underline; }
 .app-breadcrumb span { color: var(--z6); }
 
+/* ═══════════════════════════════════════════════
+   3D DASHBOARD — PORTED FROM ZAXIS-v9-final2
+═══════════════════════════════════════════════ */
+/* Welcome screen overlay */
+#welcome-screen {
+  position: fixed; inset: 0; z-index: 9000;
+  background: var(--z0);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+#welcome-screen.fade-out { opacity: 0; transform: scale(1.04); pointer-events: none; }
+#welcome-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.w-particle {
+  position: absolute; border-radius: 50%; opacity: 0;
+  animation: wfloat linear infinite;
+}
+@keyframes wfloat {
+  0%{transform:translateY(100%) translateX(0);opacity:0}
+  10%{opacity:1} 90%{opacity:0.5}
+  100%{transform:translateY(-120px) translateX(var(--dx));opacity:0}
+}
+.w-orb { position:absolute; border-radius:50%; filter:blur(80px); opacity:0.18; pointer-events:none; }
+.w-orb1 { width:400px;height:400px;background:var(--neon);top:-100px;left:-100px;animation:orbP 6s ease-in-out infinite; }
+.w-orb2 { width:300px;height:300px;background:var(--acid);bottom:-80px;right:-60px;animation:orbP 8s 2s ease-in-out infinite; }
+@keyframes orbP { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+.w-logo { font-family:var(--font-head);font-size:52px;font-weight:800;letter-spacing:-2px;position:relative;z-index:1;animation:wIn 0.9s cubic-bezier(0.2,0,0,1) both; }
+.w-logo .wz { color:var(--neon); }
+.w-tagline { font-size:16px;color:var(--zt);position:relative;z-index:1;animation:wIn 0.9s 0.2s both; }
+.w-tagline span { color:var(--neon2); }
+.w-bar-wrap { width:200px;height:2px;background:var(--border);border-radius:2px;overflow:hidden;position:relative;z-index:1;animation:wIn 0.9s 0.4s both; }
+.w-bar-fill { height:100%;background:linear-gradient(90deg,var(--neon),var(--acid));width:0;animation:wLoad 2.2s 0.5s ease forwards; }
+@keyframes wIn { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
+@keyframes wLoad { to{width:100%} }
+
+/* 3D dashboard card animations */
+@keyframes cardIn3d { from{opacity:0;transform:translateY(24px) rotateX(12deg)} to{opacity:1;transform:translateY(0) rotateX(0)} }
+@keyframes greetSlide { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+@keyframes rippleOut { to{transform:scale(30);opacity:0} }
+@keyframes livePulse { 0%,100%{box-shadow:0 0 0 0 rgba(0,245,160,0.5)} 50%{box-shadow:0 0 0 6px rgba(0,245,160,0)} }
+@keyframes feedSlide { from{opacity:0;transform:translateX(-16px)} to{opacity:1;transform:none} }
+
+.dash3d-welcome {
+  text-align:center; padding:28px 20px 22px;
+  background:linear-gradient(135deg,rgba(123,92,255,0.08),rgba(0,245,160,0.04));
+  border:1px solid var(--border); border-radius:20px; margin-bottom:22px;
+  position:relative; overflow:hidden;
+}
+.dash3d-welcome::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%,rgba(123,92,255,0.15),transparent 70%); pointer-events:none; }
+.dash3d-greeting { font-family:var(--font-head);font-size:clamp(20px,4vw,32px);font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#fff 30%,var(--neon2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:greetSlide 0.7s both; }
+.dash3d-sub { font-size:13px;color:var(--zm);margin-top:5px;animation:greetSlide 0.7s 0.1s both; }
+
+.stat3d-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;perspective:1000px; }
+.stat3d {
+  background:var(--z2);border:1px solid var(--border);border-radius:16px;
+  padding:20px 18px;cursor:pointer;position:relative;overflow:hidden;
+  transition:transform 0.35s cubic-bezier(0.2,0,0,1),box-shadow 0.35s,border-color 0.3s;
+  transform-style:preserve-3d;
+  animation:cardIn3d 0.5s var(--delay,0s) cubic-bezier(0.2,0,0,1) both;
+}
+.stat3d:hover { transform:translateY(-6px) rotateX(4deg) rotateY(-2deg) scale(1.02);box-shadow:0 24px 48px rgba(0,0,0,0.4),0 0 0 1px rgba(123,92,255,0.3);border-color:rgba(123,92,255,0.4); }
+.stat3d::before { content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.06),transparent 60%);opacity:0;transition:opacity 0.3s;pointer-events:none; }
+.stat3d:hover::before { opacity:1; }
+.stat3d-shine { position:absolute;top:-60%;left:-60%;width:60%;height:200%;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.08) 50%,transparent 60%);transform:translateX(-100%);pointer-events:none; }
+.stat3d:hover .stat3d-shine { transform:translateX(500%);transition:transform 0.7s ease; }
+.stat3d-icon { font-size:26px;margin-bottom:12px;display:block;transition:transform 0.35s;transform-origin:bottom center; }
+.stat3d:hover .stat3d-icon { transform:scale(1.25) translateY(-4px); }
+.stat3d-val { font-family:var(--font-head);font-size:28px;font-weight:800;letter-spacing:-1.5px;color:var(--zx);line-height:1;margin-bottom:4px; }
+.stat3d-label { font-size:12px;color:var(--zm);font-weight:500;margin-bottom:8px; }
+.stat3d-change { font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px; }
+.stat3d-bar { position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 16px 16px;background:linear-gradient(90deg,var(--c1,var(--neon)),var(--c2,var(--acid)));transform:scaleX(0);transform-origin:left;transition:transform 0.6s cubic-bezier(0.4,0,0.2,1); }
+.stat3d:hover .stat3d-bar { transform:scaleX(1); }
+
+.action3d-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;perspective:800px; }
+.action3d {
+  background:var(--z2);border:1px solid var(--border);border-radius:16px;
+  padding:22px 18px;cursor:pointer;text-align:center;position:relative;overflow:hidden;
+  transition:transform 0.3s cubic-bezier(0.2,0,0,1),box-shadow 0.3s,border-color 0.3s;
+  transform-style:preserve-3d;
+  animation:cardIn3d 0.5s var(--delay,0s) cubic-bezier(0.2,0,0,1) both;
+}
+.action3d:hover { transform:translateY(-8px) rotateX(6deg) scale(1.03);box-shadow:0 28px 56px rgba(0,0,0,0.45),var(--glow,0 0 30px rgba(123,92,255,0.2));border-color:var(--border-c,rgba(123,92,255,0.4)); }
+.action3d::after { content:'';position:absolute;inset:0;border-radius:16px;background:radial-gradient(circle at 50% 0%,var(--rad-c,rgba(123,92,255,0.1)),transparent 70%);opacity:0;transition:opacity 0.3s;pointer-events:none; }
+.action3d:hover::after { opacity:1; }
+.action3d-icon { font-size:34px;margin-bottom:10px;display:block;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.action3d:hover .action3d-icon { transform:scale(1.3) rotate(-8deg) translateY(-4px); }
+.action3d-name { font-size:14px;font-weight:700;color:var(--zx);margin-bottom:3px; }
+.action3d-sub { font-size:11px;color:var(--zm); }
+.action3d-ripple { position:absolute;border-radius:50%;background:rgba(255,255,255,0.15);width:10px;height:10px;transform:scale(0);pointer-events:none;animation:rippleOut 0.6s ease forwards; }
+
+.dash3d-feed { background:var(--z2);border:1px solid var(--border);border-radius:16px;overflow:hidden; }
+.dash3d-feed-head { padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
+.dash3d-feed-title { font-size:14px;font-weight:700;color:var(--zx); }
+.feed-live-dot { width:8px;height:8px;border-radius:50%;background:var(--acid);animation:livePulse 1.5s ease-in-out infinite; }
+.feed-item { display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.18s,transform 0.18s;animation:feedSlide 0.4s var(--fd,0s) cubic-bezier(0.2,0,0,1) both; }
+.feed-item:last-child { border-bottom:none; }
+.feed-item:hover { background:var(--z3);transform:translateX(4px); }
+.feed-avatar { width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:var(--glass2);border:1px solid var(--border);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.feed-item:hover .feed-avatar { transform:scale(1.2) rotate(10deg); }
+.feed-meta { flex:1; }
+.feed-text { font-size:12px;color:var(--zs); }
+.feed-text strong { color:var(--zx); }
+.feed-time { font-size:10px;color:var(--zm);margin-top:2px;font-family:var(--font-mono); }
+.feed-badge { font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(0,245,160,0.12);color:var(--acid);border:1px solid rgba(0,245,160,0.25); }
+
+.dash3d-chart { background:var(--z2);border:1px solid var(--border);border-radius:16px;padding:18px; }
+.chart3d-bars { display:flex;align-items:flex-end;gap:5px;height:70px;margin-top:14px; }
+.chart3d-bar { flex:1;border-radius:4px 4px 0 0;position:relative;background:linear-gradient(to top,var(--neon),var(--acid));min-height:4px;cursor:pointer;transform:scaleY(0);transform-origin:bottom;transition:transform 0.7s cubic-bezier(0.34,1.2,0.64,1);transition-delay:var(--bd,0s); }
+.chart3d-bar.visible { transform:scaleY(1); }
+.chart3d-bar:hover { filter:brightness(1.3); }
+.chart3d-bar::after { content:attr(data-val);position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--acid);opacity:0;transition:opacity 0.2s;white-space:nowrap; }
+.chart3d-bar:hover::after { opacity:1; }
+.chart3d-labels { display:flex;gap:5px;margin-top:5px; }
+.chart3d-labels span { flex:1;text-align:center;font-size:9px;color:var(--zm);font-family:var(--font-mono); }
+
+.dash3d-products { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
+.pcard3d { background:var(--z2);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.3s cubic-bezier(0.2,0,0,1),border-color 0.3s,box-shadow 0.3s;transform-style:preserve-3d;animation:cardIn3d 0.5s var(--delay,0s) both; }
+.pcard3d:hover { transform:translateY(-5px) rotateY(3deg) scale(1.02);border-color:rgba(123,92,255,0.4);box-shadow:0 20px 40px rgba(0,0,0,0.4),0 0 20px rgba(123,92,255,0.15); }
+.pcard3d-icon { font-size:26px;margin-bottom:8px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.pcard3d:hover .pcard3d-icon { transform:scale(1.3) translateY(-3px) rotate(-5deg); }
+.pcard3d-name { font-size:13px;font-weight:700;color:var(--zx);margin-bottom:2px; }
+.pcard3d-price { font-size:11px;color:var(--neon2);font-weight:600;margin-bottom:4px; }
+.pcard3d-comm { font-size:10px;color:var(--zm); }
+.pcard3d-cta { margin-top:10px;width:100%;padding:7px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(123,92,255,0.12);color:var(--neon2);border:1px solid rgba(123,92,255,0.25);cursor:pointer;transition:all 0.2s; }
+.pcard3d:hover .pcard3d-cta { background:var(--neon);color:#fff;border-color:var(--neon); }
+
+@media(max-width:768px){
+  .stat3d-grid { grid-template-columns:1fr 1fr; }
+  .action3d-grid { grid-template-columns:1fr 1fr; }
+  .dash3d-products { grid-template-columns:1fr 1fr; }
+  .stat3d-val { font-size:22px; }
+}
+@media(max-width:480px){
+  .stat3d-grid { grid-template-columns:1fr 1fr;gap:10px; }
+  .action3d-grid { grid-template-columns:1fr 1fr;gap:10px; }
+  .dash3d-products { grid-template-columns:1fr 1fr;gap:10px; }
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE RESPONSIVE — ADDED FOR RESPONSIVENESS
+   (Desktop appearance is 100% unchanged)
+═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── Landing topbar: shrink action buttons ── */
+  .topbar { padding: 0 16px; gap: 8px; }
+  .topbar-actions { gap: 6px; }
+  .topbar-actions .btn { padding: 8px 14px; font-size: 13px; }
+
+  /* ── Hero: fix letter-spacing & stats layout ── */
+  .hero { padding: 96px 16px 56px; }
+  .hero h1 { letter-spacing: -1px; }
+  .hero-sub { font-size: 15px; padding: 0 4px; }
+  .hero-actions { gap: 10px; }
+  .hero-actions .btn-lg { padding: 12px 22px; font-size: 15px; }
+  .hero-stats { gap: 20px; margin-top: 48px; padding-top: 32px; flex-wrap: wrap; justify-content: center; }
+  .hero-stat-num { font-size: 28px; }
+
+  /* ── Homepage sections ── */
+  .homepage-products { padding: 36px 16px; }
+  .categories-section { padding: 0 16px 40px; }
+
+  /* ── Product grid: single column on very small screens ── */
+  .product-grid { grid-template-columns: 1fr; }
+
+  /* ── Category grid ── */
+  .cat-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+
+  /* ── CTA section ── */
+  .cta-section { margin: 16px; padding: 36px 20px; }
+  .cta-section h2 { font-size: clamp(26px, 6vw, 40px); }
+
+  /* ── Footer ── */
+  .landing-footer { padding: 36px 16px 28px; }
+  .landing-footer-grid { grid-template-columns: 1fr; gap: 24px; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 8px; font-size: 10px; }
+
+  /* ── Auth pages ── */
+  .auth-right { padding: 32px 16px; }
+  .auth-card { max-width: 100%; }
+  .auth-card h1 { font-size: 26px; }
+
+  /* ── App shell: sidebar hidden by default on mobile ── */
+  .main-content { margin-left: 0; }
+  .view { padding: 16px; }
+
+  /* ── Main topbar: hide search on mobile to prevent overflow ── */
+  .main-topbar { padding: 0 16px; }
+  .main-topbar h1 { font-size: 16px; }
+  .topbar-search { display: none; }
+
+  /* ── Data tables: allow horizontal scroll inside wrapper only ── */
+  .data-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .data-table { min-width: 540px; }
+
+  /* ── Compare table: allow horizontal scroll ── */
+  .compare-header-box,
+  .compare-row { grid-template-columns: 120px 1fr 1fr; }
+  .compare-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* ── Compare CTA dual grid ── */
+  .compare-dual-cta { grid-template-columns: 1fr; }
+
+  /* ── Profile grid ── */
+  .profile-grid { grid-template-columns: 1fr; }
+
+  /* ── Form row ── */
+  .form-row { grid-template-columns: 1fr; }
+  .form-card { padding: 20px; }
+
+  /* ── Bar chart label wraps instead of overflow ── */
+  .bar-label { width: 90px; font-size: 11px; }
+
+  /* ── Stats grid: 2 per row on mobile ── */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .stat-card-value { font-size: 26px; }
+
+  /* ── Mini grid ── */
+  .mini-grid { grid-template-columns: 1fr; }
+
+  /* ── Modal: full-width with padding ── */
+  .modal-card { padding: 24px 18px; margin: 16px; max-width: calc(100vw - 32px); }
+
+  /* ── Notification panel: full-width ── */
+  .notif-panel { width: calc(100vw - 32px); right: 16px; }
+
+  /* ── Toast: full-width at bottom ── */
+  #toast { right: 16px; left: 16px; max-width: none; bottom: 16px; }
+
+  /* ── View header: stack vertically ── */
+  .view-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+  /* ── Contact grid ── */
+  .contact-grid { grid-template-columns: 1fr; }
+
+  /* ── Pricing grid: single column ── */
+  .pricing-grid { grid-template-columns: 1fr; }
+
+  /* ── Grid-2 utility: stack on mobile ── */
+  .grid-2 { grid-template-columns: 1fr; }
+
+  /* ── Detail view ── */
+  .detail-name { font-size: 26px; }
+  .detail-body { padding: 20px 16px; }
+
+  /* ── Affiliate box ── */
+  .affiliate-box { flex-direction: column; gap: 14px; }
+
+  /* ── Review sidebar: stack under main content ── */
+  .review-layout { grid-template-columns: 1fr; }
+  .review-sidebar-card { position: static; }
+
+  /* ── Legal content ── */
+  .legal-content { padding: 20px 16px; }
+
+  /* ── Search bar wrap ── */
+  .search-bar-wrap { flex-direction: column; }
+  .search-input-wrap { min-width: 100%; }
+
+  /* ── Newsletter strip ── */
+  .newsletter-strip { flex-direction: column; align-items: flex-start; padding: 20px; }
+  .newsletter-form { width: 100%; min-width: 0; }
+
+  /* ── Payment modal plans ── */
+  #payment-modal .modal-card,
+  #pay-success-modal .modal-card { padding: 20px 14px; }
+}
+
+@media (max-width: 420px) {
+  /* ── Very small phones: tighten further ── */
+  .topbar-actions .btn-outline { display: none; } /* show only primary CTA */
+  .hero-stats { gap: 16px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .cat-grid { grid-template-columns: 1fr 1fr; }
+  .hero h1 { font-size: clamp(36px, 9vw, 60px); letter-spacing: -0.5px; }
+  .section-title { letter-spacing: -0.5px; }
+}
+/* ── END MOBILE RESPONSIVE ADDITIONS ── */
+
 </style>
 </head>
 <body>
+
+<!-- ═══ ANIMATED WELCOME SCREEN ═══ -->
+<div id="welcome-screen">
+  <div id="welcome-particles"></div>
+  <div class="w-orb w-orb1"></div>
+  <div class="w-orb w-orb2"></div>
+  <div class="w-logo"><span class="wz">Z</span><span style="color:var(--zx)">AXIS</span></div>
+  <div class="w-tagline">Welcome, <span>ZAXIS User</span> ✦</div>
+  <div class="w-bar-wrap"><div class="w-bar-fill"></div></div>
+</div>
+
+<!-- slim pull-tab — opens sidebar on mobile without covering the logo -->
+<button id="sidebar-pull-tab" onclick="openMobileSidebar()" title="Open menu">MENU</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- ╔═══════════════════════════════════════════╗
      ║           LANDING PAGE                    ║
@@ -1081,7 +1404,7 @@ body::before {
       <a onclick="smoothSection('features')">Features</a>
       <a onclick="smoothSection('products-section')">Products</a>
       <a onclick="smoothSection('categories-section')">Categories</a>
-      <a href="http://www.zaxis.kesug.com" target="_blank">CEO Portfolio ↗</a>
+      <a href="https://www.jexyadav-info.great-site.net" target="_blank">CEO Portfolio ↗</a>
     </div>
     <div class="topbar-actions">
       <button class="btn btn-outline" onclick="showAuth('login')">Sign In</button>
@@ -1168,7 +1491,7 @@ body::before {
   <div class="cta-section" id="features">
     <h2>Built by Jex for builders</h2>
     <p>ZAXIS is led by CEO Jex — a full-stack developer & affiliate strategist.<br>
-    <a href="http://www.zaxis.kesug.com" target="_blank" style="color:var(--neon2)">→ View Jex's portfolio at zaxis.kesug.com</a></p>
+    <a href="https://www.jexyadav-info.great-site.net" target="_blank" style="color:var(--neon2)">→ View Jex's portfolio at jexyadav-info.great-site.net</a></p>
     <button class="btn btn-acid btn-lg" onclick="showAuth('signup')">Join ZAXIS Free →</button>
   </div>
 
@@ -1182,7 +1505,7 @@ body::before {
           </div>
           <p>The digital tools intelligence platform. Find, compare, and deploy the best software — powered by honest expert reviews.</p>
           <div class="flex-gap">
-            <a href="http://www.zaxis.kesug.com" target="_blank" class="btn btn-ghost btn-sm">CEO Portfolio ↗</a>
+            <a href="https://www.jexyadav-info.great-site.net" target="_blank" class="btn btn-ghost btn-sm">CEO Portfolio ↗</a>
           </div>
         </div>
         <div class="footer-col">
@@ -1202,7 +1525,7 @@ body::before {
         </div>
         <div class="footer-col">
           <h4>Company</h4>
-          <a href="http://www.zaxis.kesug.com" target="_blank">CEO: Jex ↗</a>
+          <a href="https://www.jexyadav-info.great-site.net" target="_blank">CEO: Jex ↗</a>
           <a>About ZAXIS</a>
           <a>Contact</a>
           <a>Privacy Policy</a>
@@ -1210,7 +1533,7 @@ body::before {
         </div>
       </div>
       <div class="footer-bottom">
-        <span>© 2025 ZAXIS. All rights reserved. CEO: Jex · <a href="http://www.zaxis.kesug.com" target="_blank">zaxis.kesug.com</a></span>
+        <span>© 2025 ZAXIS. All rights reserved. CEO: Jex · <a href="https://www.jexyadav-info.great-site.net" target="_blank">jexyadav-info.great-site.net</a></span>
         <span>hello@zaxis.kesug.com · partners@zaxis.kesug.com</span>
       </div>
     </div>
@@ -1368,6 +1691,8 @@ body::before {
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
+    <!-- ADDED: close button inside sidebar for mobile -->
+    <button class="sidebar-close-btn" onclick="closeMobileSidebar()" title="Close menu">✕</button>
     <div class="sidebar-logo">
       <div>
         <div><span class="z">Z</span><span style="color:var(--zx)">AXIS</span></div>
@@ -1434,77 +1759,103 @@ body::before {
       </div>
     </div>
 
-    <!-- ═══ VIEW: DASHBOARD ═══ -->
+    <!-- ═══ VIEW: DASHBOARD — 3D ANIMATED ═══ -->
     <div class="view active" id="view-dashboard">
-      <div class="view-header">
-        <div>
-          <div class="view-title" id="dash-welcome">Welcome back 👋</div>
-          <div class="view-sub">Here's what's happening on ZAXIS today</div>
-        </div>
-        <button class="btn btn-neon btn-sm admin-only" onclick="showView('add-product',document.getElementById('nav-add-product'))">+ Add Product</button>
+
+      <!-- WELCOME BANNER -->
+      <div class="dash3d-welcome">
+        <div class="dash3d-greeting" id="dash-welcome">Welcome back 👋</div>
+        <div class="dash3d-sub">Your ZAXIS command center — everything's live</div>
       </div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:var(--neon-soft)">📦</div>
-          <div class="stat-card-label">Total Products</div>
-          <div class="stat-card-value" id="stat-total">6</div>
-          <div class="stat-card-change change-up">↑ +3 this month</div>
+
+      <!-- STAT CARDS 3D -->
+      <div class="stat3d-grid">
+        <div class="stat3d" style="--delay:0.05s" onclick="dashStatClick(this,'products')" title="Browse Products">
+          <div class="stat3d-shine"></div><div class="stat3d-bar" style="--c1:#7b5cff;--c2:#9b7cff"></div>
+          <span class="stat3d-icon">📦</span>
+          <div class="stat3d-val" id="stat-total">12</div>
+          <div class="stat3d-label">Total Products</div>
+          <div class="stat3d-change" style="color:var(--acid)">↑ +6 this month</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:rgba(0,245,160,0.1)">⚡</div>
-          <div class="stat-card-label">Affiliate Clicks</div>
-          <div class="stat-card-value" id="stat-clicks">1,847</div>
-          <div class="stat-card-change change-up">↑ +12% vs last month</div>
+        <div class="stat3d" style="--delay:0.12s" onclick="dashStatClick(this,'clicks')">
+          <div class="stat3d-shine"></div><div class="stat3d-bar" style="--c1:#00f5a0;--c2:#00c07c"></div>
+          <span class="stat3d-icon">⚡</span>
+          <div class="stat3d-val" id="stat-clicks">1,847</div>
+          <div class="stat3d-label">Affiliate Clicks</div>
+          <div class="stat3d-change" style="color:var(--acid)">↑ +12% vs last month</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:rgba(245,200,66,0.1)">💰</div>
-          <div class="stat-card-label">Est. Revenue</div>
-          <div class="stat-card-value">$2.3k</div>
-          <div class="stat-card-change change-up">↑ +18% vs last month</div>
+        <div class="stat3d" style="--delay:0.19s" onclick="dashStatClick(this,'analytics')">
+          <div class="stat3d-shine"></div><div class="stat3d-bar" style="--c1:#f5c842;--c2:#ff6b35"></div>
+          <span class="stat3d-icon">💰</span>
+          <div class="stat3d-val">$2.3k</div>
+          <div class="stat3d-label">Est. Revenue</div>
+          <div class="stat3d-change" style="color:var(--acid)">↑ +18% vs last month</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card-icon" style="background:rgba(255,107,53,0.1)">📂</div>
-          <div class="stat-card-label">Categories</div>
-          <div class="stat-card-value" id="stat-cats">6</div>
-          <div class="stat-card-change change-up">↑ Active</div>
+        <div class="stat3d" style="--delay:0.26s" onclick="dashStatClick(this,'categories')">
+          <div class="stat3d-shine"></div><div class="stat3d-bar" style="--c1:#ff6b35;--c2:#ff4466"></div>
+          <span class="stat3d-icon">📂</span>
+          <div class="stat3d-val" id="stat-cats">7</div>
+          <div class="stat3d-label">Categories</div>
+          <div class="stat3d-change" style="color:var(--acid)">↑ Active</div>
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
-        <!-- Recent Clicks -->
-        <div class="data-table-wrap">
-          <div class="data-table-header">
-            <div class="data-table-title">Live Affiliate Clicks</div>
-            <span class="mono">Last 24h</span>
-          </div>
-          <div class="click-log" id="dash-click-log" style="padding:12px"></div>
+      <!-- QUICK ACTION TILES 3D -->
+      <div class="action3d-grid">
+        <div class="action3d" style="--delay:0.10s;--glow:0 0 30px rgba(123,92,255,0.25);--border-c:rgba(123,92,255,0.45);--rad-c:rgba(123,92,255,0.12)" onclick="dashActionClick(this,'browse')">
+          <span class="action3d-icon">🛒</span><div class="action3d-name">Browse Store</div><div class="action3d-sub">All products</div>
         </div>
-        <!-- Quick actions -->
-        <div class="data-table-wrap">
-          <div class="data-table-header">
-            <div class="data-table-title">Quick Actions</div>
-          </div>
-          <div style="padding:20px;display:flex;flex-direction:column;gap:10px">
-            <button class="btn btn-neon btn-sm" onclick="showView('browse',document.querySelector('.nav-item:nth-child(2)'))">📦 Browse Products</button>
-            <button class="btn btn-ghost btn-sm" onclick="showView('search',document.querySelector('.nav-item:nth-child(4)'))">🔍 Search Tools</button>
-            <button class="btn btn-ghost btn-sm admin-only" onclick="showView('add-product',document.getElementById('nav-add-product'))">➕ Add New Product</button>
-            <button class="btn btn-ghost btn-sm admin-only" onclick="showView('analytics',document.getElementById('nav-analytics'))">📈 View Analytics</button>
-            <hr class="divider">
-            <div style="font-size:12px;color:var(--zm)">CEO: <a href="http://www.zaxis.kesug.com" target="_blank" style="color:var(--neon2)">Jex ↗ zaxis.kesug.com</a></div>
-            <div style="font-size:12px;color:var(--zm)">Contact: <span style="color:var(--zs)">hello@zaxis.kesug.com</span></div>
-            <div style="font-size:12px;color:var(--zm)">Partners: <span style="color:var(--zs)">partners@zaxis.kesug.com</span></div>
-          </div>
+        <div class="action3d" style="--delay:0.18s;--glow:0 0 30px rgba(0,245,160,0.2);--border-c:rgba(0,245,160,0.4);--rad-c:rgba(0,245,160,0.08)" onclick="dashActionClick(this,'search')">
+          <span class="action3d-icon">🔍</span><div class="action3d-name">Search Tools</div><div class="action3d-sub">Find the right one</div>
+        </div>
+        <div class="action3d" style="--delay:0.26s;--glow:0 0 30px rgba(245,200,66,0.2);--border-c:rgba(245,200,66,0.35);--rad-c:rgba(245,200,66,0.08)" onclick="dashActionClick(this,'categories')">
+          <span class="action3d-icon">🗂️</span><div class="action3d-name">Categories</div><div class="action3d-sub">Browse by type</div>
+        </div>
+        <div class="action3d" style="--delay:0.34s;--glow:0 0 30px rgba(255,107,53,0.2);--border-c:rgba(255,107,53,0.35);--rad-c:rgba(255,107,53,0.08)" onclick="dashActionClick(this,'compare')">
+          <span class="action3d-icon">⚖️</span><div class="action3d-name">Compare</div><div class="action3d-sub">Side by side</div>
+        </div>
+        <div class="action3d" style="--delay:0.42s;--glow:0 0 30px rgba(123,92,255,0.2);--border-c:rgba(123,92,255,0.4);--rad-c:rgba(123,92,255,0.1)" onclick="dashActionClick(this,'saved')">
+          <span class="action3d-icon">🔖</span><div class="action3d-name">Saved Tools</div><div class="action3d-sub">Your wishlist</div>
+        </div>
+        <div class="action3d admin-only" style="--delay:0.50s;--glow:0 0 30px rgba(0,245,160,0.2);--border-c:rgba(0,245,160,0.4);--rad-c:rgba(0,245,160,0.08)" onclick="dashActionClick(this,'add-product')">
+          <span class="action3d-icon">➕</span><div class="action3d-name">Add Product</div><div class="action3d-sub">Admin only</div>
         </div>
       </div>
 
-      <!-- Recent products mini -->
-      <div class="data-table-wrap">
-        <div class="data-table-header">
-          <div class="data-table-title">Recent Products</div>
-          <button class="btn btn-ghost btn-sm" onclick="showView('browse',document.querySelector('.nav-item:nth-child(2)'))">View all →</button>
+      <!-- CHART + LIVE FEED -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px">
+        <div class="dash3d-chart">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div style="font-size:13px;font-weight:700;color:var(--zx)">Weekly Clicks</div>
+            <div style="font-size:11px;color:var(--acid);font-weight:600">▲ +12%</div>
+          </div>
+          <div class="chart3d-bars" id="chart3d-bars">
+            <div class="chart3d-bar" style="--bd:0.10s" data-val="184" data-h="48%"></div>
+            <div class="chart3d-bar" style="--bd:0.18s" data-val="231" data-h="62%"></div>
+            <div class="chart3d-bar" style="--bd:0.26s" data-val="198" data-h="53%"></div>
+            <div class="chart3d-bar" style="--bd:0.34s" data-val="310" data-h="83%"></div>
+            <div class="chart3d-bar" style="--bd:0.42s" data-val="278" data-h="74%"></div>
+            <div class="chart3d-bar" style="--bd:0.50s" data-val="372" data-h="100%"></div>
+            <div class="chart3d-bar" style="--bd:0.58s" data-val="274" data-h="73%"></div>
+          </div>
+          <div class="chart3d-labels"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
         </div>
-        <div class="mini-grid" id="dash-mini-products" style="padding:16px"></div>
+        <div class="dash3d-feed">
+          <div class="dash3d-feed-head">
+            <div class="dash3d-feed-title">Live Activity</div>
+            <div class="feed-live-dot"></div>
+          </div>
+          <div id="dash3d-feed-list"></div>
+        </div>
       </div>
+
+      <!-- FEATURED PRODUCTS 3D -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:15px;font-weight:700;color:var(--zx)">Featured Products</div>
+        <button class="btn btn-ghost btn-sm" onclick="showView('browse',document.querySelector('[onclick*=browse]'))">View all →</button>
+      </div>
+      <div class="dash3d-products" id="dash3d-products"></div>
+
     </div>
 
     <!-- ═══ VIEW: BROWSE PRODUCTS ═══ -->
@@ -1765,7 +2116,7 @@ body::before {
           </div>
           <div class="form-group">
             <label class="form-label">Company / Portfolio URL</label>
-            <input class="form-input" id="profile-url" placeholder="https://your-portfolio.com" value="http://www.zaxis.kesug.com">
+            <input class="form-input" id="profile-url" placeholder="https://your-portfolio.com" value="https://www.jexyadav-info.great-site.net">
           </div>
           <hr class="divider">
           <div style="font-size:13px;color:var(--zm);margin-bottom:14px">
@@ -1773,7 +2124,7 @@ body::before {
             General: zaxisgod02@gmail.com<br>
             Partnerships: jexyadav00@gmail.com<br>
             Legal: zaxisgod02@gmail.com<br>
-            CEO Portfolio: <a href="http://www.zaxis.kesug.com" target="_blank" style="color:var(--neon2)">zaxis.kesug.com</a>
+            CEO Portfolio: <a href="https://www.jexyadav-info.great-site.net" target="_blank" style="color:var(--neon2)">jexyadav-info.great-site.net</a>
           </div>
           <button class="btn btn-neon" onclick="saveProfile()">Save Changes →</button>
         </div>
@@ -1877,14 +2228,14 @@ body::before {
             <div class="contact-detail-icon">🌐</div>
             <div class="contact-detail-text">
               <strong>Founder/CEO Portfolio</strong>
-              <a href="http://www.zaxis.kesug.com" target="_blank">zaxis.kesug.com ↗</a>
+              <a href="https://www.jexyadav-info.great-site.net" target="_blank">jexyadav-info.great-site.net ↗</a>
             </div>
           </div>
           <hr class="divider">
           <div style="font-size:12px;color:var(--zm);line-height:1.7">
             <strong style="color:var(--zs)">Response time:</strong> 1–3 business days<br>
             <strong style="color:var(--zs)">Affiliate inquiries:</strong> jexyadav00@gmail.com<br>
-            <strong style="color:var(--zs)">CEO:</strong> Jex Yadav· <a href="http://www.zaxis.kesug.com" target="_blank" style="color:var(--neon2)">Portfolio ↗</a>
+            <strong style="color:var(--zs)">CEO:</strong> Jex Yadav· <a href="https://www.jexyadav-info.great-site.net" target="_blank" style="color:var(--neon2)">Portfolio ↗</a>
           </div>
         </div>
         <div class="form-card" style="max-width:100%">
@@ -2027,9 +2378,6 @@ body::before {
     </div>
   </div>
 </div>
-
-<!-- ═══ SIDEBAR OVERLAY (mobile) ═══ -->
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- ═══ NOTIFICATION PANEL ═══ -->
 <div class="notif-panel" id="notif-panel">
@@ -2187,14 +2535,21 @@ function bootApp() {
       { id:'c4', name:'Student Tools',      slug:'student',     icon:'🎓', description:'Note-taking, study aids, research tools, and productivity apps.' },
       { id:'c5', name:'SEO & Marketing',    slug:'seo-marketing',icon:'📈',description:'Keyword tools, rank trackers, email marketing, and growth software.' },
       { id:'c6', name:'Design Tools',       slug:'design',      icon:'🎨', description:'Graphic design, video editing, UI/UX tools, and creative software.' },
+      { id:'c7', name:'Security & VPN',     slug:'security',    icon:'🔐', description:'VPNs, password managers, and cybersecurity tools for students.' },
     ],
     products: [
-      { id:'p1', title:'Jasper AI',   slug:'jasper-ai',   description:'The most powerful AI writing assistant. Ideal for marketers, bloggers, and content teams who need high-volume output consistently.',  price:'$39/mo',   image_url:'🤖', category_id:'c1', rating:4.9, status:'featured',  affiliate_link:'https://www.jasper.ai/', commission:'30%', pros:['Exceptional output quality','Brand voice training','50+ templates','Surfer SEO integration'], cons:['No free plan','Expensive vs competitors'], created_at:'2025-01-01' },
-      { id:'p2', title:'Copy.ai',     slug:'copy-ai',     description:'Fast, affordable AI copywriting for small businesses. Great for social media, emails, and short-form content with 90+ templates.',       price:'$36/mo',   image_url:'✍️', category_id:'c1', rating:4.7, status:'published', affiliate_link:'https://www.copy.ai/', commission:'25%', pros:['Free plan available','90+ templates','Easy to use'], cons:['Weaker long-form','No SEO integration'], created_at:'2025-01-02' },
-      { id:'p3', title:'Hostinger',   slug:'hostinger',   description:'Best budget web hosting for beginners. Blazing-fast LiteSpeed servers, free domain, SSL, and 1-click WordPress install included.',        price:'$2.99/mo', image_url:'🌐', category_id:'c2', rating:4.8, status:'featured',  affiliate_link:'https://www.hostinger.com/', commission:'60%', pros:['Ultra cheap','Free domain & SSL','Fast servers'], cons:['Support can be slow','No daily backups on cheapest plan'], created_at:'2025-01-03' },
-      { id:'p4', title:'Notion AI',   slug:'notion-ai',   description:'AI integrated directly into your workspace. Summarize docs, generate content, and automate tasks without switching apps.',                  price:'$10/mo',   image_url:'📝', category_id:'c4', rating:4.6, status:'published', affiliate_link:'https://www.notion.so/', commission:'15%', pros:['Seamless workspace integration','Great for students','Free base plan'], cons:['AI add-on costs extra','Limited templates'], created_at:'2025-01-04' },
-      { id:'p5', title:'Surfer SEO',  slug:'surfer-seo',  description:'AI-powered SEO content optimization. Write content that ranks by analyzing top SERP competitors and keyword density in real-time.',       price:'$59/mo',   image_url:'🔍', category_id:'c5', rating:4.7, status:'published', affiliate_link:'https://surferseo.com/', commission:'25%', pros:['Real-time SERP analysis','Jasper integration','Content score system'], cons:['Expensive','Steep learning curve'], created_at:'2025-01-05' },
-      { id:'p6', title:'Midjourney',  slug:'midjourney',  description:'The leading AI image generator. Best-in-class quality for creative professionals, designers, and marketers needing stunning visuals.',      price:'$10/mo',   image_url:'🎨', category_id:'c6', rating:4.8, status:'featured',  affiliate_link:'https://www.midjourney.com/', commission:'20%', pros:['Best image quality','Active community','Fast generation'], cons:['Discord-only interface','No free plan'], created_at:'2025-01-06' },
+      { id:'p1', title:'Jasper AI',   slug:'jasper-ai',   description:'The most powerful AI writing assistant. Ideal for marketers, bloggers, and content teams who need high-volume output consistently.',  price:'$49/mo',   image_url:'🤖', category_id:'c1', rating:4.4, status:'featured',  affiliate_link:'https://www.jasper.ai/', commission:'25% recurring', pros:['Exceptional output quality','Brand voice training','50+ templates','Surfer SEO integration'], cons:['No free plan','Expensive vs competitors','7-day trial only'], created_at:'2025-01-01' },
+      { id:'p2', title:'Copy.ai',     slug:'copy-ai',     description:'Fast, affordable AI copywriting for students and small businesses. 90+ templates for social media, emails, and short-form content.',       price:'$36/mo',   image_url:'✍️', category_id:'c1', rating:4.5, status:'published', affiliate_link:'https://www.copy.ai/', commission:'45% recurring', pros:['2,000 free words/month','90+ templates','Beginner-friendly'], cons:['Output needs editing','Free plan resets monthly','Weak for long-form'], created_at:'2025-01-02' },
+      { id:'p3', title:'Hostinger',   slug:'hostinger',   description:'Best value web hosting for students building their first website. Beginner-friendly hPanel, free domain, SSL, and 1-click WordPress.',        price:'$2.99/mo', image_url:'🌐', category_id:'c2', rating:4.4, status:'featured',  affiliate_link:'https://www.hostinger.com/', commission:'60%/sale', pros:['Cheapest entry price','Free domain & SSL','1-click WordPress','24/7 support'], cons:['Renewal prices spike','Lower performance than premium hosts','Entry plan storage limits'], created_at:'2025-01-03' },
+      { id:'p4', title:'Notion AI',   slug:'notion-ai',   description:'AI assistant built directly into your workspace. Summarize notes, generate outlines, fix grammar, and brainstorm — all in one app.',                  price:'$10/mo',   image_url:'📝', category_id:'c4', rating:4.8, status:'featured', affiliate_link:'https://www.notion.so/', commission:'50% recurring', pros:['Generous free tier','AI inside your workflow','Works on all devices','Education plan free'], cons:['AI limited on free plan','Can feel overwhelming for beginners','Needs internet for AI'], created_at:'2025-01-04' },
+      { id:'p5', title:'Grammarly Premium', slug:'grammarly', description:'AI writing assistant that checks grammar, spelling, tone, clarity, and plagiarism across Gmail, Google Docs, and any website.', price:'$12/mo', image_url:'📖', category_id:'c4', rating:4.7, status:'featured', affiliate_link:'https://www.grammarly.com/', commission:'$20/sale', pros:['Works everywhere in browser','Plagiarism checker','Free version very useful','Tone detector'], cons:['Premium pricey monthly','Suggestions can be conservative','Not a replacement for writing practice'], created_at:'2025-01-05' },
+      { id:'p6', title:'Canva Pro',   slug:'canva-pro',   description:'Drag-and-drop design platform with 250,000+ templates. Magic Design AI, Background Remover, and Brand Kit for professional visuals.',      price:'$15/mo',   image_url:'🎨', category_id:'c6', rating:4.9, status:'featured',  affiliate_link:'https://www.canva.com/', commission:'$36/sale', pros:['Free Education plan for students','Zero learning curve','Works on mobile','AI design features'], cons:['Pro overlaps with free for most students','Some premium templates require Pro'], created_at:'2025-01-06' },
+      { id:'p7', title:'Coursera Plus', slug:'coursera-plus', description:'Unlimited access to 7,000+ courses and certificates from Google, Meta, IBM, Stanford, and Yale. Employer-recognized certifications.', price:'$59/mo', image_url:'🎓', category_id:'c4', rating:4.3, status:'published', affiliate_link:'https://www.coursera.org/', commission:'45% first month', pros:['Google/IBM/Meta certs recognized by employers','Unlimited certificates included','Financial aid available','Offline mobile downloads'], cons:['Monthly price high for students','Quality varies','Better for professional certs'], created_at:'2025-01-07' },
+      { id:'p8', title:'NordVPN',     slug:'nordvpn',     description:'Encrypts your internet on public campus Wi-Fi, hides your IP, and gives access to geo-restricted content. 5,500+ servers in 60 countries.', price:'$3.69/mo', image_url:'🔐', category_id:'c4', rating:4.6, status:'published', affiliate_link:'https://nordvpn.com/', commission:'40% + rebills', pros:['Essential for public Wi-Fi safety','30-day money-back guarantee','6 simultaneous devices','Threat Protection built in'], cons:['Monthly rate expensive','Overkill for home-only users'], created_at:'2025-01-08' },
+      { id:'p9', title:'Skillshare',  slug:'skillshare',  description:'35,000+ short-form video classes in design, business, writing, and photography. Project-based learning with 1-month free trial.', price:'$14/mo', image_url:'🖌️', category_id:'c4', rating:4.2, status:'published', affiliate_link:'https://www.skillshare.com/', commission:'$7/trial', pros:['1-month free trial','Great for creative skills','Mobile offline downloads','Hands-on projects'], cons:['No formal certifications','Quality varies by teacher','Better creative than technical'], created_at:'2025-01-09' },
+      { id:'p10', title:'Otter.ai',   slug:'otter-ai',    description:'AI transcription and note-taking. Records lectures in real-time, identifies speakers, generates summaries, and lets you search all notes.', price:'$16.99/mo', image_url:'🎙️', category_id:'c4', rating:4.5, status:'published', affiliate_link:'https://otter.ai/', commission:'20% recurring', pros:['300 free minutes/month','Real-time transcription','Works for Zoom/Google Meet','AI summaries included'], cons:['Free plan limited to 300 min','Accuracy drops with accents','OtterPilot is Pro+ only'], created_at:'2025-01-10' },
+      { id:'p11', title:'Surfer SEO',  slug:'surfer-seo',  description:'AI-powered SEO content optimization. Write content that ranks by analyzing top SERP competitors and keyword density in real-time.',       price:'$59/mo',   image_url:'🔍', category_id:'c5', rating:4.7, status:'published', affiliate_link:'https://surferseo.com/', commission:'25%', pros:['Real-time SERP analysis','Jasper integration','Content score system'], cons:['Expensive','Steep learning curve'], created_at:'2025-01-11' },
+      { id:'p12', title:'Midjourney',  slug:'midjourney',  description:'The leading AI image generator. Best-in-class quality for creative professionals, designers, and marketers needing stunning visuals.',      price:'$10/mo',   image_url:'🖼️', category_id:'c6', rating:4.8, status:'featured',  affiliate_link:'https://www.midjourney.com/', commission:'20%', pros:['Best image quality','Active community','Fast generation'], cons:['Discord-only interface','No free plan'], created_at:'2025-01-12' },
     ],
     affiliate_clicks: [],
     profiles: [
@@ -2528,6 +2883,8 @@ function bootApp() {
     if(name==='admin-products') setTimeout(initTableFilter,100);
     // Always refresh category dropdown with real UUIDs when opening Add Product
     if(name==='add-product') populateCategoryFilters();
+    // ADDED: auto-close mobile sidebar after navigation
+    if (window.innerWidth <= 768) window.closeMobileSidebar && window.closeMobileSidebar();
   }
   window.showView = showView;
 
@@ -3431,9 +3788,38 @@ function bootApp() {
     const p=document.getElementById('notif-panel');
     if(p) p.classList.toggle('open');
   };
-  window.openMobileSidebar=function(){
-    const s=document.querySelector('.sidebar');
-    if(s) s.classList.toggle('mobile-open');
+  // Mobile sidebar — pull-tab version (no FAB, no ☰ button)
+  window.toggleMobileSidebar = function() {
+    const s = document.querySelector('.sidebar');
+    const ov = document.getElementById('sidebar-overlay');
+    const tab = document.getElementById('sidebar-pull-tab');
+    if (!s) return;
+    const isOpen = s.classList.contains('mobile-open');
+    if (isOpen) {
+      s.classList.remove('mobile-open');
+      if (ov) ov.classList.remove('open');
+      if (tab) tab.style.display = 'flex';
+    } else {
+      s.classList.add('mobile-open');
+      if (ov) ov.classList.add('open');
+      if (tab) tab.style.display = 'none';
+    }
+  };
+  window.openMobileSidebar = function() {
+    const s = document.querySelector('.sidebar');
+    const ov = document.getElementById('sidebar-overlay');
+    const tab = document.getElementById('sidebar-pull-tab');
+    if (s) s.classList.add('mobile-open');
+    if (ov) ov.classList.add('open');
+    if (tab) tab.style.display = 'none';
+  };
+  window.closeMobileSidebar = function() {
+    const s = document.querySelector('.sidebar');
+    const ov = document.getElementById('sidebar-overlay');
+    const tab = document.getElementById('sidebar-pull-tab');
+    if (s) s.classList.remove('mobile-open');
+    if (ov) ov.classList.remove('open');
+    if (tab && window.innerWidth <= 768) tab.style.display = 'flex';
   };
   window.openPasswordModal=function(){
     const m=document.getElementById('password-modal');
@@ -3534,8 +3920,7 @@ function bootApp() {
     if(!right||document.getElementById('notif-btn')) return;
     right.insertAdjacentHTML('afterbegin',`
       <button class="btn btn-icon btn-ghost" onclick="toggleTheme()" title="Toggle theme">🌙</button>
-      <button class="btn btn-icon btn-ghost" id="notif-btn" onclick="toggleNotifications()" style="position:relative">🔔<span class="notif-dot"></span></button>
-      <button class="mobile-topbar-btn" onclick="openMobileSidebar()">☰</button>`);
+      <button class="btn btn-icon btn-ghost" id="notif-btn" onclick="toggleNotifications()" style="position:relative">🔔<span class="notif-dot"></span></button>`);
   }
   window.updateMainTopbar=updateMainTopbar;
 
@@ -3786,6 +4171,1777 @@ function bootApp() {
   })();
 
 } // end bootApp
+
+/* ═══════════════════════════════════════════════
+   WELCOME SCREEN ANIMATION
+═══════════════════════════════════════════════ */
+(function initWelcome(){
+  // Create floating particles
+  const pc = document.getElementById('welcome-particles');
+  if (pc) {
+    for (let i = 0; i < 30; i++) {
+      const d = document.createElement('div');
+      d.className = 'w-particle';
+      const sz = Math.random() * 4 + 2;
+      d.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:-10px;--dx:${(Math.random()-0.5)*120}px;animation-duration:${Math.random()*4+3}s;animation-delay:${Math.random()*4}s;background:${Math.random()>0.5?'rgba(123,92,255,0.6)':'rgba(0,245,160,0.5)'};`;
+      pc.appendChild(d);
+    }
+  }
+  // Dismiss after 2.8s
+  setTimeout(() => {
+    const ws = document.getElementById('welcome-screen');
+    if (ws) {
+      ws.classList.add('fade-out');
+      setTimeout(() => { ws.style.display = 'none'; }, 800);
+    }
+  }, 2800);
+})();
+
+/* ═══════════════════════════════════════════════
+   3D DASHBOARD INTERACTIONS
+═══════════════════════════════════════════════ */
+(function init3dDash(){
+  const feedEvents = [
+    { icon:'🤖', text:'<strong>Notion AI</strong> was visited', time:'2 min ago', badge:'click' },
+    { icon:'🎨', text:'<strong>Canva Pro</strong> affiliate link opened', time:'8 min ago', badge:'click' },
+    { icon:'🌐', text:'<strong>Hostinger</strong> review viewed', time:'15 min ago', badge:'view' },
+    { icon:'📖', text:'<strong>Grammarly</strong> added to saved', time:'22 min ago', badge:'save' },
+    { icon:'🔐', text:'<strong>NordVPN</strong> affiliate link opened', time:'31 min ago', badge:'click' },
+  ];
+
+  function renderFeed(){
+    const el = document.getElementById('dash3d-feed-list');
+    if (!el) return;
+    el.innerHTML = feedEvents.map((e,i) => `
+      <div class="feed-item" style="--fd:${i*0.08}s" onclick="this.style.background='rgba(123,92,255,0.1)';setTimeout(()=>this.style.background='',400)">
+        <div class="feed-avatar">${e.icon}</div>
+        <div class="feed-meta">
+          <div class="feed-text">${e.text}</div>
+          <div class="feed-time">${e.time}</div>
+        </div>
+        <div class="feed-badge">${e.badge}</div>
+      </div>`).join('');
+  }
+
+  function renderDash3dProducts(){
+    const el = document.getElementById('dash3d-products');
+    if (!el || typeof DB === 'undefined') return;
+    const items = DB.products.slice(0,6);
+    el.innerHTML = items.map((p,i) => `
+      <div class="pcard3d" style="--delay:${0.05+i*0.07}s" onclick="typeof openProductDetail==='function'?openProductDetail('${p.slug}'):showView('browse',null)">
+        <div class="pcard3d-icon">${p.image_url||'📦'}</div>
+        <div class="pcard3d-name">${p.title}</div>
+        <div class="pcard3d-price">${p.price}</div>
+        <div class="pcard3d-comm">Commission: ${p.commission||'—'}</div>
+        <button class="pcard3d-cta" onclick="event.stopPropagation();typeof openProductDetail==='function'?openProductDetail('${p.slug}'):null">View Details →</button>
+      </div>`).join('');
+  }
+
+  function animateBars(){
+    document.querySelectorAll('.chart3d-bar').forEach(b => {
+      b.style.height = b.dataset.h || '50%';
+      setTimeout(() => b.classList.add('visible'), 120);
+    });
+  }
+
+  window.dashActionClick = function(el, view){
+    const r = document.createElement('div');
+    r.className = 'action3d-ripple';
+    r.style.cssText = `left:${el.clientWidth/2}px;top:${el.clientHeight/2}px;`;
+    el.appendChild(r);
+    setTimeout(()=>r.remove(), 700);
+    if (view === 'add-product') { const n=document.getElementById('nav-add-product'); showView('add-product',n); }
+    else if (view==='compare'||view==='saved') { showView(view,null); }
+    else { const n=document.querySelector(`[onclick*="${view}"]`); showView(view,n); }
+  };
+
+  window.dashStatClick = function(el, type){
+    el.style.transform='scale(0.93) translateY(2px)';
+    setTimeout(()=>{ el.style.transform=''; },200);
+    if(type==='products') { const n=document.querySelector('[onclick*=browse]'); showView('browse',n); }
+    else if(type==='categories') { const n=document.querySelector('[onclick*=categories]'); showView('categories',n); }
+    else if(type==='analytics') { const n=document.getElementById('nav-analytics'); showView('analytics',n); }
+  };
+
+  function tryInit(){
+    const dash = document.getElementById('view-dashboard');
+    if (!dash || !dash.classList.contains('active')) return;
+    renderFeed(); renderDash3dProducts(); animateBars();
+  }
+
+  // Watch for dashboard becoming active
+  const dashEl = document.getElementById('view-dashboard');
+  if (dashEl) {
+    new MutationObserver(() => {
+      if (dashEl.classList.contains('active')) { renderFeed(); renderDash3dProducts(); animateBars(); }
+    }).observe(dashEl, { attributes:true, attributeFilter:['class'] });
+  }
+
+  setTimeout(tryInit, 1200);
+  setTimeout(tryInit, 2800);
+
+  // Live feed refresh every 18s
+  setInterval(()=>{
+    const live = [
+      { icon:'✍️', text:'<strong>Copy.ai</strong> affiliate link opened', time:'just now', badge:'click' },
+      { icon:'📝', text:'<strong>Notion AI</strong> saved to wishlist', time:'just now', badge:'save' },
+      { icon:'🎙️', text:'<strong>Otter.ai</strong> review viewed', time:'just now', badge:'view' },
+      { icon:'🎓', text:'<strong>Coursera Plus</strong> link clicked', time:'just now', badge:'click' },
+    ];
+    feedEvents.unshift(live[Math.floor(Math.random()*live.length)]);
+    if (feedEvents.length > 5) feedEvents.pop();
+    renderFeed();
+  }, 18000);
+})();
 </script>
+<!-- ════════════════════════════════════════════════════════════════
+     ZAXIS v11 EXTENSION — Topics, Subcategories, Personas, Compare 2.0
+     Self-contained: appended to v10 without touching existing markup.
+════════════════════════════════════════════════════════════════ -->
+<style>
+  /* Topics & drill-down views */
+  .zx-breadcrumb { display:flex; gap:8px; align-items:center; font-size:12px; color:var(--zm); margin-bottom:18px; flex-wrap:wrap; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.08em; }
+  .zx-breadcrumb a { color:var(--zt); cursor:pointer; }
+  .zx-breadcrumb a:hover { color:var(--neon2); }
+  .zx-breadcrumb .sep { color:var(--z5); }
+  .zx-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+  .zx-tile { background:var(--z2); border:1px solid var(--border); border-radius:var(--r); padding:22px; cursor:pointer; transition:var(--transition); position:relative; overflow:hidden; }
+  .zx-tile:hover { border-color:var(--neon); transform:translateY(-2px); box-shadow:var(--shadow-neon); }
+  .zx-tile::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,var(--neon-soft) 0%,transparent 60%); opacity:0; transition:var(--transition); }
+  .zx-tile:hover::before { opacity:1; }
+  .zx-tile-icon { font-size:32px; margin-bottom:10px; position:relative; }
+  .zx-tile-name { font-family:var(--font-head); font-weight:700; color:var(--zx); font-size:16px; margin-bottom:4px; position:relative; }
+  .zx-tile-meta { font-size:12px; color:var(--zm); position:relative; }
+  .zx-tile-count { position:absolute; top:14px; right:14px; background:var(--z4); color:var(--zs); font-size:10px; font-weight:700; padding:3px 8px; border-radius:99px; font-family:var(--font-mono); }
+  /* Persona selector */
+  .zx-persona-bar { display:flex; gap:8px; flex-wrap:wrap; padding:0 12px 12px; border-bottom:1px solid var(--border); margin-bottom:8px; }
+  .zx-persona-chip { padding:6px 10px; background:var(--z3); border:1px solid var(--border); border-radius:99px; font-size:11px; color:var(--zs); cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:5px; font-weight:600; }
+  .zx-persona-chip.active { background:var(--neon); color:#fff; border-color:var(--neon); box-shadow:0 0 14px var(--neon-glow); }
+  .zx-persona-chip:hover:not(.active) { border-color:var(--neon); color:var(--zx); }
+  .zx-persona-label { font-size:9px; color:var(--zm); text-transform:uppercase; letter-spacing:.12em; padding:0 12px 6px; font-family:var(--font-mono); }
+  /* Persona modal */
+  .zx-persona-modal { position:fixed; inset:0; background:rgba(0,0,0,.85); display:none; align-items:center; justify-content:center; z-index:9999; padding:20px; backdrop-filter:blur(8px); }
+  .zx-persona-modal.open { display:flex; }
+  .zx-persona-card { background:var(--z1); border:1px solid var(--border2); border-radius:var(--r-lg); padding:36px; max-width:680px; width:100%; box-shadow:var(--shadow-neon); }
+  .zx-persona-card h2 { font-family:var(--font-head); color:var(--zx); font-size:28px; margin-bottom:8px; }
+  .zx-persona-card p.sub { color:var(--zt); font-size:14px; margin-bottom:24px; }
+  .zx-persona-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; }
+  .zx-persona-pick { background:var(--z2); border:1px solid var(--border); border-radius:var(--r); padding:18px; cursor:pointer; text-align:center; transition:var(--transition); }
+  .zx-persona-pick:hover { border-color:var(--neon); transform:translateY(-2px); background:var(--neon-soft); }
+  .zx-persona-pick .ic { font-size:30px; margin-bottom:8px; }
+  .zx-persona-pick .nm { font-family:var(--font-head); font-weight:700; color:var(--zx); font-size:14px; }
+  .zx-persona-pick .dc { font-size:11px; color:var(--zm); margin-top:4px; }
+  /* Compare 2.0 */
+  .zx-cmp-verdict { background:linear-gradient(135deg,var(--neon-soft) 0%,transparent 100%); border:1px solid rgba(123,92,255,.35); border-radius:var(--r); padding:24px; margin-bottom:24px; display:flex; gap:18px; align-items:flex-start; }
+  .zx-cmp-verdict .tro { font-size:42px; line-height:1; }
+  .zx-cmp-verdict h3 { font-family:var(--font-head); color:var(--zx); font-size:20px; margin-bottom:6px; }
+  .zx-cmp-verdict p { color:var(--zs); font-size:14px; line-height:1.6; }
+  .zx-cmp-verdict .winner-tag { display:inline-block; background:var(--neon); color:#fff; font-size:10px; font-weight:800; letter-spacing:.1em; padding:3px 9px; border-radius:99px; margin-bottom:8px; font-family:var(--font-mono); }
+  .zx-cmp-head { display:grid; grid-template-columns:160px 1fr 1fr; background:var(--z2); border:1px solid var(--border); border-radius:var(--r) var(--r) 0 0; }
+  .zx-cmp-head > div { padding:22px; border-right:1px solid var(--border); text-align:center; }
+  .zx-cmp-head > div:last-child { border-right:none; }
+  .zx-cmp-head .lbl { display:flex; align-items:center; justify-content:flex-start; font-family:var(--font-mono); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--zm); padding:22px; }
+  .zx-cmp-head .ph.win { background:linear-gradient(180deg,rgba(123,92,255,.15) 0%,transparent 100%); position:relative; }
+  .zx-cmp-head .ph.win::after { content:'🏆 WINNER'; position:absolute; top:8px; right:8px; background:var(--neon); color:#fff; font-size:9px; font-weight:800; padding:3px 7px; border-radius:99px; font-family:var(--font-mono); letter-spacing:.08em; }
+  .zx-cmp-head .ic { font-size:42px; margin-bottom:10px; }
+  .zx-cmp-head .nm { font-family:var(--font-head); font-size:20px; font-weight:800; color:var(--zx); margin-bottom:4px; }
+  .zx-cmp-head .pr { font-size:13px; color:var(--zt); margin-bottom:6px; font-family:var(--font-mono); }
+  .zx-cmp-head .rt { font-size:12px; color:var(--gold); }
+  .zx-cmp-row { display:grid; grid-template-columns:160px 1fr 1fr; border-left:1px solid var(--border); border-right:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--z1); }
+  .zx-cmp-row > div { padding:14px 22px; border-right:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--zs); }
+  .zx-cmp-row > div:last-child { border-right:none; }
+  .zx-cmp-row .lbl { justify-content:flex-start; color:var(--zm); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+  .zx-cmp-row.section { background:var(--z2); }
+  .zx-cmp-row.section .lbl { color:var(--neon2); font-family:var(--font-head); font-size:11px; font-weight:800; letter-spacing:.14em; }
+  .zx-cmp-row .bar { width:100%; max-width:180px; height:8px; background:var(--z4); border-radius:4px; overflow:hidden; position:relative; }
+  .zx-cmp-row .bar > span { display:block; height:100%; background:linear-gradient(90deg,var(--neon),var(--neon2)); border-radius:4px; transition:width .6s ease; }
+  .zx-cmp-row .bar.acid > span { background:linear-gradient(90deg,var(--acid2),var(--acid)); }
+  .zx-cmp-row .scoretxt { font-family:var(--font-mono); font-weight:700; color:var(--zx); font-size:12px; margin-left:8px; }
+  .zx-cmp-cell { display:flex; align-items:center; gap:8px; }
+  .zx-cmp-bottom { border-radius:0 0 var(--r) var(--r); }
+  .zx-cmp-section-title { font-family:var(--font-head); font-size:13px; font-weight:800; color:var(--neon2); margin:28px 0 12px; letter-spacing:.14em; text-transform:uppercase; }
+  .zx-pvgraph { display:grid; grid-template-columns:160px 1fr; gap:14px; align-items:center; padding:14px 0; border-bottom:1px solid var(--border); }
+  .zx-pvgraph:last-child { border-bottom:none; }
+  .zx-pvgraph .lbl { font-size:13px; font-weight:700; color:var(--zx); display:flex; align-items:center; gap:8px; }
+  .zx-pvgraph .barwrap { display:flex; flex-direction:column; gap:6px; }
+  .zx-pvgraph .barlin { display:flex; align-items:center; gap:8px; }
+  .zx-pvgraph .barlin .tag { width:62px; font-size:10px; color:var(--zm); font-family:var(--font-mono); text-transform:uppercase; }
+  .zx-pvgraph .barlin .bb { flex:1; height:10px; background:var(--z3); border-radius:5px; overflow:hidden; }
+  .zx-pvgraph .barlin .bb > span { display:block; height:100%; background:linear-gradient(90deg,var(--neon),var(--acid)); }
+  .zx-pvgraph .barlin .vt { font-family:var(--font-mono); font-size:11px; color:var(--zs); width:36px; text-align:right; }
+  .zx-pcgrid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media(max-width:780px){ .zx-pcgrid,.zx-cmp-head,.zx-cmp-row { grid-template-columns:1fr; } .zx-pcgrid { grid-template-columns:1fr; } }
+  .zx-pclist { background:var(--z2); border:1px solid var(--border); border-radius:var(--r); padding:18px; }
+  .zx-pclist h4 { font-family:var(--font-head); font-size:13px; color:var(--zx); margin-bottom:10px; letter-spacing:.06em; }
+  .zx-pclist ul { list-style:none; padding:0; margin:0; }
+  .zx-pclist li { font-size:13px; color:var(--zs); padding:5px 0; padding-left:20px; position:relative; }
+  .zx-pclist.pros li::before { content:'✓'; position:absolute; left:0; color:var(--acid); font-weight:800; }
+  .zx-pclist.cons li::before { content:'✕'; position:absolute; left:0; color:var(--red); font-weight:800; }
+  .zx-vote { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .zx-vote button { flex:1; min-width:140px; background:var(--z2); border:1px solid var(--border); color:var(--zs); padding:12px; border-radius:var(--r-sm); font-weight:700; transition:var(--transition); font-family:var(--font-body); cursor:pointer; }
+  .zx-vote button:hover { border-color:var(--neon); color:var(--zx); }
+  .zx-vote button.voted { background:var(--neon); color:#fff; border-color:var(--neon); }
+  .zx-vote .ct { font-family:var(--font-mono); margin-left:6px; opacity:.85; }
+  .zx-cta-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:24px; }
+  @media(max-width:780px){ .zx-cta-grid { grid-template-columns:1fr; } }
+  .zx-cta { background:var(--z2); border:1px solid var(--border); border-radius:var(--r); padding:20px; text-align:center; }
+  .zx-cta.win { background:linear-gradient(135deg,rgba(123,92,255,.12) 0%,transparent 100%); border-color:rgba(123,92,255,.4); }
+  .zx-cta h4 { font-family:var(--font-head); color:var(--zx); margin-bottom:6px; }
+  .zx-cta p { font-size:12px; color:var(--zt); margin-bottom:12px; }
+  .zx-cta .btnx { display:inline-block; padding:11px 20px; border-radius:var(--r-sm); background:var(--neon); color:#fff; font-weight:800; font-size:13px; letter-spacing:.04em; text-decoration:none; transition:var(--transition); cursor:pointer; }
+  .zx-cta .btnx:hover { box-shadow:0 0 22px var(--neon-glow); transform:translateY(-1px); }
+  .zx-cta .btnx.ghost { background:transparent; border:1px solid var(--border2); color:var(--zs); }
+  .zx-trend-ribbon { display:inline-block; background:var(--warn); color:#fff; font-size:9px; padding:3px 8px; border-radius:99px; font-weight:800; letter-spacing:.1em; font-family:var(--font-mono); margin-left:6px; }
+</style>
+
+<!-- Persona modal -->
+<div class="zx-persona-modal" id="zx-persona-modal">
+  <div class="zx-persona-card">
+    <h2>Tell us who you are</h2>
+    <p class="sub">We'll tailor recommendations, scoring, and the "AI Verdict" on every comparison to your real use-case.</p>
+    <div class="zx-persona-grid" id="zx-persona-grid"></div>
+    <div style="margin-top:18px;text-align:right">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('zx-persona-modal').classList.remove('open')">Skip for now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ── PERSONAS ───────────────────────────────────────────────────
+  const PERSONAS = [
+    { id:'student',   icon:'🎓', name:'Student',     desc:'Affordable, free tiers, study & learning' },
+    { id:'business',  icon:'💼', name:'Business',    desc:'ROI, teams, scale, integrations' },
+    { id:'creator',   icon:'🎨', name:'Creator',     desc:'Content, design, social, monetize' },
+    { id:'developer', icon:'💻', name:'Developer',   desc:'APIs, code, dev-experience, perf' },
+    { id:'beginner',  icon:'🌱', name:'Beginner',    desc:'Easy, low learning curve, free plans' },
+    { id:'agency',    icon:'🏢', name:'Agency',      desc:'White-label, multi-client, premium' },
+  ];
+  function getPersona(){ return localStorage.getItem('zaxis_persona') || ''; }
+  function setPersona(id){
+    localStorage.setItem('zaxis_persona', id);
+    document.querySelectorAll('.zx-persona-chip').forEach(c=>c.classList.toggle('active', c.dataset.p===id));
+    document.getElementById('zx-persona-modal').classList.remove('open');
+    if(typeof window.renderComparison==='function') window.renderComparison();
+    if(typeof window.zxRenderTopic==='function' && window.__zxCurrentTopic) window.zxRenderTopic(window.__zxCurrentTopic);
+    if(typeof window.showToast==='function'){
+      const p = PERSONAS.find(x=>x.id===id);
+      if(p) window.showToast(`${p.icon} Personalized for ${p.name}`);
+    }
+  }
+  window.zxSetPersona = setPersona;
+  window.zxOpenPersona = ()=>document.getElementById('zx-persona-modal').classList.add('open');
+
+  // Build modal grid
+  document.getElementById('zx-persona-grid').innerHTML = PERSONAS.map(p=>
+    `<div class="zx-persona-pick" onclick="zxSetPersona('${p.id}')">
+       <div class="ic">${p.icon}</div><div class="nm">${p.name}</div><div class="dc">${p.desc}</div>
+     </div>`).join('');
+
+  // ── TAXONOMY ───────────────────────────────────────────────────
+  // Topics → Categories → Subcategories → Products
+  // Products carry use-case scores keyed to PERSONAS for the "AI Verdict".
+  const T = (id,name,icon,price,rating,scores,pros,cons,link,desc)=>(
+    { id, name, icon, price, rating, scores, pros, cons, link, desc, votes:{up:0,down:0} }
+  );
+  const TAXONOMY = [
+    { id:'ai-tools', icon:'🤖', name:'AI Tools', tagline:'Writing, image, video, code & voice AI',
+      categories:[
+        { id:'ai-writing', name:'AI Writing', icon:'✍️', subs:[
+          { id:'long-form', name:'Long-form', products:[
+            T('chatgpt','ChatGPT Plus','💬','$20/mo',4.8,{student:9.5,business:9.4,creator:9.6,developer:9.2,beginner:9.7,agency:9.0},
+              ['Best general reasoning','Huge plugin ecosystem','GPT-4o multimodal','Custom GPTs'],
+              ['Hallucinations','Slower on complex code'],'https://chat.openai.com','Industry-leading conversational AI from OpenAI.'),
+            T('claude','Claude Pro','🟧','$20/mo',4.7,{student:9.0,business:9.5,creator:8.8,developer:9.4,beginner:8.9,agency:9.1},
+              ['Best long-context (200k)','Superior writing tone','Excellent for analysis'],
+              ['Smaller plugin ecosystem','No image gen'],'https://claude.ai','Anthropic\'s Claude — long context master.'),
+            T('jasper','Jasper AI','🤖','$49/mo',4.4,{student:6.5,business:9.0,creator:8.8,developer:6.0,beginner:7.5,agency:9.2},
+              ['Brand voice training','50+ marketing templates','SEO mode'],
+              ['No free plan','Pricey'],'https://www.jasper.ai/','AI for marketing teams at scale.'),
+          ]},
+          { id:'short-copy', name:'Short copy & ads', products:[
+            T('copyai','Copy.ai','✍️','$36/mo',4.5,{student:8.0,business:8.5,creator:8.8,developer:6.5,beginner:9.0,agency:8.0},
+              ['Free 2k words/mo','90+ templates','Beginner-friendly'],
+              ['Output needs editing','Weak long-form'],'https://www.copy.ai/','Fast AI copy for socials and emails.'),
+            T('writesonic','Writesonic','📝','$16/mo',4.3,{student:7.5,business:7.8,creator:8.2,developer:6.0,beginner:8.5,agency:7.5},
+              ['Cheap entry plan','Built-in SEO','Chatsonic chat mode'],
+              ['Quality varies','UI cluttered'],'https://writesonic.com/','Affordable AI writer with SEO tooling.'),
+          ]},
+          { id:'grammar', name:'Grammar & polish', products:[
+            T('grammarly','Grammarly Premium','📖','$12/mo',4.7,{student:9.6,business:9.0,creator:8.5,developer:7.0,beginner:9.5,agency:8.5},
+              ['Works everywhere','Tone detector','Plagiarism checker'],
+              ['Conservative suggestions'],'https://www.grammarly.com/','AI grammar across the web.'),
+          ]},
+        ]},
+        { id:'ai-image', name:'AI Image', icon:'🖼️', subs:[
+          { id:'general-image', name:'General image gen', products:[
+            T('midjourney','Midjourney','🖼️','$10/mo',4.8,{student:8.5,business:8.5,creator:9.7,developer:7.5,beginner:7.0,agency:9.0},
+              ['Best image quality','Active community'],
+              ['Discord-only','No free plan'],'https://www.midjourney.com/','Best-in-class AI imagery.'),
+            T('dalle','DALL·E 3','🎨','$20/mo',4.5,{student:8.0,business:8.0,creator:9.0,developer:7.5,beginner:9.2,agency:8.2},
+              ['Inside ChatGPT','Easy prompts','Text rendering'],
+              ['Less artistic than MJ'],'https://openai.com/dall-e-3','Native image gen inside ChatGPT.'),
+            T('leonardo','Leonardo.AI','🦁','Free+','💎',4.4,{student:8.7,business:7.5,creator:9.1,developer:7.8,beginner:8.5,agency:8.0},
+              ['Generous free tier','Game asset models'],
+              ['Inconsistent at scale'],'https://leonardo.ai/','Free-tier image gen with style tuning.'),
+          ]},
+          { id:'background', name:'Background remove & edit', products:[
+            T('removebg','remove.bg','✂️','Free+',4.5,{student:9.0,business:8.5,creator:9.3,developer:8.0,beginner:9.5,agency:8.0},
+              ['One-click free','API available'],
+              ['Limited edit controls'],'https://www.remove.bg/','Instant AI background removal.'),
+          ]},
+        ]},
+        { id:'ai-video', name:'AI Video', icon:'🎬', subs:[
+          { id:'gen-video', name:'Generate video', products:[
+            T('runway','Runway Gen-3','🎥','$15/mo',4.6,{student:7.5,business:8.0,creator:9.5,developer:7.0,beginner:7.8,agency:8.5},
+              ['Cinematic outputs','Motion brush'],
+              ['Cost per second','Short clips'],'https://runwayml.com/','Pro AI video generator.'),
+            T('pika','Pika Labs','🌀','Free+',4.3,{student:8.2,business:7.0,creator:9.0,developer:7.0,beginner:8.5,agency:7.5},
+              ['Free credits','Discord & web'],
+              ['Quality variance'],'https://pika.art/','Discord-first AI video.'),
+          ]},
+          { id:'edit-video', name:'AI editing', products:[
+            T('descript','Descript','📼','$15/mo',4.5,{student:8.8,business:8.5,creator:9.4,developer:7.5,beginner:9.0,agency:8.7},
+              ['Edit by editing text','Studio sound','Overdub voice'],
+              ['Render speed'],'https://www.descript.com/','Edit video like a doc.'),
+          ]},
+        ]},
+        { id:'ai-code', name:'AI Code', icon:'⌨️', subs:[
+          { id:'copilots', name:'Copilots', products:[
+            T('copilot','GitHub Copilot','🐙','$10/mo',4.6,{student:9.5,business:9.0,creator:7.0,developer:9.7,beginner:8.5,agency:8.5},
+              ['Best IDE integration','Strong code-completion'],
+              ['Privacy concerns'],'https://github.com/features/copilot','AI pair programmer in your IDE.'),
+            T('cursor','Cursor','🖱️','$20/mo',4.7,{student:9.0,business:8.5,creator:7.5,developer:9.6,beginner:8.0,agency:8.5},
+              ['Whole-codebase context','Composer agent'],
+              ['VS Code fork lock-in'],'https://cursor.sh/','AI-first code editor.'),
+          ]},
+        ]},
+        { id:'ai-voice', name:'AI Voice', icon:'🎙️', subs:[
+          { id:'tts', name:'Text-to-speech', products:[
+            T('eleven','ElevenLabs','🔊','$5/mo',4.8,{student:8.5,business:8.5,creator:9.6,developer:8.5,beginner:8.7,agency:9.0},
+              ['Best voice realism','Voice cloning'],
+              ['Free quota tight'],'https://elevenlabs.io/','Hyper-realistic AI voices.'),
+          ]},
+          { id:'transcribe', name:'Transcription', products:[
+            T('otter','Otter.ai','🎙️','$17/mo',4.5,{student:9.5,business:9.2,creator:8.5,developer:7.0,beginner:9.0,agency:8.7},
+              ['Real-time transcription','Zoom & Meet integration'],
+              ['Accuracy on accents'],'https://otter.ai/','AI transcription & meeting notes.'),
+          ]},
+        ]},
+      ]},
+    { id:'tech', icon:'💻', name:'Tech Products', tagline:'Laptops, phones, audio, monitors, gear',
+      categories:[
+        { id:'laptops', name:'Laptops', icon:'💻', subs:[
+          { id:'student-laptop', name:'For students', products:[
+            T('macair','MacBook Air M3','💻','$1099',4.8,{student:9.6,business:9.2,creator:9.0,developer:9.0,beginner:9.5,agency:8.7},
+              ['18h battery','Silent fanless','Great display'],
+              ['8GB base RAM','Pricey upgrades'],'https://www.apple.com/shop/buy-mac/macbook-air','Apple silicon ultraportable.'),
+            T('xps13','Dell XPS 13','💻','$999',4.4,{student:9.0,business:9.0,creator:8.5,developer:8.7,beginner:8.8,agency:8.5},
+              ['Premium build','OLED option'],
+              ['Battery vs Air'],'https://www.dell.com/','Windows premium ultraportable.'),
+          ]},
+          { id:'creator-laptop', name:'For creators', products:[
+            T('mbp14','MacBook Pro 14 M3 Pro','🍎','$1999',4.9,{student:7.0,business:9.5,creator:9.8,developer:9.5,beginner:7.5,agency:9.4},
+              ['Mini-LED HDR','M3 Pro performance'],
+              ['Heavy','Expensive'],'https://www.apple.com/','Pro creator workstation.'),
+          ]},
+        ]},
+        { id:'phones', name:'Phones', icon:'📱', subs:[
+          { id:'flagship', name:'Flagships', products:[
+            T('iphone15p','iPhone 15 Pro','📱','$999',4.7,{student:8.5,business:9.4,creator:9.6,developer:9.0,beginner:9.2,agency:9.0},
+              ['Titanium build','A17 Pro chip','USB-C'],
+              ['Pricey'],'https://www.apple.com/iphone-15-pro/','Apple flagship.'),
+            T('s24u','Galaxy S24 Ultra','📲','$1299',4.6,{student:8.0,business:9.3,creator:9.5,developer:8.8,beginner:8.5,agency:9.0},
+              ['200MP camera','S Pen','7yrs updates'],
+              ['Bulky'],'https://www.samsung.com/','Samsung pro flagship.'),
+          ]},
+        ]},
+        { id:'audio', name:'Audio', icon:'🎧', subs:[
+          { id:'headphones', name:'Over-ear headphones', products:[
+            T('xm5','Sony WH-1000XM5','🎧','$399',4.7,{student:9.0,business:9.2,creator:9.0,developer:9.0,beginner:9.4,agency:8.8},
+              ['Best ANC','30h battery','Comfort'],
+              ['No fold-flat'],'https://www.sony.com/','Class-leading ANC.'),
+          ]},
+        ]},
+        { id:'monitors', name:'Monitors', icon:'🖥️', subs:[
+          { id:'productivity-monitor', name:'Productivity', products:[
+            T('lgu27','LG 27UP850N 4K','🖥️','$449',4.5,{student:8.5,business:9.0,creator:9.0,developer:9.2,beginner:8.7,agency:8.8},
+              ['USB-C 96W PD','HDR400'],
+              ['No HDMI 2.1'],'https://www.lg.com/','4K USB-C dock monitor.'),
+          ]},
+        ]},
+      ]},
+    { id:'earn', icon:'💰', name:'Earn Money Online', tagline:'Freelance, affiliate, creator, ecom & invest',
+      categories:[
+        { id:'freelance', name:'Freelancing', icon:'🧑‍💼', subs:[
+          { id:'marketplaces', name:'Marketplaces', products:[
+            T('upwork','Upwork','💼','Free + 10%',4.2,{student:9.0,business:9.0,creator:8.5,developer:9.0,beginner:8.7,agency:9.0},
+              ['Largest pool','Enterprise jobs'],
+              ['Service fees','Connects cost'],'https://www.upwork.com/','Top freelance marketplace.'),
+            T('fiverr','Fiverr','🟢','Free + 20%',4.3,{student:9.2,business:8.5,creator:9.0,developer:8.5,beginner:9.4,agency:8.0},
+              ['Easy gig setup','Buyer-driven'],
+              ['Race to bottom'],'https://www.fiverr.com/','Productized services platform.'),
+          ]},
+        ]},
+        { id:'affiliate', name:'Affiliate Marketing', icon:'🔗', subs:[
+          { id:'networks', name:'Networks', products:[
+            T('impact','Impact','🤝','Free',4.6,{student:7.5,business:9.5,creator:9.0,developer:8.0,beginner:7.5,agency:9.4},
+              ['Premium brands','Real-time tracking'],
+              ['Approval slow'],'https://impact.com/','Top affiliate platform.'),
+          ]},
+        ]},
+        { id:'creator-income', name:'Creator Economy', icon:'🎬', subs:[
+          { id:'memberships', name:'Memberships', products:[
+            T('patreon','Patreon','🅿️','5-12%',4.3,{student:8.5,business:8.0,creator:9.5,developer:7.0,beginner:9.0,agency:7.5},
+              ['Recurring fan revenue','Tiers'],
+              ['Discoverability weak'],'https://www.patreon.com/','Membership monetization.'),
+          ]},
+        ]},
+        { id:'ecom', name:'E-commerce', icon:'🛒', subs:[
+          { id:'storefronts', name:'Storefronts', products:[
+            T('shopify','Shopify','🛍️','$39/mo',4.6,{student:7.5,business:9.5,creator:8.5,developer:8.5,beginner:8.8,agency:9.3},
+              ['Massive app store','POS','Reliable'],
+              ['Transaction fees','App-cost creep'],'https://www.shopify.com/','Leading ecom platform.'),
+          ]},
+        ]},
+        { id:'invest', name:'Investing & Crypto', icon:'📈', subs:[
+          { id:'brokerage', name:'Brokerages', products:[
+            T('etoro','eToro','📈','$0',4.0,{student:8.5,business:7.0,creator:7.0,developer:6.5,beginner:9.2,agency:6.5},
+              ['Copy trading','0 commission stocks'],
+              ['Spreads','Withdrawal fee'],'https://www.etoro.com/','Social investing.'),
+          ]},
+        ]},
+      ]},
+    { id:'gaming', icon:'🎮', name:'Gaming', tagline:'PCs, consoles, streaming gear, services',
+      categories:[
+        { id:'consoles', name:'Consoles', icon:'🕹️', subs:[
+          { id:'current-gen', name:'Current gen', products:[
+            T('ps5','PlayStation 5','🎮','$499',4.7,{student:9.0,business:6.0,creator:8.5,developer:7.0,beginner:9.4,agency:6.0},
+              ['Exclusives','DualSense haptics'],
+              ['Storage upgrades'],'https://www.playstation.com/','Sony current-gen.'),
+            T('xboxx','Xbox Series X','🎮','$499',4.6,{student:9.0,business:6.0,creator:8.5,developer:7.5,beginner:9.3,agency:6.0},
+              ['Game Pass','Quick Resume'],
+              ['Fewer exclusives'],'https://www.xbox.com/','Microsoft current-gen.'),
+          ]},
+        ]},
+        { id:'gaming-pc', name:'Gaming PCs', icon:'🖥️', subs:[
+          { id:'prebuilt', name:'Prebuilt rigs', products:[
+            T('alienware','Alienware Aurora R16','🛸','$1799',4.4,{student:7.5,business:7.0,creator:8.5,developer:8.0,beginner:8.5,agency:7.5},
+              ['Pre-tuned','Upgradable'],
+              ['Premium price'],'https://www.dell.com/alienware','Prebuilt gaming desktop.'),
+          ]},
+        ]},
+        { id:'cloud-gaming', name:'Cloud Gaming', icon:'☁️', subs:[
+          { id:'services', name:'Services', products:[
+            T('gfn','GeForce NOW Ultimate','☁️','$20/mo',4.5,{student:9.0,business:7.0,creator:7.5,developer:7.5,beginner:9.2,agency:6.5},
+              ['RTX 4080-class','Bring own library'],
+              ['Game compatibility'],'https://www.nvidia.com/geforce-now/','NVIDIA cloud gaming.'),
+          ]},
+        ]},
+      ]},
+    { id:'creator', icon:'📱', name:'Creator Tools', tagline:'Editing, thumbnails, streaming, podcast',
+      categories:[
+        { id:'video-edit', name:'Video Editing', icon:'🎞️', subs:[
+          { id:'desktop-video', name:'Desktop NLE', products:[
+            T('premiere','Premiere Pro','🎞️','$23/mo',4.5,{student:8.5,business:9.0,creator:9.6,developer:7.5,beginner:7.5,agency:9.3},
+              ['Industry standard','Adobe ecosystem'],
+              ['Stability'],'https://www.adobe.com/products/premiere.html','Adobe pro NLE.'),
+            T('davinci','DaVinci Resolve','🎬','Free',4.8,{student:9.7,business:8.5,creator:9.5,developer:8.0,beginner:8.0,agency:8.7},
+              ['Free pro tier','Best color tools'],
+              ['Steeper learning'],'https://www.blackmagicdesign.com/products/davinciresolve','Free pro NLE.'),
+          ]},
+        ]},
+        { id:'thumbnails', name:'Thumbnails & graphics', icon:'🖌️', subs:[
+          { id:'design-tools', name:'Design tools', products:[
+            T('canva','Canva Pro','🎨','$15/mo',4.9,{student:9.6,business:9.2,creator:9.7,developer:7.0,beginner:9.8,agency:9.0},
+              ['250k+ templates','Magic Design AI'],
+              ['Limited print control'],'https://www.canva.com/','Drag-and-drop design.'),
+            T('figma','Figma','🎯','Free+',4.8,{student:9.4,business:9.5,creator:9.0,developer:9.5,beginner:8.5,agency:9.5},
+              ['Real-time collab','Free tier'],
+              ['Offline limits'],'https://www.figma.com/','Design & prototyping.'),
+          ]},
+        ]},
+        { id:'streaming', name:'Streaming', icon:'📺', subs:[
+          { id:'streaming-sw', name:'Software', products:[
+            T('streamlabs','Streamlabs','📺','Free+',4.3,{student:8.7,business:7.0,creator:9.2,developer:7.0,beginner:9.0,agency:7.5},
+              ['Donation alerts','Themes'],
+              ['Resource heavy'],'https://streamlabs.com/','All-in-one streaming app.'),
+          ]},
+        ]},
+        { id:'podcast', name:'Podcast', icon:'🎙️', subs:[
+          { id:'podcast-host', name:'Hosting', products:[
+            T('buzzsprout','Buzzsprout','🎧','$12/mo',4.7,{student:8.5,business:8.5,creator:9.3,developer:7.5,beginner:9.5,agency:8.5},
+              ['Easy onboarding','Magic Mastering'],
+              ['Storage caps'],'https://www.buzzsprout.com/','Podcast hosting & analytics.'),
+          ]},
+        ]},
+      ]},
+  ];
+  window.ZAXIS_TAXONOMY = TAXONOMY;
+  window.ZAXIS_PERSONAS = PERSONAS;
+
+  // Build flat product index — also merged into DB.products for compare selects
+  const FLAT = [];
+  TAXONOMY.forEach(t => t.categories.forEach(c => c.subs.forEach(s => s.products.forEach(p => {
+    FLAT.push({ ...p, _topic:t.id, _cat:c.id, _sub:s.id, _topicName:t.name, _catName:c.name, _subName:s.name });
+  }))));
+  window.ZAXIS_FLAT = FLAT;
+
+  function syncToDB(){
+    if (typeof window.DB === 'undefined') return;
+    const existing = new Set(DB.products.map(p=>p.id));
+    FLAT.forEach(p=>{
+      if (existing.has(p.id)) return;
+      DB.products.push({
+        id:p.id, title:p.name, slug:p.id,
+        description:p.desc||'', price:p.price, image_url:p.icon,
+        category_id:p._cat, rating:typeof p.rating==='number'?p.rating:4.5,
+        status:'published', affiliate_link:p.link,
+        commission:'', pros:p.pros||[], cons:p.cons||[],
+        created_at:new Date().toISOString(),
+        _zx:true, _scores:p.scores
+      });
+    });
+    if (typeof window.populateCompareSelects==='function') window.populateCompareSelects();
+  }
+
+  // ── SIDEBAR INJECTION ──────────────────────────────────────────
+  function injectSidebar(){
+    const nav = document.querySelector('.sidebar-nav');
+    if (!nav || nav.dataset.zxInjected) return;
+    nav.dataset.zxInjected = '1';
+
+    // Persona block at top
+    const personaWrap = document.createElement('div');
+    personaWrap.innerHTML =
+      `<div class="zx-persona-label">I am a…</div>
+       <div class="zx-persona-bar" id="zx-persona-bar">
+         ${PERSONAS.map(p=>`<div class="zx-persona-chip" data-p="${p.id}" onclick="zxSetPersona('${p.id}')">${p.icon} ${p.name}</div>`).join('')}
+       </div>`;
+    nav.insertBefore(personaWrap, nav.firstChild);
+
+    // Topics block
+    const topicsWrap = document.createElement('div');
+    topicsWrap.innerHTML =
+      `<div class="sidebar-section-label">Browse by topic</div>` +
+      TAXONOMY.map(t=>
+        `<div class="nav-item" onclick="zxOpenTopic('${t.id}', this)">
+           <span class="nav-icon">${t.icon}</span> ${t.name}
+         </div>`).join('') +
+      `<div class="nav-item" onclick="zxOpenTrending(this)">
+         <span class="nav-icon">🚀</span> Trending <span class="zx-trend-ribbon">HOT</span>
+       </div>
+       <div class="nav-item" onclick="showView('compare', this)">
+         <span class="nav-icon">⚖️</span> Compare Hub
+       </div>
+       <div class="nav-item" onclick="showView('saved', this)">
+         <span class="nav-icon">⭐</span> Favorites
+       </div>`;
+    // Append at end of "Main" section, just before Account label if any
+    const acctLabel = Array.from(nav.querySelectorAll('.sidebar-section-label')).find(el=>el.textContent.trim()==='Account');
+    if (acctLabel) nav.insertBefore(topicsWrap, acctLabel); else nav.appendChild(topicsWrap);
+
+    // Mark active persona
+    const cur = getPersona();
+    if (cur) document.querySelectorAll('.zx-persona-chip').forEach(c=>c.classList.toggle('active', c.dataset.p===cur));
+  }
+
+  // ── DRILL-DOWN VIEWS ───────────────────────────────────────────
+  function ensureViews(){
+    const main = document.querySelector('main.main-content');
+    if (!main || document.getElementById('view-zx-topic')) return;
+    const html = `
+      <div class="view" id="view-zx-topic">
+        <div class="zx-breadcrumb" id="zx-bc-topic"></div>
+        <div class="view-header">
+          <div>
+            <div class="view-title" id="zx-topic-title">Topic</div>
+            <div class="view-sub" id="zx-topic-sub"></div>
+          </div>
+        </div>
+        <div class="zx-grid" id="zx-topic-grid"></div>
+      </div>
+      <div class="view" id="view-zx-cat">
+        <div class="zx-breadcrumb" id="zx-bc-cat"></div>
+        <div class="view-header">
+          <div>
+            <div class="view-title" id="zx-cat-title">Category</div>
+            <div class="view-sub">Pick a subcategory to see products</div>
+          </div>
+        </div>
+        <div class="zx-grid" id="zx-cat-grid"></div>
+      </div>
+      <div class="view" id="view-zx-sub">
+        <div class="zx-breadcrumb" id="zx-bc-sub"></div>
+        <div class="view-header">
+          <div>
+            <div class="view-title" id="zx-sub-title">Subcategory</div>
+            <div class="view-sub" id="zx-sub-sub"></div>
+          </div>
+          <button class="btn btn-neon btn-sm" id="zx-sub-compare-btn" onclick="zxCompareTopTwo()">⚖️ Compare top 2</button>
+        </div>
+        <div class="product-grid" id="zx-sub-products"></div>
+      </div>
+      <div class="view" id="view-zx-trending">
+        <div class="view-header">
+          <div>
+            <div class="view-title">🚀 Trending</div>
+            <div class="view-sub">Top-rated picks across every topic — refreshed for your persona</div>
+          </div>
+        </div>
+        <div class="zx-grid" id="zx-trending-grid"></div>
+      </div>`;
+    main.insertAdjacentHTML('beforeend', html);
+  }
+
+  const showV = (id) => {
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    const v = document.getElementById(id);
+    if (v) { v.classList.add('active'); window.scrollTo(0,0); }
+    if (window.innerWidth <= 768 && window.closeMobileSidebar) window.closeMobileSidebar();
+  };
+
+  window.zxOpenTopic = function(topicId, navEl){
+    const t = TAXONOMY.find(x=>x.id===topicId); if (!t) return;
+    window.__zxCurrentTopic = topicId;
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    if (navEl) navEl.classList.add('active');
+    document.getElementById('zx-topic-title').textContent = `${t.icon} ${t.name}`;
+    document.getElementById('zx-topic-sub').textContent = t.tagline;
+    document.getElementById('zx-bc-topic').innerHTML =
+      `<a onclick="showView('dashboard',null)">Home</a><span class="sep">/</span><span>${t.name}</span>`;
+    document.getElementById('zx-topic-grid').innerHTML = t.categories.map(c=>{
+      const total = c.subs.reduce((a,s)=>a+s.products.length,0);
+      return `<div class="zx-tile" onclick="zxOpenCat('${t.id}','${c.id}')">
+        <div class="zx-tile-count">${c.subs.length} subs</div>
+        <div class="zx-tile-icon">${c.icon}</div>
+        <div class="zx-tile-name">${c.name}</div>
+        <div class="zx-tile-meta">${total} products</div>
+      </div>`;
+    }).join('');
+    showV('view-zx-topic');
+  };
+  window.zxRenderTopic = window.zxOpenTopic;
+
+  window.zxOpenCat = function(topicId, catId){
+    const t = TAXONOMY.find(x=>x.id===topicId);
+    const c = t?.categories.find(x=>x.id===catId); if (!c) return;
+    document.getElementById('zx-cat-title').textContent = `${c.icon} ${c.name}`;
+    document.getElementById('zx-bc-cat').innerHTML =
+      `<a onclick="showView('dashboard',null)">Home</a><span class="sep">/</span>
+       <a onclick="zxOpenTopic('${t.id}',null)">${t.name}</a><span class="sep">/</span><span>${c.name}</span>`;
+    document.getElementById('zx-cat-grid').innerHTML = c.subs.map(s=>
+      `<div class="zx-tile" onclick="zxOpenSub('${t.id}','${c.id}','${s.id}')">
+        <div class="zx-tile-count">${s.products.length}</div>
+        <div class="zx-tile-icon">📂</div>
+        <div class="zx-tile-name">${s.name}</div>
+        <div class="zx-tile-meta">Tap to view products</div>
+      </div>`).join('');
+    showV('view-zx-cat');
+  };
+
+  window.__zxLastSub = null;
+  window.zxOpenSub = function(topicId, catId, subId){
+    const t = TAXONOMY.find(x=>x.id===topicId);
+    const c = t?.categories.find(x=>x.id===catId);
+    const s = c?.subs.find(x=>x.id===subId); if (!s) return;
+    window.__zxLastSub = { t, c, s };
+    document.getElementById('zx-sub-title').textContent = s.name;
+    document.getElementById('zx-sub-sub').textContent = `${s.products.length} products in ${c.name}`;
+    document.getElementById('zx-bc-sub').innerHTML =
+      `<a onclick="showView('dashboard',null)">Home</a><span class="sep">/</span>
+       <a onclick="zxOpenTopic('${t.id}',null)">${t.name}</a><span class="sep">/</span>
+       <a onclick="zxOpenCat('${t.id}','${c.id}')">${c.name}</a><span class="sep">/</span><span>${s.name}</span>`;
+    const persona = getPersona();
+    const sorted = [...s.products].sort((a,b)=>{
+      const sa = persona && a.scores?.[persona] || a.rating*2;
+      const sb = persona && b.scores?.[persona] || b.rating*2;
+      return sb - sa;
+    });
+    document.getElementById('zx-sub-products').innerHTML = sorted.map((p,i)=>{
+      const score = persona ? (p.scores?.[persona]?.toFixed(1) ?? '—') : (p.rating ?? '—');
+      const tag = i===0 && persona ? `<span class="zx-trend-ribbon" style="background:var(--neon)">BEST FOR ${persona.toUpperCase()}</span>` : '';
+      return `<div class="zx-tile" onclick="zxQuickCompare('${p.id}')">
+        <div class="zx-tile-count" style="background:var(--neon);color:#fff">${score}</div>
+        <div class="zx-tile-icon">${p.icon}</div>
+        <div class="zx-tile-name">${p.name} ${tag}</div>
+        <div class="zx-tile-meta">${p.price} · ★ ${p.rating}</div>
+        <div style="margin-top:10px;display:flex;gap:6px">
+          <a href="${p.link}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="btn btn-neon btn-sm" style="flex:1;text-align:center;text-decoration:none">Try →</a>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();zxQuickCompare('${p.id}')">⚖️</button>
+        </div>
+      </div>`;
+    }).join('');
+    showV('view-zx-sub');
+  };
+
+  window.zxCompareTopTwo = function(){
+    const ctx = window.__zxLastSub; if (!ctx || ctx.s.products.length<2) return;
+    const persona = getPersona();
+    const sorted = [...ctx.s.products].sort((a,b)=>{
+      const sa = persona && a.scores?.[persona] || a.rating*2;
+      const sb = persona && b.scores?.[persona] || b.rating*2;
+      return sb - sa;
+    });
+    showView('compare', null);
+    setTimeout(()=>{
+      const a = document.getElementById('cmp-a'), b = document.getElementById('cmp-b');
+      if (a) a.value = sorted[0].id;
+      if (b) b.value = sorted[1].id;
+      if (window.renderComparison) window.renderComparison();
+    }, 80);
+  };
+  window.zxQuickCompare = function(pid){
+    showView('compare', null);
+    setTimeout(()=>{
+      const a = document.getElementById('cmp-a'), b = document.getElementById('cmp-b');
+      if (a) a.value = pid;
+      if (b && b.options.length>1) {
+        // pick the next product from same sub if possible
+        const ctx = window.__zxLastSub;
+        if (ctx) {
+          const other = ctx.s.products.find(p=>p.id!==pid);
+          if (other) b.value = other.id;
+        }
+      }
+      if (window.renderComparison) window.renderComparison();
+    }, 80);
+  };
+
+  window.zxOpenTrending = function(navEl){
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    if (navEl) navEl.classList.add('active');
+    const persona = getPersona();
+    const ranked = [...FLAT].sort((a,b)=>{
+      const sa = persona && a.scores?.[persona] || a.rating*2;
+      const sb = persona && b.scores?.[persona] || b.rating*2;
+      return sb - sa;
+    }).slice(0, 16);
+    document.getElementById('zx-trending-grid').innerHTML = ranked.map((p,i)=>{
+      const score = persona ? (p.scores?.[persona]?.toFixed(1) ?? '—') : (p.rating ?? '—');
+      return `<div class="zx-tile" onclick="zxQuickCompare('${p.id}')">
+        <div class="zx-tile-count" style="background:var(--warn);color:#fff">#${i+1}</div>
+        <div class="zx-tile-icon">${p.icon}</div>
+        <div class="zx-tile-name">${p.name}</div>
+        <div class="zx-tile-meta">${p._topicName} · ${p._catName}</div>
+        <div style="margin-top:8px;font-family:var(--font-mono);font-size:11px;color:var(--neon2)">SCORE ${score}</div>
+      </div>`;
+    }).join('');
+    showV('view-zx-trending');
+  };
+
+  // ── COMPARE 2.0 ────────────────────────────────────────────────
+  function findProduct(id){
+    let p = FLAT.find(x=>x.id===id);
+    if (p) return p;
+    const dbp = (window.DB?.products||[]).find(x=>x.id===id);
+    if (!dbp) return null;
+    return {
+      id:dbp.id, name:dbp.title, icon:dbp.image_url, price:dbp.price,
+      rating:dbp.rating, scores:dbp._scores||null, pros:dbp.pros||[], cons:dbp.cons||[],
+      link:dbp.affiliate_link, desc:dbp.description, _topicName:'', _catName:''
+    };
+  }
+  function priceNum(s){ if(!s) return 0; const m=String(s).match(/[\d.]+/); return m?parseFloat(m[0]):0; }
+  function valueScore(p, persona){
+    const score = (persona && p.scores?.[persona]) ? p.scores[persona] : (p.rating||4)*2;
+    const price = priceNum(p.price)||1;
+    return score / Math.log2(price+2);
+  }
+  const VOTES = JSON.parse(localStorage.getItem('zaxis_votes')||'{}');
+  function persistVotes(){ localStorage.setItem('zaxis_votes', JSON.stringify(VOTES)); }
+  window.zxVote = function(pid, dir){
+    VOTES[pid] = VOTES[pid] || {up:0,down:0,my:null};
+    if (VOTES[pid].my === dir) { VOTES[pid][dir]--; VOTES[pid].my=null; }
+    else {
+      if (VOTES[pid].my) VOTES[pid][VOTES[pid].my]--;
+      VOTES[pid][dir]++; VOTES[pid].my = dir;
+    }
+    persistVotes();
+    if (window.renderComparison) window.renderComparison();
+  };
+  function voteCounts(pid){ return VOTES[pid] || {up:0,down:0,my:null}; }
+
+  const FEATURE_KEYS = [
+    { key:'price', label:'Price' },
+    { key:'rating', label:'User Rating' },
+  ];
+  const PERSONA_KEYS_ORDER = ['student','business','creator','developer','beginner','agency'];
+
+  window.renderComparison = function(){
+    const aId = document.getElementById('cmp-a')?.value;
+    const bId = document.getElementById('cmp-b')?.value;
+    const out = document.getElementById('compare-output');
+    const ph  = document.getElementById('compare-placeholder');
+    if (!out) return;
+    if (!aId || !bId) { if (ph) ph.style.display='block'; out.innerHTML=''; return; }
+    if (ph) ph.style.display='none';
+    const a = findProduct(aId), b = findProduct(bId);
+    if (!a || !b) { out.innerHTML='<div style="padding:40px;text-align:center;color:var(--zm)">One product not found.</div>'; return; }
+
+    const persona = getPersona();
+    const aScore = persona && a.scores?.[persona] ? a.scores[persona] : (a.rating||4)*2;
+    const bScore = persona && b.scores?.[persona] ? b.scores[persona] : (b.rating||4)*2;
+    const winner = aScore >= bScore ? a : b;
+    const loser  = winner === a ? b : a;
+    const personaLabel = persona ? PERSONAS.find(x=>x.id===persona)?.name : 'all-round use';
+
+    const aWin = winner === a;
+    const bWin = winner === b;
+
+    const bar = (v, max=10, acid=false) =>
+      `<div class="zx-cmp-cell" style="width:100%;justify-content:center">
+        <div class="bar ${acid?'acid':''}"><span style="width:${Math.min(100,(v/max)*100)}%"></span></div>
+        <div class="scoretxt">${(typeof v==='number'?v.toFixed(1):v)}</div>
+      </div>`;
+
+    const personaRows = PERSONA_KEYS_ORDER.map(pk=>{
+      const pa = a.scores?.[pk] ?? '—';
+      const pb = b.scores?.[pk] ?? '—';
+      const ic = PERSONAS.find(x=>x.id===pk)?.icon || '•';
+      return `<div class="zx-cmp-row">
+        <div class="lbl">${ic} ${pk}</div>
+        <div>${typeof pa==='number'?bar(pa):'<span style="color:var(--zm)">—</span>'}</div>
+        <div>${typeof pb==='number'?bar(pb):'<span style="color:var(--zm)">—</span>'}</div>
+      </div>`;
+    }).join('');
+
+    const ratingBar = (v)=>bar(v||0,5,true);
+    const aV = voteCounts(a.id), bV = voteCounts(b.id);
+
+    const aValue = valueScore(a, persona);
+    const bValue = valueScore(b, persona);
+    const maxValue = Math.max(aValue,bValue,0.001);
+    const maxScore = Math.max(aScore,bScore,0.001);
+    const maxPrice = Math.max(priceNum(a.price), priceNum(b.price), 1);
+
+    const pvLine = (label, av, bv, max, fmt) => `
+      <div class="zx-pvgraph">
+        <div class="lbl">${label}</div>
+        <div class="barwrap">
+          <div class="barlin"><span class="tag">${a.name}</span><div class="bb"><span style="width:${(av/max)*100}%"></span></div><span class="vt">${fmt(av)}</span></div>
+          <div class="barlin"><span class="tag">${b.name}</span><div class="bb"><span style="width:${(bv/max)*100}%"></span></div><span class="vt">${fmt(bv)}</span></div>
+        </div>
+      </div>`;
+
+    out.innerHTML = `
+      <div class="zx-cmp-verdict">
+        <div class="tro">🏆</div>
+        <div>
+          <span class="winner-tag">AI VERDICT · ${persona?personaLabel.toUpperCase():'GENERAL'}</span>
+          <h3>${winner.name} wins for ${personaLabel}</h3>
+          <p>For ${personaLabel}, <strong>${winner.name}</strong> scores <strong>${winner === a?aScore.toFixed(1):bScore.toFixed(1)}/10</strong> vs <strong>${loser.name}</strong> at <strong>${loser === a?aScore.toFixed(1):bScore.toFixed(1)}/10</strong>. ${persona?'Switch persona in the sidebar to re-run the verdict for a different use-case.':'Pick a persona in the sidebar (Student / Business / Creator…) for a personalized verdict.'}</p>
+        </div>
+      </div>
+
+      <div class="zx-cmp-head">
+        <div class="lbl">Product</div>
+        <div class="ph ${aWin?'win':''}"><div class="ic">${a.icon}</div><div class="nm">${a.name}</div><div class="pr">${a.price||'—'}</div><div class="rt">★ ${a.rating||'—'}</div></div>
+        <div class="ph ${bWin?'win':''}"><div class="ic">${b.icon}</div><div class="nm">${b.name}</div><div class="pr">${b.price||'—'}</div><div class="rt">★ ${b.rating||'—'}</div></div>
+      </div>
+
+      <div class="zx-cmp-row section"><div class="lbl">Use-case scoring</div><div></div><div></div></div>
+      ${personaRows}
+
+      <div class="zx-cmp-row section"><div class="lbl">Feature matrix</div><div></div><div></div></div>
+      <div class="zx-cmp-row"><div class="lbl">Price</div><div>${a.price||'—'}</div><div>${b.price||'—'}</div></div>
+      <div class="zx-cmp-row"><div class="lbl">User rating</div><div>${ratingBar(a.rating)}</div><div>${ratingBar(b.rating)}</div></div>
+      <div class="zx-cmp-row"><div class="lbl">Pros count</div><div>${(a.pros||[]).length}</div><div>${(b.pros||[]).length}</div></div>
+      <div class="zx-cmp-row"><div class="lbl">Cons count</div><div>${(a.cons||[]).length}</div><div>${(b.cons||[]).length}</div></div>
+      <div class="zx-cmp-row zx-cmp-bottom"><div class="lbl">Personalized score</div><div>${bar(aScore)}</div><div>${bar(bScore)}</div></div>
+
+      <div class="zx-cmp-section-title">📊 Price vs Value</div>
+      <div style="background:var(--z2);border:1px solid var(--border);border-radius:var(--r);padding:8px 22px">
+        ${pvLine('Performance', aScore, bScore, maxScore, v=>v.toFixed(1))}
+        ${pvLine('Value (score / log price)', aValue, bValue, maxValue, v=>v.toFixed(2))}
+        ${pvLine('Price (USD/mo)', priceNum(a.price), priceNum(b.price), maxPrice, v=>'$'+v)}
+      </div>
+
+      <div class="zx-cmp-section-title">✅ Pros & Cons</div>
+      <div class="zx-pcgrid">
+        <div class="zx-pclist pros"><h4>${a.name} — Pros</h4><ul>${(a.pros||[]).map(x=>`<li>${x}</li>`).join('')||'<li style="color:var(--zm)">—</li>'}</ul></div>
+        <div class="zx-pclist pros"><h4>${b.name} — Pros</h4><ul>${(b.pros||[]).map(x=>`<li>${x}</li>`).join('')||'<li style="color:var(--zm)">—</li>'}</ul></div>
+        <div class="zx-pclist cons"><h4>${a.name} — Cons</h4><ul>${(a.cons||[]).map(x=>`<li>${x}</li>`).join('')||'<li style="color:var(--zm)">—</li>'}</ul></div>
+        <div class="zx-pclist cons"><h4>${b.name} — Cons</h4><ul>${(b.cons||[]).map(x=>`<li>${x}</li>`).join('')||'<li style="color:var(--zm)">—</li>'}</ul></div>
+      </div>
+
+      <div class="zx-cmp-section-title">🗳️ Community votes</div>
+      <div class="zx-pcgrid">
+        <div class="zx-pclist"><h4>${a.name}</h4>
+          <div class="zx-vote">
+            <button class="${aV.my==='up'?'voted':''}" onclick="zxVote('${a.id}','up')">👍 Upvote<span class="ct">${aV.up}</span></button>
+            <button class="${aV.my==='down'?'voted':''}" onclick="zxVote('${a.id}','down')">👎 Downvote<span class="ct">${aV.down}</span></button>
+          </div>
+        </div>
+        <div class="zx-pclist"><h4>${b.name}</h4>
+          <div class="zx-vote">
+            <button class="${bV.my==='up'?'voted':''}" onclick="zxVote('${b.id}','up')">👍 Upvote<span class="ct">${bV.up}</span></button>
+            <button class="${bV.my==='down'?'voted':''}" onclick="zxVote('${b.id}','down')">👎 Downvote<span class="ct">${bV.down}</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="zx-cta-grid">
+        <div class="zx-cta ${aWin?'win':''}">
+          <h4>${a.icon} ${a.name}</h4>
+          <p>${a.price||''} · ★ ${a.rating||''}</p>
+          <a class="btnx" href="${a.link||'#'}" target="_blank" rel="noopener">Try ${a.name} →</a>
+        </div>
+        <div class="zx-cta ${bWin?'win':''}">
+          <h4>${b.icon} ${b.name}</h4>
+          <p>${b.price||''} · ★ ${b.rating||''}</p>
+          <a class="btnx" href="${b.link||'#'}" target="_blank" rel="noopener">Try ${b.name} →</a>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:center">
+        <button class="btn btn-ghost btn-sm" onclick="zxOpenTopic('${a._topic||'ai-tools'}',null)">View alternatives →</button>
+      </div>
+    `;
+  };
+
+  // ── BOOT ───────────────────────────────────────────────────────
+  function boot(){
+    injectSidebar();
+    ensureViews();
+    syncToDB();
+    if (!getPersona() && !sessionStorage.getItem('zx_persona_skip')) {
+      sessionStorage.setItem('zx_persona_skip','1');
+      setTimeout(()=>document.getElementById('zx-persona-modal').classList.add('open'), 800);
+    }
+  }
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+  setTimeout(boot, 600);
+  setTimeout(boot, 1800);
+})();
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ZAXIS v12 ENHANCEMENT  •  Smart Compare + Premium Tool Cards
+     Cyberpunk · Neon Purple #8B5CF6 · Electric Cyan #06B6D4
+     ═══════════════════════════════════════════════════════════ -->
+<style>
+:root{
+  --zx12-purple:#8B5CF6; --zx12-cyan:#06B6D4;
+  --zx12-glow-p: 0 0 24px rgba(139,92,246,.45);
+  --zx12-glow-c: 0 0 24px rgba(6,182,212,.40);
+  --zx12-grad: linear-gradient(135deg,#8B5CF6 0%,#06B6D4 100%);
+  --zx12-glass: rgba(18,18,28,.55);
+}
+
+/* ── Premium Tool Card ───────────────────────────────────────── */
+.zx12-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;}
+.zx12-card{
+  position:relative;background:var(--zx12-glass);
+  border:1px solid rgba(139,92,246,.28);
+  border-radius:18px;padding:20px;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s;
+  overflow:hidden;cursor:pointer;
+}
+.zx12-card::before{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+  background:var(--zx12-grad);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.zx12-card:hover{transform:translateY(-6px);box-shadow:var(--zx12-glow-p),0 20px 50px -20px rgba(0,0,0,.6);border-color:transparent;}
+.zx12-card:hover::before{opacity:1;}
+.zx12-card .logo{
+  width:56px;height:56px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(6,182,212,.18));
+  border:1px solid rgba(255,255,255,.08);margin-bottom:14px;
+}
+.zx12-card .nm{font-size:18px;font-weight:700;letter-spacing:-.01em;margin:0 0 4px;color:#fff;}
+.zx12-card .ds{font-size:12.5px;color:rgba(255,255,255,.55);margin:0 0 14px;line-height:1.45;min-height:34px;}
+.zx12-card .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.zx12-card .pill{
+  font-size:11px;font-weight:600;letter-spacing:.02em;
+  padding:4px 9px;border-radius:999px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.85);display:inline-flex;align-items:center;gap:4px;
+}
+.zx12-card .pill.star{color:#fbbf24;}
+.zx12-card .pill.fire{background:linear-gradient(135deg,rgba(251,146,60,.22),rgba(239,68,68,.22));border-color:rgba(251,146,60,.35);color:#fdba74;}
+.zx12-card .pill.price{background:linear-gradient(135deg,rgba(6,182,212,.18),rgba(139,92,246,.18));border-color:rgba(6,182,212,.35);color:#67e8f9;}
+.zx12-card .actions{display:flex;gap:8px;margin-top:14px;}
+.zx12-btn{
+  flex:1;text-align:center;text-decoration:none;
+  font-size:12.5px;font-weight:600;padding:9px 12px;border-radius:10px;
+  border:1px solid rgba(139,92,246,.4);color:#e9d5ff;background:rgba(139,92,246,.08);
+  transition:all .2s;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+}
+.zx12-btn:hover{background:rgba(139,92,246,.22);box-shadow:var(--zx12-glow-p);}
+.zx12-btn.primary{background:var(--zx12-grad);border-color:transparent;color:#fff;}
+.zx12-btn.primary:hover{box-shadow:var(--zx12-glow-c),var(--zx12-glow-p);}
+.zx12-card .ribbon{
+  position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;letter-spacing:.08em;
+  padding:4px 8px;border-radius:6px;background:var(--zx12-grad);color:#fff;
+  box-shadow:var(--zx12-glow-p);
+}
+
+/* ── Smart Compare Panel ─────────────────────────────────────── */
+.zx12-cmp{margin-bottom:24px;}
+.zx12-cmp-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:18px 22px;border-radius:16px 16px 0 0;
+  background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(6,182,212,.12));
+  border:1px solid rgba(139,92,246,.28);border-bottom:none;
+}
+.zx12-cmp-head h3{margin:0;font-size:18px;font-weight:700;color:#fff;display:flex;align-items:center;gap:10px;letter-spacing:-.01em;}
+.zx12-cmp-head h3 .dot{width:8px;height:8px;border-radius:50%;background:var(--zx12-cyan);box-shadow:var(--zx12-glow-c);animation:zx12pulse 2s infinite;}
+@keyframes zx12pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.4);}}
+.zx12-cmp-body{
+  background:var(--zx12-glass);border:1px solid rgba(139,92,246,.28);border-top:none;
+  border-radius:0 0 16px 16px;padding:18px 22px;backdrop-filter:blur(14px);
+}
+.zx12-verdict{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;margin:14px 0;border-radius:12px;
+  background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(139,92,246,.10));
+  border:1px solid rgba(251,191,36,.35);
+}
+.zx12-verdict .trophy{font-size:28px;filter:drop-shadow(0 0 12px rgba(251,191,36,.6));}
+.zx12-verdict .txt{flex:1;}
+.zx12-verdict .lbl{font-size:10px;font-weight:700;letter-spacing:.12em;color:#fbbf24;}
+.zx12-verdict .msg{font-size:15px;font-weight:600;color:#fff;margin-top:2px;}
+
+.zx12-matrix{width:100%;border-collapse:collapse;margin-top:8px;}
+.zx12-matrix th,.zx12-matrix td{
+  padding:11px 12px;text-align:center;font-size:13.5px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.zx12-matrix th{
+  font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(255,255,255,.55);text-align:left;
+}
+.zx12-matrix th:not(:first-child),.zx12-matrix td:not(:first-child){text-align:center;}
+.zx12-matrix td:first-child{text-align:left;font-weight:600;color:rgba(255,255,255,.75);font-size:12.5px;}
+.zx12-matrix .win{color:#a78bfa;font-weight:700;text-shadow:0 0 12px rgba(139,92,246,.5);}
+.zx12-matrix .yes{color:#34d399;}
+.zx12-matrix .no{color:#f87171;opacity:.7;}
+
+.zx12-vis{margin-top:18px;padding:16px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.06);}
+.zx12-vis .ttl{font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.zx12-vis-row{display:grid;grid-template-columns:90px 1fr 50px;gap:10px;align-items:center;margin-bottom:8px;font-size:12px;color:rgba(255,255,255,.7);}
+.zx12-vis-bar{height:10px;border-radius:6px;background:rgba(255,255,255,.05);overflow:hidden;position:relative;}
+.zx12-vis-bar>span{display:block;height:100%;border-radius:6px;background:var(--zx12-grad);box-shadow:var(--zx12-glow-p);transition:width .8s cubic-bezier(.2,.8,.2,1);}
+.zx12-vis-bar.alt>span{background:linear-gradient(135deg,#06B6D4,#22d3ee);box-shadow:var(--zx12-glow-c);}
+.zx12-vis-row .v{text-align:right;font-family:ui-monospace,monospace;color:#fff;font-weight:600;}
+
+.zx12-cta-row{display:flex;gap:10px;margin-top:18px;}
+.zx12-cta-row .zx12-btn{flex:1;padding:12px;font-size:13.5px;}
+
+@media (max-width:640px){
+  .zx12-matrix th,.zx12-matrix td{padding:9px 6px;font-size:12px;}
+  .zx12-cmp-head{flex-direction:column;align-items:flex-start;}
+}
+</style>
+
+<script>
+(function(){
+  const ZX12_FEATURE_LABELS = {
+    student:'Student Use', business:'Business Value', creator:'Creativity',
+    developer:'Coding', beginner:'Ease of Use', agency:'Agency Power'
+  };
+  function priceTier(s){
+    const m = String(s||'').match(/[\d.]+/);
+    const n = m?parseFloat(m[0]):0;
+    if(!n) return 'Free';
+    if(n<10) return '$';
+    if(n<25) return '$$';
+    if(n<60) return '$$$';
+    return '$$$$';
+  }
+  function hasFree(p){
+    const s=(p.price||'').toLowerCase();
+    return s.includes('free')||s.includes('freemium')||priceTier(p.price)==='Free';
+  }
+
+  // ── Premium Tool Card helper ──────────────────────────────────
+  window.zxToolCard = function(p, opts){
+    opts = opts || {};
+    const persona = (window.getPersona && window.getPersona()) || null;
+    const score = persona ? (p.scores?.[persona]?.toFixed(1) ?? p.rating ?? '—') : (p.rating ?? '—');
+    const trend = (opts.trending || (p.rating>=4.7)) ? '<span class="pill fire">🔥 Trending</span>' : '';
+    const ribbon = opts.ribbon ? `<span class="ribbon">${opts.ribbon}</span>` : '';
+    const desc = (p.desc || p._catName || 'Discover this tool').toString().slice(0,60);
+    const tier = priceTier(p.price);
+    const priceLbl = hasFree(p) ? '💰 Freemium' : `💰 ${p.price||tier}`;
+    return `
+      <div class="zx12-card" onclick="zxQuickCompare && zxQuickCompare('${p.id}')">
+        ${ribbon}
+        <div class="logo">${p.icon||'⚡'}</div>
+        <h4 class="nm">${p.name}</h4>
+        <p class="ds">${desc}</p>
+        <div class="meta">
+          <span class="pill star">⭐ ${score}</span>
+          ${trend}
+        </div>
+        <div class="meta"><span class="pill price">${priceLbl}</span></div>
+        <div class="actions">
+          <button class="zx12-btn" onclick="event.stopPropagation();zxQuickCompare && zxQuickCompare('${p.id}')">⚖️ Compare</button>
+          <a class="zx12-btn primary" href="${p.link||'#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+        </div>
+      </div>`;
+  };
+
+  // ── Override sub-page & trending grids to use new cards ──────
+  function reskin(){
+    const oldSub = window.zxOpenSub;
+    if (oldSub && !oldSub.__zx12){
+      window.zxOpenSub = function(t,c,s){
+        oldSub(t,c,s);
+        const ctx = window.__zxLastSub; if(!ctx) return;
+        const persona = window.getPersona && window.getPersona();
+        const sorted = [...ctx.s.products].sort((a,b)=>{
+          const sa = persona && a.scores?.[persona] || a.rating*2;
+          const sb = persona && b.scores?.[persona] || b.rating*2;
+          return sb - sa;
+        });
+        const grid = document.getElementById('zx-sub-products');
+        if (grid){
+          grid.className = 'zx12-cards';
+          grid.innerHTML = sorted.map((p,i)=>window.zxToolCard(p,{
+            ribbon: i===0 && persona ? `BEST FOR ${persona.toUpperCase()}` : (i===0?'TOP PICK':null),
+            trending: i<2
+          })).join('');
+        }
+      };
+      window.zxOpenSub.__zx12 = true;
+    }
+    const oldTrend = window.zxOpenTrending;
+    if (oldTrend && !oldTrend.__zx12){
+      window.zxOpenTrending = function(el){
+        oldTrend(el);
+        const grid = document.getElementById('zx-trending-grid');
+        if (!grid) return;
+        const persona = window.getPersona && window.getPersona();
+        const FLAT = (window.ZAXIS_TAXONOMY||[]).flatMap(t=>t.categories.flatMap(c=>c.subs.flatMap(s=>s.products.map(p=>({...p,_topicName:t.name,_catName:c.name})))));
+        const ranked = FLAT.sort((a,b)=>{
+          const sa = persona && a.scores?.[persona] || a.rating*2;
+          const sb = persona && b.scores?.[persona] || b.rating*2;
+          return sb - sa;
+        }).slice(0,16);
+        grid.className = 'zx12-cards';
+        grid.innerHTML = ranked.map((p,i)=>window.zxToolCard(p,{
+          ribbon:`#${i+1}`, trending:i<5
+        })).join('');
+      };
+      window.zxOpenTrending.__zx12 = true;
+    }
+  }
+
+  // ── Smart Compare panel injected on top of compare output ────
+  function injectCompareSkin(){
+    const oldRender = window.renderComparison;
+    if (!oldRender || oldRender.__zx12) return;
+    window.renderComparison = function(){
+      oldRender();
+      const out = document.getElementById('compare-output');
+      const aId = document.getElementById('cmp-a')?.value;
+      const bId = document.getElementById('cmp-b')?.value;
+      if (!out || !aId || !bId) return;
+      // findProduct via taxonomy fallback DB
+      const FLAT = (window.ZAXIS_TAXONOMY||[]).flatMap(t=>t.categories.flatMap(c=>c.subs.flatMap(s=>s.products)));
+      const find = id => FLAT.find(x=>x.id===id) || (window.DB?.products||[]).find(x=>x.id===id);
+      const a = find(aId), b = find(bId); if (!a||!b) return;
+      const persona = window.getPersona && window.getPersona();
+      const aScore = persona && a.scores?.[persona] ? a.scores[persona] : (a.rating||4)*2;
+      const bScore = persona && b.scores?.[persona] ? b.scores[persona] : (b.rating||4)*2;
+      const winner = aScore>=bScore ? a : b;
+      const personaLabel = persona ? (window.ZAXIS_PERSONAS||[]).find(x=>x.id===persona)?.name : 'creators';
+
+      // Build feature matrix rows
+      const keys = ['student','business','creator','developer','beginner','agency'];
+      const rows = keys.filter(k=>a.scores?.[k]!=null||b.scores?.[k]!=null).map(k=>{
+        const av=a.scores?.[k], bv=b.scores?.[k];
+        const aw = (av??-1)>(bv??-1), bw=(bv??-1)>(av??-1);
+        return `<tr>
+          <td>${ZX12_FEATURE_LABELS[k]||k}</td>
+          <td class="${aw?'win':''}">${av?.toFixed(1) ?? '—'}</td>
+          <td class="${bw?'win':''}">${bv?.toFixed(1) ?? '—'}</td>
+        </tr>`;
+      }).join('');
+
+      const aT = priceTier(a.price), bT = priceTier(b.price);
+      const aFree = hasFree(a), bFree = hasFree(b);
+      const aV = (a.rating||4)*2, bV = (b.rating||4)*2;
+      const maxScore = Math.max(aScore,bScore,1);
+
+      const panel = document.createElement('div');
+      panel.className = 'zx12-cmp';
+      panel.innerHTML = `
+        <div class="zx12-cmp-head">
+          <h3><span class="dot"></span>🔍 Compare AI Tools</h3>
+          <div style="font-size:12px;color:rgba(255,255,255,.55);font-family:ui-monospace,monospace">${a.name.toUpperCase()} VS ${b.name.toUpperCase()}</div>
+        </div>
+        <div class="zx12-cmp-body">
+          <div class="zx12-verdict">
+            <div class="trophy">🏆</div>
+            <div class="txt">
+              <div class="lbl">AI VERDICT</div>
+              <div class="msg">${winner.name} wins for ${personaLabel}</div>
+            </div>
+          </div>
+          <table class="zx12-matrix">
+            <thead><tr><th>Feature</th><th>${a.name}</th><th>${b.name}</th></tr></thead>
+            <tbody>
+              <tr><td>Price</td>
+                <td class="${aT.length<=bT.length?'win':''}">${aT}</td>
+                <td class="${bT.length<=aT.length?'win':''}">${bT}</td></tr>
+              ${rows}
+              <tr><td>User Rating</td>
+                <td class="${(a.rating||0)>=(b.rating||0)?'win':''}">★ ${a.rating??'—'}</td>
+                <td class="${(b.rating||0)>=(a.rating||0)?'win':''}">★ ${b.rating??'—'}</td></tr>
+              <tr><td>Free Plan</td>
+                <td class="${aFree?'yes':'no'}">${aFree?'✔':'✘'}</td>
+                <td class="${bFree?'yes':'no'}">${bFree?'✔':'✘'}</td></tr>
+            </tbody>
+          </table>
+
+          <div class="zx12-vis">
+            <div class="ttl">📊 Visual Graph</div>
+            <div class="zx12-vis-row"><span>${a.name}</span><div class="zx12-vis-bar"><span style="width:${(aScore/maxScore)*100}%"></span></div><span class="v">${aScore.toFixed(1)}</span></div>
+            <div class="zx12-vis-row"><span>${b.name}</span><div class="zx12-vis-bar alt"><span style="width:${(bScore/maxScore)*100}%"></span></div><span class="v">${bScore.toFixed(1)}</span></div>
+            <div style="height:8px"></div>
+            <div class="zx12-vis-row"><span>Value A</span><div class="zx12-vis-bar"><span style="width:${(aV/10)*100}%"></span></div><span class="v">${aV.toFixed(1)}</span></div>
+            <div class="zx12-vis-row"><span>Value B</span><div class="zx12-vis-bar alt"><span style="width:${(bV/10)*100}%"></span></div><span class="v">${bV.toFixed(1)}</span></div>
+          </div>
+
+          <div class="zx12-cta-row">
+            <a class="zx12-btn primary" href="${winner.link||'#'}" target="_blank" rel="noopener">⚡ Try ${winner.name}</a>
+            <button class="zx12-btn" onclick="document.getElementById('cmp-a').selectedIndex=0;document.getElementById('cmp-b').selectedIndex=0;renderComparison();">🔄 View Alternatives</button>
+          </div>
+        </div>`;
+      out.insertBefore(panel, out.firstChild);
+    };
+    window.renderComparison.__zx12 = true;
+  }
+
+  function init(){ reskin(); injectCompareSkin(); }
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+  setTimeout(init, 700);
+  setTimeout(init, 2000);
+})();
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════
+     ZAXIS v13 — Full taxonomy + Comparison Hub upgrade
+     Implements PDF guides: Category Structure + Comparison Hub.
+     Self-contained; mutates v12 globals after init.
+════════════════════════════════════════════════════════════════ -->
+<style>
+  /* Smart filter chip strip */
+  .zx13-filters{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0 6px;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,.06);}
+  .zx13-flabel{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45);width:100%;margin-bottom:4px;font-weight:600;}
+  .zx13-chip{
+    cursor:pointer;user-select:none;font-size:12.5px;font-weight:600;
+    padding:7px 13px;border-radius:999px;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+    color:rgba(255,255,255,.78);transition:all .2s ease;
+  }
+  .zx13-chip:hover{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.45);color:#fff;}
+  .zx13-chip.active{
+    background:linear-gradient(135deg,#8B5CF6,#06B6D4);color:#fff;border-color:transparent;
+    box-shadow:0 0 18px rgba(139,92,246,.45);
+  }
+  /* Compare hub mode tabs */
+  .zx13-modes{display:flex;gap:6px;padding:6px;background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);border-radius:14px;margin-bottom:18px;width:fit-content;}
+  .zx13-mode{cursor:pointer;font-size:13px;font-weight:600;padding:8px 16px;border-radius:10px;
+    color:rgba(255,255,255,.65);transition:all .2s;}
+  .zx13-mode:hover{color:#fff;}
+  .zx13-mode.active{background:linear-gradient(135deg,#8B5CF6,#06B6D4);color:#fff;
+    box-shadow:0 0 18px rgba(139,92,246,.4);}
+  /* Multi-verdict block */
+  .zx13-verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:14px 0 18px;}
+  .zx13-verdict{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);
+    border-radius:12px;padding:12px 14px;}
+  .zx13-verdict .lbl{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:rgba(6,182,212,.85);font-weight:700;margin-bottom:4px;}
+  .zx13-verdict .val{font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;}
+  /* Use-case ranked list */
+  .zx13-uc-list{display:flex;flex-direction:column;gap:10px;}
+  .zx13-uc-row{display:flex;align-items:center;gap:14px;padding:14px;
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;
+    transition:all .2s;}
+  .zx13-uc-row:hover{border-color:rgba(139,92,246,.4);box-shadow:0 0 16px rgba(139,92,246,.2);}
+  .zx13-uc-rank{font-size:22px;font-weight:800;background:linear-gradient(135deg,#8B5CF6,#06B6D4);
+    -webkit-background-clip:text;background-clip:text;color:transparent;width:34px;text-align:center;}
+  .zx13-uc-ic{font-size:28px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;
+    background:rgba(139,92,246,.12);border-radius:12px;}
+  .zx13-uc-mid{flex:1;min-width:0;}
+  .zx13-uc-nm{font-size:15px;font-weight:700;color:#fff;}
+  .zx13-uc-meta{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px;}
+  .zx13-uc-score{font-size:20px;font-weight:800;color:#06B6D4;}
+  /* Recommendations strip */
+  .zx13-recs{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08);}
+  .zx13-recs-h{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);
+    font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .zx13-recs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+  /* Animated bar transition */
+  .zx12-bar i, .zx13-bar i{transition:width .9s cubic-bezier(.2,.8,.2,1);}
+  /* Mobile */
+  @media (max-width:720px){
+    .zx13-modes{width:100%;overflow-x:auto;}
+    .zx13-verdicts{grid-template-columns:1fr;}
+    .zx12-cmp-head{flex-direction:column;align-items:flex-start;gap:10px;}
+    .zx12-matrix{font-size:12px;}
+    .zx13-recs-grid{grid-template-columns:1fr 1fr;gap:10px;}
+    .zx13-mobile-sticky{position:sticky;top:0;z-index:50;background:rgba(10,10,18,.92);
+      backdrop-filter:blur(18px);padding:10px 0;margin:-10px 0 10px;}
+  }
+</style>
+
+<script>
+(function ZAXISv13(){
+  function ready(fn){
+    if (window.ZAXIS_TAXONOMY && window.ZAXIS_PERSONAS) fn();
+    else setTimeout(()=>ready(fn), 80);
+  }
+
+  ready(function(){
+    var T = function(id,name,icon,price,rating,scores,pros,cons,link,desc,tags){
+      return { id, name, icon, price, rating, scores, pros, cons, link, desc, tags:tags||[], votes:{up:0,down:0} };
+    };
+
+    // ── FULL TAXONOMY (PDF spec) ────────────────────────────────────
+    var TAX = [
+      { id:'ai-tools', icon:'🤖', name:'AI Tools', tagline:'Writing, image, video — your AI superpowers',
+        categories:[
+          { id:'ai-writing', name:'AI Writing Tools', icon:'✍️', subs:[{ id:'writing', name:'Writing', products:[
+            T('chatgpt','ChatGPT','💬','Freemium',4.9,{student:9.7,business:9.4,creator:9.6,developer:9.2,beginner:9.8,agency:9.0},['Best general reasoning','GPT-4o multimodal','Custom GPTs'],['Hallucinations'],'https://chat.openai.com','Industry-leading conversational AI.',['trending','ai','free','beginner','student','creator']),
+            T('jasper','Jasper AI','🤖','$49/mo',4.4,{student:6.5,business:9.0,creator:8.8,developer:6.0,beginner:7.5,agency:9.2},['Brand voice','50+ templates','SEO mode'],['No free plan','Pricey'],'https://www.jasper.ai/','AI for marketing teams.',['ai','premium','business']),
+            T('copyai','Copy.ai','✒️','Freemium',4.3,{student:7.5,business:8.6,creator:8.2,developer:5.5,beginner:8.5,agency:8.4},['90+ templates','Free tier','Workflows'],['Output quality varies'],'https://www.copy.ai/','Marketing copy generator.',['ai','free','beginner','business']),
+            T('writesonic','Writesonic','🪶','Freemium',4.3,{student:8.0,business:8.4,creator:8.5,developer:5.8,beginner:8.6,agency:8.0},['SEO articles','AI images included','Cheap'],['UI clutter'],'https://writesonic.com/','SEO-first AI writer.',['ai','free','student','creator']),
+            T('notion-ai','Notion AI','📓','$10/mo',4.6,{student:9.0,business:9.0,creator:8.7,developer:8.2,beginner:9.2,agency:8.5},['Inside Notion','Great summaries','Cheap add-on'],['Needs Notion'],'https://www.notion.so/product/ai','AI baked into your workspace.',['ai','student','business','beginner']),
+          ]}]},
+          { id:'ai-image', name:'AI Image Generation', icon:'🎨', subs:[{ id:'image', name:'Image', products:[
+            T('midjourney','Midjourney','🌌','$10/mo',4.8,{student:7.5,business:8.0,creator:9.7,developer:7.0,beginner:8.0,agency:9.2},['Best aesthetic','v6 photoreal','Strong community'],['Discord-based'],'https://www.midjourney.com/','Premier AI image generator.',['trending','ai','creator','premium']),
+            T('leonardo','Leonardo AI','🦁','Freemium',4.6,{student:8.5,business:8.2,creator:9.3,developer:7.4,beginner:8.7,agency:8.8},['Free credits daily','Fine-tuned models','Canvas editor'],['Slower at peak'],'https://leonardo.ai/','Powerful free-tier image AI.',['ai','free','creator','student']),
+            T('dalle','DALL·E','🖼️','Freemium',4.5,{student:8.5,business:8.5,creator:8.8,developer:7.8,beginner:9.2,agency:8.5},['In ChatGPT','Easy prompting','Reliable'],['Less artistic'],'https://openai.com/dall-e-3','OpenAI image generation.',['ai','beginner','free']),
+            T('canva-ai','Canva AI','🎨','Freemium',4.7,{student:9.4,business:8.8,creator:9.2,developer:6.5,beginner:9.6,agency:8.6},['All-in-one design','Magic Studio','Templates'],['Limited control'],'https://www.canva.com/ai-image-generator/','Design-first AI tools.',['ai','free','beginner','creator','student']),
+            T('firefly','Adobe Firefly','🔥','Freemium',4.5,{student:7.5,business:8.7,creator:9.1,developer:7.0,beginner:8.5,agency:9.0},['Commercial-safe','Photoshop integration','Generative fill'],['Credit caps'],'https://www.adobe.com/products/firefly.html','Adobe\'s creative AI.',['ai','creator','business']),
+          ]}]},
+          { id:'ai-video', name:'AI Video Tools', icon:'🎬', subs:[{ id:'video', name:'Video', products:[
+            T('runway','Runway','🎞️','Freemium',4.7,{student:7.8,business:8.5,creator:9.6,developer:7.5,beginner:8.0,agency:9.3},['Gen-3 video','Pro editing','Real-time effects'],['Compute-hungry'],'https://runwayml.com/','Cutting-edge AI video.',['trending','ai','creator','premium']),
+            T('synthesia','Synthesia','🧑‍💼','$30/mo',4.6,{student:6.5,business:9.4,creator:8.5,developer:6.5,beginner:9.0,agency:9.2},['AI avatars','140+ languages','Corporate-ready'],['No free tier'],'https://www.synthesia.io/','Avatar-based video at scale.',['ai','business','premium']),
+            T('pika','Pika Labs','🎥','Freemium',4.4,{student:8.0,business:7.5,creator:9.2,developer:7.0,beginner:8.5,agency:8.2},['Fast text-to-video','Free tier','Fun community'],['Short clips'],'https://pika.art/','Playful AI video.',['ai','free','creator']),
+            T('descript','Descript','🎙️','Freemium',4.7,{student:8.7,business:9.0,creator:9.5,developer:7.5,beginner:9.0,agency:9.0},['Edit by transcript','Overdub voice','Studio sound'],['Learning curve'],'https://www.descript.com/','Podcast & video editor.',['ai','creator','student','free']),
+            T('veed','VEED AI','📹','Freemium',4.5,{student:9.0,business:8.5,creator:9.0,developer:6.5,beginner:9.3,agency:8.6},['Browser-based','Auto subtitles','Easy UI'],['Watermark on free'],'https://www.veed.io/','Online video editor + AI.',['ai','free','beginner','creator','student']),
+          ]}]},
+        ]
+      },
+      { id:'tech', icon:'💻', name:'Tech Products', tagline:'Laptops, phones & audio gear',
+        categories:[
+          { id:'gaming-laptops', name:'Gaming Laptops', icon:'💻', subs:[{ id:'laptops', name:'Top picks', products:[
+            T('asus-rog','ASUS ROG','⚡','$1,800',4.7,{student:8.0,business:7.5,creator:8.8,developer:8.7,beginner:7.5,agency:8.0,gamer:9.6},['RGB everything','High refresh','Great cooling'],['Heavy'],'https://rog.asus.com/','Republic of Gamers flagship.',['gaming','tech','premium','trending']),
+            T('legion','Lenovo Legion','🛡️','$1,500',4.6,{student:8.5,business:7.5,creator:8.6,developer:8.5,beginner:8.0,agency:7.8,gamer:9.4},['Best value','Strong battery','Cool design'],['Avg speakers'],'https://www.lenovo.com/legion','Stealthy gaming powerhouse.',['gaming','tech']),
+            T('msi-raider','MSI Raider','🐉','$2,200',4.5,{student:6.5,business:7.0,creator:8.8,developer:8.6,beginner:6.5,agency:7.5,gamer:9.5},['Top-tier specs','4K display','Per-key RGB'],['Loud fans'],'https://www.msi.com/','High-performance gaming.',['gaming','tech','premium']),
+            T('alienware','Alienware M-Series','👽','$2,500',4.6,{student:6.0,business:7.5,creator:9.0,developer:8.7,beginner:6.0,agency:7.8,gamer:9.7},['Iconic design','Premium build','Strong support'],['Expensive'],'https://www.dell.com/alienware','Dell\'s premium gaming line.',['gaming','tech','premium']),
+            T('predator','Acer Predator','🐺','$1,700',4.5,{student:8.0,business:7.0,creator:8.5,developer:8.5,beginner:7.5,agency:7.5,gamer:9.3},['Aggressive value','Solid GPU','Big screen'],['Bulky'],'https://www.acer.com/predator','Acer\'s gaming flagship.',['gaming','tech']),
+          ]}]},
+          { id:'smartphones', name:'Smartphones', icon:'📱', subs:[{ id:'phones', name:'Top picks', products:[
+            T('iphone-16-pro','iPhone 16 Pro','📱','$999',4.8,{student:8.5,business:9.5,creator:9.6,developer:8.8,beginner:9.4,agency:9.3},['Best camera','iOS ecosystem','A18 chip'],['Pricey'],'https://www.apple.com/iphone-16-pro/','Apple\'s 2025 flagship.',['tech','trending','premium','creator','business']),
+            T('s25','Samsung Galaxy S25','📲','$899',4.7,{student:8.7,business:9.3,creator:9.4,developer:9.0,beginner:9.0,agency:9.1},['AI features','Stunning display','Versatile cameras'],['One UI bloat'],'https://www.samsung.com/galaxy-s25','Samsung\'s 2025 flagship.',['tech','trending','premium','creator']),
+            T('pixel-10','Google Pixel 10','📷','$799',4.6,{student:9.0,business:8.7,creator:9.2,developer:9.2,beginner:9.4,agency:8.7},['Magic Editor','Pure Android','7 yrs updates'],['Battery'],'https://store.google.com/','Google\'s AI-first phone.',['tech','trending','student','beginner']),
+            T('oneplus-14','OnePlus 14','⚙️','$799',4.5,{student:8.8,business:8.5,creator:8.7,developer:8.8,beginner:8.7,agency:8.4},['Fast charge','Smooth UI','Great value'],['Camera 2nd-tier'],'https://www.oneplus.com/','Speed-focused flagship.',['tech','student']),
+            T('nothing-phone','Nothing Phone','💡','$599',4.4,{student:9.2,business:7.8,creator:9.0,developer:8.5,beginner:8.7,agency:7.8},['Glyph design','Clean UI','Distinctive'],['Cameras OK'],'https://nothing.tech/','Design-led Android phone.',['tech','student','creator','beginner']),
+          ]}]},
+          { id:'audio', name:'Audio Devices', icon:'🎧', subs:[{ id:'audio-d', name:'Top picks', products:[
+            T('sony-xm6','Sony WH-1000XM6','🎧','$399',4.8,{student:8.7,business:9.3,creator:9.4,developer:9.0,beginner:9.2,agency:9.1},['Best ANC','30hr battery','Premium sound'],['Pricey'],'https://www.sony.com/','Best-in-class ANC headphones.',['tech','premium','trending']),
+            T('airpods-pro','AirPods Pro','🎵','$249',4.7,{student:9.0,business:9.1,creator:9.0,developer:8.5,beginner:9.5,agency:8.7},['Apple ecosystem','Spatial audio','Comfy'],['Battery'],'https://www.apple.com/airpods-pro/','Apple\'s flagship earbuds.',['tech','beginner','creator']),
+            T('jbl-flip','JBL Flip','🔊','$129',4.6,{student:9.4,business:7.5,creator:8.5,developer:7.0,beginner:9.4,agency:7.5},['Punchy bass','Waterproof','Affordable'],['Mono'],'https://www.jbl.com/','Portable Bluetooth speaker.',['tech','student','beginner']),
+            T('rode-nt-usb','Rode NT-USB','🎙️','$169',4.7,{student:8.5,business:8.7,creator:9.5,developer:7.5,beginner:9.0,agency:8.7},['Studio-grade','Plug & play','Great for podcasts'],['Stand basic'],'https://rode.com/','USB studio mic.',['tech','creator']),
+            T('logitech-gpro-x','Logitech G Pro X','🎮','$129',4.6,{student:8.7,business:7.0,creator:8.0,developer:7.5,beginner:8.5,agency:7.5,gamer:9.4},['Pro esports','Detachable mic','Comfy'],['Plastic build'],'https://www.logitechg.com/','Esports headset.',['tech','gaming']),
+          ]}]},
+        ]
+      },
+      { id:'earn', icon:'💰', name:'Earn Money Online', tagline:'Freelancing, affiliate & monetization platforms',
+        categories:[
+          { id:'freelancing', name:'Freelancing Platforms', icon:'💼', subs:[{ id:'freelance', name:'Top picks', products:[
+            T('fiverr','Fiverr','🟢','Free',4.5,{student:9.4,business:8.5,creator:9.0,developer:8.7,beginner:9.5,agency:8.0},['Low entry','Huge demand','Easy gigs'],['Race to bottom'],'https://www.fiverr.com/','Gig marketplace.',['earn','free','beginner','student']),
+            T('upwork','Upwork','🔵','Free',4.4,{student:8.5,business:9.0,creator:8.5,developer:9.4,beginner:8.0,agency:9.2},['High-value clients','Long contracts','Hourly tracking'],['Fees'],'https://www.upwork.com/','Top freelance platform.',['earn','free','business']),
+            T('toptal','Toptal','🏆','Free',4.6,{student:5.5,business:9.4,creator:7.5,developer:9.7,beginner:5.0,agency:9.5},['Top 3% only','Premium rates','Vetted'],['Hard screening'],'https://www.toptal.com/','Elite freelance network.',['earn','premium','business']),
+            T('contra','Contra','⚡','Free',4.5,{student:8.7,business:8.5,creator:9.3,developer:8.5,beginner:8.7,agency:8.5},['0% fees','Independent-first','Modern UI'],['Smaller pool'],'https://contra.com/','Commission-free freelance.',['earn','free','creator','beginner']),
+            T('freelancer','Freelancer.com','🟡','Free',4.0,{student:8.5,business:7.5,creator:7.5,developer:8.0,beginner:8.5,agency:7.0},['Project bidding','Contests','Wide variety'],['Spam'],'https://www.freelancer.com/','Classic freelance bidding.',['earn','free','beginner']),
+          ]}]},
+          { id:'affiliate', name:'Affiliate Marketing', icon:'🔗', subs:[{ id:'aff', name:'Top networks', products:[
+            T('impact','Impact','🌐','Free',4.6,{student:7.5,business:9.3,creator:9.0,developer:7.5,beginner:7.5,agency:9.4},['Premium brands','Robust tracking','SaaS partnerships'],['Approval slow'],'https://impact.com/','Enterprise affiliate platform.',['earn','free','business','startup']),
+            T('partnerstack','PartnerStack','🤝','Free',4.6,{student:7.5,business:9.2,creator:9.1,developer:7.5,beginner:7.5,agency:9.3},['SaaS focus','Recurring commissions','Great UX'],['Niche'],'https://partnerstack.com/','SaaS affiliate network.',['earn','free','startup','business','creator']),
+            T('amazon-associates','Amazon Associates','🟧','Free',4.3,{student:9.2,business:8.0,creator:9.4,developer:7.5,beginner:9.5,agency:7.5},['Trusted brand','Massive catalog','Easy approval'],['Low commissions'],'https://affiliate-program.amazon.com/','Amazon\'s affiliate program.',['earn','free','beginner','student','creator']),
+            T('clickbank','ClickBank','🟦','Free',4.0,{student:8.0,business:7.5,creator:8.5,developer:6.5,beginner:8.0,agency:7.5},['High commissions','Digital products','Easy entry'],['Quality varies'],'https://www.clickbank.com/','Digital product marketplace.',['earn','free']),
+            T('shareasale','ShareASale','🟪','Free',4.4,{student:8.0,business:8.7,creator:8.7,developer:7.0,beginner:8.0,agency:8.7},['Diverse merchants','Reliable payouts','Long-running'],['Dated UI'],'https://www.shareasale.com/','Multi-vertical affiliate network.',['earn','free','business']),
+          ]}]},
+          { id:'monetization', name:'Content Monetization', icon:'💵', subs:[{ id:'mon', name:'Top platforms', products:[
+            T('youtube','YouTube','▶️','Free',4.8,{student:9.5,business:8.7,creator:9.8,developer:8.0,beginner:9.5,agency:8.7},['Massive reach','Multiple revenue streams','Ad share'],['Algorithm-dependent'],'https://www.youtube.com/','World\'s biggest video platform.',['earn','free','creator','trending','beginner']),
+            T('patreon','Patreon','🅿️','Free',4.5,{student:8.5,business:7.5,creator:9.5,developer:7.0,beginner:8.7,agency:7.5},['Recurring income','Loyal fans','Tier system'],['Fees'],'https://www.patreon.com/','Membership for creators.',['earn','free','creator']),
+            T('substack','Substack','📰','Free',4.6,{student:8.7,business:8.0,creator:9.4,developer:8.0,beginner:9.0,agency:7.5},['Built-in audience','Email-first','Paid subs'],['Crowded niche'],'https://substack.com/','Newsletter monetization.',['earn','free','creator','student']),
+            T('kofi','Ko-fi','☕','Free',4.6,{student:9.0,business:7.0,creator:9.2,developer:7.5,beginner:9.4,agency:7.0},['0% on tips','Simple shop','Memberships'],['Smaller'],'https://ko-fi.com/','Tips & memberships, fee-free.',['earn','free','creator','beginner','student']),
+            T('bmc','Buy Me a Coffee','🍵','Free',4.6,{student:9.0,business:7.0,creator:9.2,developer:7.5,beginner:9.5,agency:7.0},['Easy setup','Memberships','Fan-friendly'],['Limited shop'],'https://www.buymeacoffee.com/','Tips, memberships & extras.',['earn','free','creator','beginner','student']),
+          ]}]},
+        ]
+      },
+      { id:'gaming', icon:'🎮', name:'Gaming', tagline:'Gear & consoles for serious play',
+        categories:[
+          { id:'gaming-gear', name:'Gaming Gear', icon:'🕹️', subs:[{ id:'gear', name:'Top gear', products:[
+            T('razer-kb','Razer Keyboard','⌨️','$169',4.6,{student:8.0,business:7.0,creator:8.5,developer:8.5,beginner:7.5,agency:7.0,gamer:9.5},['Pro-grade switches','Chroma RGB','Aluminum body'],['Software bloat'],'https://www.razer.com/','Esports-grade keyboard.',['gaming','premium','trending']),
+            T('g502','Logitech G502','🖱️','$80',4.7,{student:9.0,business:8.0,creator:9.0,developer:9.0,beginner:9.0,agency:8.0,gamer:9.6},['Iconic shape','25K DPI sensor','Customizable'],['Heavy'],'https://www.logitechg.com/','Legendary gaming mouse.',['gaming','student']),
+            T('steelseries','SteelSeries Headset','🎧','$199',4.6,{student:8.5,business:7.5,creator:8.5,developer:8.0,beginner:8.5,agency:7.5,gamer:9.5},['Sonar audio','Comfy','Dual wireless'],['Pricey'],'https://steelseries.com/','Premium gaming headset.',['gaming','premium']),
+            T('streamdeck','Elgato Stream Deck','🎛️','$149',4.8,{student:7.5,business:8.7,creator:9.7,developer:8.5,beginner:8.5,agency:9.0,gamer:9.0},['Custom macros','Streamer favorite','Plugin ecosystem'],['Companion app needed'],'https://www.elgato.com/','Programmable LCD keys.',['gaming','creator','trending']),
+            T('secretlab','Secretlab Chair','🪑','$549',4.8,{student:7.5,business:8.7,creator:9.0,developer:9.2,beginner:8.5,agency:8.7,gamer:9.6},['Premium build','Lumbar support','5yr warranty'],['Expensive'],'https://secretlab.co/','Top-rated gaming chair.',['gaming','premium']),
+          ]}]},
+          { id:'consoles', name:'Gaming Consoles', icon:'🎮', subs:[{ id:'cons', name:'Top consoles', products:[
+            T('ps5','PlayStation 5','🎮','$499',4.8,{student:8.7,business:7.0,creator:9.0,developer:8.0,beginner:9.4,agency:7.0,gamer:9.7},['Exclusives','Fast SSD','DualSense'],['Big'],'https://www.playstation.com/ps5/','Sony\'s flagship console.',['gaming','trending','beginner']),
+            T('xbox-x','Xbox Series X','🟢','$499',4.7,{student:8.7,business:7.0,creator:8.7,developer:8.5,beginner:9.3,agency:7.0,gamer:9.6},['Game Pass','4K 120fps','Quick Resume'],['Fewer exclusives'],'https://www.xbox.com/','Microsoft\'s flagship.',['gaming','beginner']),
+            T('switch-2','Nintendo Switch 2','🔴','$399',4.8,{student:9.4,business:7.0,creator:8.7,developer:7.5,beginner:9.6,agency:7.0,gamer:9.5},['Hybrid play','Nintendo exclusives','Family friendly'],['Battery'],'https://www.nintendo.com/','Nintendo\'s 2025 console.',['gaming','trending','student','beginner']),
+            T('steam-deck','Steam Deck','🎚️','$549',4.7,{student:9.0,business:7.0,creator:8.5,developer:8.7,beginner:8.5,agency:7.0,gamer:9.4},['PC gaming portable','Huge library','Open SteamOS'],['Heavy'],'https://www.steamdeck.com/','Valve\'s handheld PC.',['gaming','student','trending']),
+            T('quest-3','Meta Quest 3','🥽','$499',4.6,{student:8.5,business:8.0,creator:9.0,developer:9.0,beginner:8.7,agency:8.0,gamer:9.3},['Standalone VR','Mixed reality','No PC needed'],['Battery'],'https://www.meta.com/quest/','Standalone VR/MR headset.',['gaming','trending','creator']),
+          ]}]},
+        ]
+      },
+      { id:'smart', icon:'🏠', name:'Smart Lifestyle', tagline:'Smart home & wearables',
+        categories:[
+          { id:'smart-home', name:'Smart Home', icon:'🏠', subs:[{ id:'home', name:'Top devices', products:[
+            T('echo','Amazon Echo','🟦','$99',4.5,{student:8.7,business:7.5,creator:7.5,developer:8.0,beginner:9.5,agency:7.0},['Alexa ecosystem','Cheap','Music ready'],['Privacy questions'],'https://www.amazon.com/echo','Alexa-powered smart speaker.',['tech','beginner','free']),
+            T('nest-hub','Google Nest Hub','📺','$99',4.6,{student:8.7,business:7.7,creator:7.7,developer:8.0,beginner:9.4,agency:7.0},['Visual assistant','Photo frame','Smart home control'],['Limited apps'],'https://store.google.com/','Google smart display.',['tech','beginner']),
+            T('hue','Philips Hue','💡','$60+',4.7,{student:8.0,business:7.5,creator:9.0,developer:8.0,beginner:9.0,agency:7.0},['Best ecosystem','Color rich','Reliable'],['Hub needed'],'https://www.philips-hue.com/','Best smart bulbs.',['tech','creator']),
+            T('ring','Ring Doorbell','🔔','$99',4.4,{student:7.5,business:8.7,creator:7.0,developer:7.5,beginner:9.2,agency:8.0},['Easy install','HD video','Mobile alerts'],['Subscription'],'https://ring.com/','Smart video doorbell.',['tech','beginner','business']),
+            T('tplink','TP-Link Smart Plug','🔌','$15',4.6,{student:9.4,business:7.5,creator:7.0,developer:8.0,beginner:9.6,agency:7.0},['Cheap entry','Energy monitor','No hub'],['Wi-Fi only'],'https://www.tp-link.com/','Affordable smart plug.',['tech','student','beginner','free']),
+          ]}]},
+          { id:'wearables', name:'Wearables', icon:'⌚', subs:[{ id:'wear', name:'Top wearables', products:[
+            T('apple-watch-ultra','Apple Watch Ultra','⌚','$799',4.8,{student:7.5,business:9.0,creator:9.0,developer:8.5,beginner:8.7,agency:8.7},['Rugged','Best fitness on iOS','Long battery'],['iOS only','Pricey'],'https://www.apple.com/apple-watch-ultra/','Apple\'s adventure watch.',['tech','premium','trending']),
+            T('galaxy-watch','Samsung Galaxy Watch','⌚','$329',4.6,{student:8.5,business:8.5,creator:8.5,developer:8.5,beginner:8.7,agency:8.0},['Wear OS','Great display','Health sensors'],['Battery'],'https://www.samsung.com/galaxy-watch','Samsung flagship watch.',['tech']),
+            T('fitbit','Fitbit Charge','🏃','$159',4.5,{student:9.2,business:7.7,creator:7.5,developer:7.5,beginner:9.4,agency:7.0},['Best for fitness','7-day battery','Cheap'],['Subscription perks'],'https://www.fitbit.com/','Fitness-focused tracker.',['tech','student','beginner']),
+            T('oura','Oura Ring','💍','$299',4.7,{student:8.0,business:9.0,creator:8.7,developer:8.0,beginner:8.7,agency:8.5},['Discreet','Best sleep tracking','Long battery'],['Subscription'],'https://ouraring.com/','Smart ring for health.',['tech','trending','business']),
+            T('meta-glasses','Meta Smart Glasses','🕶️','$299',4.4,{student:8.0,business:8.5,creator:9.2,developer:8.0,beginner:8.5,agency:8.5},['Hands-free capture','Stylish','AI assistant'],['Battery'],'https://www.meta.com/smart-glasses/','Ray-Ban Meta AI glasses.',['tech','trending','creator']),
+          ]}]},
+        ]
+      },
+    ];
+
+    // Replace taxonomy in place
+    var TAXONOMY = window.ZAXIS_TAXONOMY;
+    TAXONOMY.length = 0;
+    TAX.forEach(function(t){ TAXONOMY.push(t); });
+
+    // Rebuild flat index
+    var FLAT = [];
+    TAXONOMY.forEach(function(t){ t.categories.forEach(function(c){ c.subs.forEach(function(s){ s.products.forEach(function(p){
+      FLAT.push(Object.assign({}, p, { _topic:t.id, _cat:c.id, _sub:s.id, _topicName:t.name, _catName:c.name, _subName:s.name }));
+    });});});});
+    window.ZAXIS_FLAT = FLAT;
+
+    // Re-sync to DB.products
+    if (window.DB && Array.isArray(window.DB.products)) {
+      var existing = new Set(window.DB.products.map(function(p){return p.id;}));
+      FLAT.forEach(function(p){
+        if (existing.has(p.id)) return;
+        window.DB.products.push({
+          id:p.id, title:p.name, slug:p.id, description:p.desc||'', price:p.price,
+          image_url:p.icon, category_id:p._cat, rating:typeof p.rating==='number'?p.rating:4.5,
+          status:'published', affiliate_link:p.link, commission:'', pros:p.pros||[], cons:p.cons||[],
+          created_at:new Date().toISOString(), _zx:true, _scores:p.scores, _tags:p.tags||[]
+        });
+      });
+      if (typeof window.populateCompareSelects==='function') window.populateCompareSelects();
+    }
+
+    // Re-render sidebar topics list (replace existing topic nav-items with new TAXONOMY)
+    (function rebuildSidebar(){
+      var nav = document.querySelector('.sidebar-nav');
+      if (!nav) return;
+      // Find topics block by hunting for sidebar-section-label "Browse by topic"
+      var labels = nav.querySelectorAll('.sidebar-section-label');
+      var topicLabel = null;
+      labels.forEach(function(l){ if (/browse by topic/i.test(l.textContent)) topicLabel = l; });
+      if (!topicLabel) return;
+      // Remove subsequent nav-items until next section label or end (only the topic ones, not Trending/Compare/Favorites)
+      var node = topicLabel.nextSibling;
+      var toRemove = [];
+      while (node) {
+        if (node.nodeType===1 && node.classList && node.classList.contains('nav-item')) {
+          var txt = node.textContent || '';
+          if (/trending|compare hub|favorites/i.test(txt)) break;
+          toRemove.push(node);
+        }
+        node = node.nextSibling;
+      }
+      toRemove.forEach(function(n){ n.remove(); });
+      // Insert new
+      var firstSibling = topicLabel.nextSibling;
+      TAXONOMY.forEach(function(t){
+        var div = document.createElement('div');
+        div.className = 'nav-item';
+        div.setAttribute('onclick',"zxOpenTopic('"+t.id+"', this)");
+        div.innerHTML = '<span class="nav-icon">'+t.icon+'</span> '+t.name;
+        nav.insertBefore(div, firstSibling);
+      });
+    })();
+
+    // ── SMART FILTERS ───────────────────────────────────────────────
+    var SMART_FILTERS = [
+      { id:'trending',   label:'🔥 Trending Now',    test:function(p){ return (p._tags||p.tags||[]).indexOf('trending')>-1; } },
+      { id:'student',    label:'🎓 Best for Students', test:function(p){ return (p._scores||p.scores||{}).student>=9; } },
+      { id:'creator',    label:'🎨 Best for Creators', test:function(p){ return (p._scores||p.scores||{}).creator>=9; } },
+      { id:'beginner',   label:'🌱 Beginner Friendly', test:function(p){ return (p._scores||p.scores||{}).beginner>=9; } },
+      { id:'premium',    label:'💎 Premium Picks',  test:function(p){ return (p._tags||p.tags||[]).indexOf('premium')>-1 || /\$\d{3,}/.test(p.price||''); } },
+      { id:'earn',       label:'💰 Make Money Online', test:function(p){ return (p._topic||p._topicName||'').toString().toLowerCase().indexOf('earn')>-1 || (p._tags||p.tags||[]).indexOf('earn')>-1; } },
+      { id:'startup',    label:'🚀 Startup Tools',  test:function(p){ return (p._tags||p.tags||[]).indexOf('startup')>-1 || (p._scores||p.scores||{}).business>=9; } },
+      { id:'gaming',     label:'🎮 Gaming Setup',   test:function(p){ return (p._tags||p.tags||[]).indexOf('gaming')>-1 || (p._topic||'').indexOf('gaming')>-1; } },
+      { id:'ai',         label:'🤖 AI-Powered',     test:function(p){ return (p._tags||p.tags||[]).indexOf('ai')>-1 || (p._topic||'').indexOf('ai')>-1; } },
+      { id:'free',       label:'🎁 Free to Start',  test:function(p){ return (p._tags||p.tags||[]).indexOf('free')>-1 || /free/i.test(p.price||''); } },
+    ];
+    window.ZAXIS_SMART_FILTERS = SMART_FILTERS;
+
+    function getFilter(){ try{ return localStorage.getItem('zx13_filter')||''; }catch(e){ return ''; } }
+    function setFilter(id){
+      var cur = getFilter();
+      try { localStorage.setItem('zx13_filter', cur===id?'':id); } catch(e){}
+      renderFilterBar();
+      // Re-render current view
+      var t = window.__zxCurrentTopic;
+      if (t && typeof window.zxOpenTopic==='function') window.zxOpenTopic(t, null);
+    }
+    window.zx13SetFilter = setFilter;
+
+    function renderFilterBar(){
+      // Insert above topic grid view
+      var hosts = ['view-zx-topic','view-zx-trending'];
+      var cur = getFilter();
+      hosts.forEach(function(hid){
+        var host = document.getElementById(hid);
+        if (!host) return;
+        var bar = host.querySelector('.zx13-filters');
+        if (!bar) {
+          bar = document.createElement('div');
+          bar.className = 'zx13-filters';
+          var header = host.querySelector('.view-header');
+          if (header && header.nextSibling) host.insertBefore(bar, header.nextSibling);
+          else host.appendChild(bar);
+        }
+        bar.innerHTML = '<div class="zx13-flabel">⚡ Smart Filters</div>' +
+          SMART_FILTERS.map(function(f){
+            return '<div class="zx13-chip '+(cur===f.id?'active':'')+'" onclick="zx13SetFilter(\''+f.id+'\')">'+f.label+'</div>';
+          }).join('');
+      });
+    }
+
+    // Wrap zxOpenTopic to apply active filter to the rendered grid
+    var origOpenTopic = window.zxOpenTopic;
+    window.zxOpenTopic = function(topicId, navEl){
+      origOpenTopic(topicId, navEl);
+      renderFilterBar();
+      var cur = getFilter();
+      if (!cur) return;
+      var f = SMART_FILTERS.find(function(x){return x.id===cur;});
+      if (!f) return;
+      var grid = document.getElementById('zx-topic-grid');
+      if (!grid) return;
+      // Replace grid with subcategory tiles filtered by whether they have any matching product
+      var t = TAXONOMY.find(function(x){return x.id===topicId;});
+      if (!t) return;
+      var html = '';
+      t.categories.forEach(function(c){
+        c.subs.forEach(function(s){
+          var matches = s.products.filter(function(p){ return f.test(Object.assign({_topic:t.id,_cat:c.id}, p)); });
+          if (!matches.length) return;
+          html += '<div class="zx-tile" onclick="zxOpenSub(\''+t.id+'\',\''+c.id+'\',\''+s.id+'\')">'+
+            '<div style="font-size:28px">'+c.icon+'</div>'+
+            '<div style="font-weight:700;margin-top:6px">'+c.name+' · '+s.name+'</div>'+
+            '<div style="opacity:.6;font-size:12px;margin-top:4px">'+matches.length+' picks match "'+f.label+'"</div></div>';
+        });
+      });
+      grid.innerHTML = html || '<div style="opacity:.55;padding:20px">No products match this filter in this topic.</div>';
+    };
+
+    // ── COMPARISON HUB v13 ──────────────────────────────────────────
+    function getMode(){ try{ return localStorage.getItem('zx13_cmpmode')||'tool'; }catch(e){ return 'tool'; } }
+    function setMode(m){ try{ localStorage.setItem('zx13_cmpmode', m); }catch(e){} renderModeUI(); if (window.renderComparison) window.renderComparison(); }
+    window.zx13SetMode = setMode;
+
+    function renderModeUI(){
+      var view = document.getElementById('view-compare') || document.querySelector('[data-view="compare"]');
+      if (!view) return;
+      var bar = view.querySelector('.zx13-modes');
+      var cur = getMode();
+      if (!bar) {
+        bar = document.createElement('div');
+        bar.className = 'zx13-modes zx13-mobile-sticky';
+        var first = view.firstElementChild;
+        view.insertBefore(bar, first);
+      }
+      bar.innerHTML =
+        '<div class="zx13-mode '+(cur==='tool'?'active':'')+'" onclick="zx13SetMode(\'tool\')">⚔️ Tool vs Tool</div>'+
+        '<div class="zx13-mode '+(cur==='product'?'active':'')+'" onclick="zx13SetMode(\'product\')">📱 Product vs Product</div>'+
+        '<div class="zx13-mode '+(cur==='usecase'?'active':'')+'" onclick="zx13SetMode(\'usecase\')">🎯 Use-Case</div>';
+    }
+
+    function priceRank(p){
+      var s = (p.price||'').toString();
+      if (/free/i.test(s) && !/\$/.test(s)) return 0;
+      var m = s.match(/\$(\d[\d,]*)/); if (!m) return 1;
+      var n = parseInt(m[1].replace(/,/g,''),10);
+      if (n<50) return 1; if (n<200) return 2; if (n<800) return 3; return 4;
+    }
+
+    function buildVerdicts(items){
+      // items: array of products with _scores
+      var personas = [
+        { key:'creator',  label:'Best for Creators' },
+        { key:'developer',label:'Best for Coding' },
+        { key:'business', label:'Best for Business' },
+        { key:'student',  label:'Best for Students' },
+        { key:'beginner', label:'Best Beginner Pick' },
+      ];
+      var out = [];
+      personas.forEach(function(p){
+        var winner = items.slice().sort(function(a,b){
+          return ((b._scores||b.scores||{})[p.key]||0) - ((a._scores||a.scores||{})[p.key]||0);
+        })[0];
+        if (winner) out.push({ lbl:p.label, val:(winner.icon||'•')+' '+(winner.title||winner.name) });
+      });
+      // Best value = highest avg score / priceRank
+      var bv = items.slice().sort(function(a,b){
+        var avgA = avgScore(a), avgB = avgScore(b);
+        return (avgB/(priceRank(b)+0.5)) - (avgA/(priceRank(a)+0.5));
+      })[0];
+      if (bv) out.push({ lbl:'Best Value', val:'💎 '+(bv.title||bv.name) });
+      return out;
+    }
+    function avgScore(p){
+      var s = p._scores||p.scores||{}; var keys = Object.keys(s); if (!keys.length) return 0;
+      var sum=0; keys.forEach(function(k){ sum+=s[k]; }); return sum/keys.length;
+    }
+
+    function findRecs(excludeIds, topicHint){
+      var pool = (window.DB && window.DB.products) ? window.DB.products : [];
+      var ex = new Set(excludeIds);
+      var scored = pool.filter(function(p){ return !ex.has(p.id) && p._zx; }).map(function(p){
+        return { p:p, s:avgScore(p) + (topicHint && p.category_id===topicHint ? 1 : 0) };
+      }).sort(function(a,b){ return b.s-a.s; }).slice(0,4);
+      return scored.map(function(x){return x.p;});
+    }
+
+    // Wrap renderComparison to add v13 features
+    var prevRender = window.renderComparison;
+    window.renderComparison = function(){
+      var mode = getMode();
+      // Use-case mode: render ranked top 3 by current persona, ignoring selects
+      if (mode === 'usecase') {
+        var host = document.querySelector('[data-comparison-output]') || document.getElementById('compare-output') || document.getElementById('comparison-result') || document.querySelector('.comparison-result');
+        // Fallback: find any container in compare view
+        if (!host) {
+          var v = document.getElementById('view-compare') || document.querySelector('.view.active');
+          if (v) {
+            host = v.querySelector('.zx-cmp-out');
+            if (!host) { host = document.createElement('div'); host.className='zx-cmp-out'; v.appendChild(host); }
+          }
+        }
+        if (!host) { renderModeUI(); return; }
+        var personaId = (function(){ try{ return localStorage.getItem('zx_persona'); }catch(e){return null;} })() || 'creator';
+        var personaObj = (window.ZAXIS_PERSONAS||[]).find(function(p){return p.id===personaId;}) || {name:'creators',icon:'🎨',id:'creator'};
+        var pool = (window.DB&&window.DB.products) ? window.DB.products.filter(function(p){return p._zx;}) : [];
+        var ranked = pool.slice().sort(function(a,b){
+          return ((b._scores||{})[personaObj.id]||0) - ((a._scores||{})[personaObj.id]||0);
+        }).slice(0,5);
+        var rowsHtml = ranked.map(function(p,i){
+          var sc = ((p._scores||{})[personaObj.id]||0).toFixed(1);
+          return '<div class="zx13-uc-row">'+
+            '<div class="zx13-uc-rank">#'+(i+1)+'</div>'+
+            '<div class="zx13-uc-ic">'+(p.image_url||'•')+'</div>'+
+            '<div class="zx13-uc-mid"><div class="zx13-uc-nm">'+p.title+'</div>'+
+              '<div class="zx13-uc-meta">'+(p.description||'')+' · '+(p.price||'')+'</div></div>'+
+            '<div class="zx13-uc-score">'+sc+'<span style="font-size:11px;opacity:.6">/10</span></div>'+
+            '<a class="zx12-btn primary" href="'+(p.affiliate_link||'#')+'" target="_blank" rel="noopener">Try →</a>'+
+          '</div>';
+        }).join('');
+        host.innerHTML =
+          '<div class="zx12-cmp">'+
+          '<div class="zx12-cmp-head"><h3><span class="dot"></span>🎯 Best Picks for '+personaObj.icon+' '+personaObj.name+'</h3>'+
+          '<div style="opacity:.6;font-size:12px">Ranked across all topics by persona score</div></div>'+
+          '<div class="zx13-uc-list">'+rowsHtml+'</div>'+
+          '</div>';
+        renderModeUI();
+        return;
+      }
+      // Otherwise: run previous renderComparison, then enhance
+      if (typeof prevRender === 'function') prevRender();
+      renderModeUI();
+      enhancePanel();
+    };
+
+    function enhancePanel(){
+      // Find the compare panel injected by v12
+      var panel = document.querySelector('.zx12-cmp');
+      if (!panel) return;
+      // Avoid double-inject
+      if (panel.querySelector('.zx13-verdicts')) {
+        // refresh recs only
+        return;
+      }
+      // Identify the two compared products via select values
+      var aSel = document.getElementById('cmp-a'), bSel = document.getElementById('cmp-b');
+      if (!aSel || !bSel) return;
+      var pool = (window.DB&&window.DB.products)||[];
+      var A = pool.find(function(p){return p.id===aSel.value;});
+      var B = pool.find(function(p){return p.id===bSel.value;});
+      if (!A || !B) return;
+      var verdicts = buildVerdicts([A,B]);
+      var verdictHtml = '<div class="zx13-verdicts">'+
+        verdicts.map(function(v){return '<div class="zx13-verdict"><div class="lbl">'+v.lbl+'</div><div class="val">'+v.val+'</div></div>';}).join('')+
+      '</div>';
+      // Insert after the head
+      var head = panel.querySelector('.zx12-cmp-head');
+      if (head && head.parentNode) {
+        var wrap = document.createElement('div');
+        wrap.innerHTML = verdictHtml;
+        head.parentNode.insertBefore(wrap.firstChild, head.nextSibling);
+      }
+      // Animate bars: set width after a tick
+      requestAnimationFrame(function(){
+        panel.querySelectorAll('.zx12-bar i').forEach(function(b){
+          var w = b.style.width; if (!w) return;
+          b.style.width = '0%';
+          setTimeout(function(){ b.style.width = w; }, 30);
+        });
+      });
+      // Recommendations strip
+      var recs = findRecs([A.id,B.id], A.category_id);
+      if (recs.length) {
+        var recHtml = '<div class="zx13-recs"><div class="zx13-recs-h">✨ You might also like</div>'+
+          '<div class="zx13-recs-grid">'+recs.map(function(p){
+            return '<div class="zx12-card">'+
+              '<div class="logo">'+(p.image_url||'•')+'</div>'+
+              '<div class="nm">'+p.title+'</div>'+
+              '<div class="ds">'+(p.description||'').slice(0,60)+'</div>'+
+              '<div class="meta"><span class="pill star">⭐ '+(p.rating||4.5)+'</span><span class="pill price">'+(p.price||'Free')+'</span></div>'+
+              '<div class="actions"><a class="zx12-btn primary" href="'+(p.affiliate_link||'#')+'" target="_blank" rel="noopener">Visit</a></div>'+
+            '</div>';
+          }).join('')+'</div></div>';
+        panel.insertAdjacentHTML('beforeend', recHtml);
+      }
+      panel.classList.add('zx13-mobile-sticky-parent');
+    }
+
+    // Initial paint
+    renderModeUI();
+    renderFilterBar();
+    if (window.zxOpenTopic && window.__zxCurrentTopic) {
+      // refresh
+    }
+    // Force compare re-render once selects are populated
+    setTimeout(function(){ if (window.renderComparison) window.renderComparison(); }, 200);
+
+    console.log('✅ ZAXIS v13 patch active — full taxonomy + Compare Hub upgrade');
+  });
+})();
+</script>
+
 </body>
 </html>
